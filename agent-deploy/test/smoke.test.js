@@ -102,6 +102,9 @@ test('codex developer profile installs skills, agents, mcp toml, and command ski
   assertDeveloperWorkflowSkills(path.join(project, '.agents'));
   assert.ok(fs.existsSync(path.join(project, '.codex/agents/code-reviewer.md')));
   assert.ok(fs.existsSync(path.join(project, '.codex/agents/architecture-reviewer.md')));
+  // prompts mirror under the shared .agents/ root (parity with Claude/Gemini)
+  assert.ok(fs.existsSync(path.join(project, '.agents/prompts/_universal-template.md')));
+  assert.ok(fs.existsSync(path.join(project, '.agents/prompts/dev-implementation.md')));
 
   const toml = fs.readFileSync(path.join(project, '.codex/config.toml'), 'utf8');
   assert.match(toml, /\[mcp_servers\.company-docs\]/);
@@ -163,6 +166,8 @@ test('gemini developer profile installs commands, fallback agents/skills, and mc
   assert.ok(fs.existsSync(path.join(project, '.gemini/agents/code-reviewer.md')));
   assert.ok(fs.existsSync(path.join(project, '.gemini/agents/architecture-reviewer.md')));
   assertDeveloperWorkflowSkills(path.join(project, '.gemini'));
+  assert.ok(fs.existsSync(path.join(project, '.gemini/prompts/_universal-template.md')));
+  assert.ok(fs.existsSync(path.join(project, '.gemini/prompts/dev-implementation.md')));
 
   const skipOps = plan.operations.filter((o) => o.kind === 'skip');
   assert.ok(skipOps.some((o) => o.sourceRel === 'mcp' && /MCP config policy/.test(o.reason)));
@@ -214,6 +219,10 @@ test('merge-json preserves pre-existing user keys', () => {
   assert.ok(mcp.mcpServers['company-docs'], 'company key added');
   // prompt-asset is cross-role knowledge capture: present from the core profile up
   assert.ok(fs.existsSync(path.join(project, '.claude/skills/prompt-asset/SKILL.md')));
+  // universal skeleton ships with the skill; starter task templates ship with prompt-library
+  assert.ok(fs.existsSync(path.join(project, '.claude/prompts/_universal-template.md')));
+  assert.ok(fs.existsSync(path.join(project, '.claude/prompts/dev-implementation.md')));
+  assert.ok(fs.existsSync(path.join(project, '.claude/prompts/research.md')));
 });
 
 test('apply --dry-run --json emits valid JSON on stdout (no trailing text)', () => {

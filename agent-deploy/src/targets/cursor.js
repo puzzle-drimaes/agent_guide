@@ -56,6 +56,7 @@ export default createAdapter({
             break;
           case 'agents':
           case 'skills':
+          case 'prompts':
             ops.push(...mirrorOps({ moduleId: module.id, assetRoot, sourceRel, destRoot: root }));
             break;
           case 'commands':

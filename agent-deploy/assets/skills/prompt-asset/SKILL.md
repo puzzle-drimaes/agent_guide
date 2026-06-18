@@ -30,8 +30,17 @@ secrets, or customer-identifying content — strip or placeholder it first.
 
 ## Prompt DB entry
 
-Produce these fields (Notion Prompt DB schema). Leave usage/success metrics blank for
-a new entry; they are filled by operations over time.
+Produce these fields (Notion Prompt DB schema). Write the `프롬프트 본문` field on the
+company prompt skeleton — start from the installed templates and pick the closest one:
+
+```text
+Codex:  .agents/prompts/      (_universal-template.md + task templates)
+Claude: .claude/prompts/
+Gemini: .gemini/prompts/
+Cursor: .cursor/prompts/
+```
+
+Leave usage/success metrics blank for a new entry; they are filled by operations over time.
 
 ```text
 이름:

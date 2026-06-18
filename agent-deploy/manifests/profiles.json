@@ -8,6 +8,7 @@
       "baseline-rules",
       "review-agent",
       "prompt-asset-skill",
+      "prompt-library",
       "mcp-baseline"
     ],
     "sdd": [
@@ -34,6 +35,7 @@
       "company-code-review-skill",
       "spec-writing-skill",
       "prompt-asset-skill",
+      "prompt-library",
       "planning-command",
       "mcp-baseline"
     ],
@@ -54,6 +56,7 @@
       "company-code-review-skill",
       "spec-writing-skill",
       "prompt-asset-skill",
+      "prompt-library",
       "planning-command",
       "mcp-baseline"
     ]

@@ -85,6 +85,9 @@ export default createAdapter({
           case 'skills':
             ops.push(...mirrorOps({ moduleId: module.id, assetRoot, sourceRel, destRoot: sharedRoot }));
             break;
+          case 'prompts':
+            ops.push(...mirrorOps({ moduleId: module.id, assetRoot, sourceRel, destRoot: sharedRoot }));
+            break;
           case 'agents':
             ops.push(...mirrorOps({ moduleId: module.id, assetRoot, sourceRel, destRoot: codexRoot }));
             break;

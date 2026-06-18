@@ -467,6 +467,8 @@ governance
 - [x] `assets/skills/company-code-review/` (Review Before Done, developer)
 - [x] `assets/skills/spec-writing/` (SDD-full spec authoring, developer)
 - [x] `assets/skills/prompt-asset/` (knowledge capture, 전 직무 공통; core/developer/full)
+- [x] `assets/prompts/_universal-template.md` (범용 프롬프트 골격, prompt-asset-skill 모듈에 동봉)
+- [x] `assets/prompts/` 스타터 라이브러리 (dev/doc/comparison/research, `prompt-library` 모듈; core/developer/full)
 - [ ] `assets/skills/meeting-summary/`
 - [ ] `assets/skills/customer-response/`
 - [ ] `assets/prompts/product/`

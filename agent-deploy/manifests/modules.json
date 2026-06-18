@@ -272,9 +272,10 @@
     },
     {
       "id": "prompt-asset-skill",
-      "description": "Knowledge-capture skill: turn a reusable prompt into a Prompt DB entry and propose promotion",
+      "description": "Knowledge-capture skill + universal prompt template: turn a reusable prompt into a Prompt DB entry and propose promotion",
       "paths": [
-        "skills/prompt-asset"
+        "skills/prompt-asset",
+        "prompts/_universal-template.md"
       ],
       "targets": [
         "claude",
@@ -284,6 +285,27 @@
       ],
       "dependencies": [
         "baseline-rules"
+      ],
+      "cost": "light",
+      "stability": "stable"
+    },
+    {
+      "id": "prompt-library",
+      "description": "Starter prompt templates (dev/doc/comparison/research) following the company skeleton",
+      "paths": [
+        "prompts/dev-implementation.md",
+        "prompts/doc-writing.md",
+        "prompts/comparison-analysis.md",
+        "prompts/research.md"
+      ],
+      "targets": [
+        "claude",
+        "cursor",
+        "codex",
+        "gemini"
+      ],
+      "dependencies": [
+        "prompt-asset-skill"
       ],
       "cost": "light",
       "stability": "stable"
