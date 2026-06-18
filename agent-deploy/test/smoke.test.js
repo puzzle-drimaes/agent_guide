@@ -48,6 +48,64 @@ test('minimal profile does NOT include developer architecture assets', () => {
   assert.ok(!fs.existsSync(path.join(project, '.claude/skills')), 'no skills in minimal');
 });
 
+test('codex minimal profile installs AGENTS.md, project rules, and shared install-state', () => {
+  const project = tmpProject();
+  applyPlan(buildPlan({ target: 'codex', profile: 'minimal', projectRoot: project }));
+
+  assert.ok(fs.existsSync(path.join(project, 'AGENTS.md')));
+  assert.ok(fs.existsSync(path.join(project, '.agents/rules/common/security.md')));
+  assert.ok(!fs.existsSync(path.join(project, '.agents/rules/developer/architecture.md')), 'architecture scoped out of minimal');
+  assert.ok(fs.existsSync(path.join(project, '.agent-deploy/install-state.json')));
+
+  const state = JSON.parse(fs.readFileSync(path.join(project, '.agent-deploy/install-state.json'), 'utf8'));
+  assert.equal(state.target.target, 'codex');
+  assert.ok(state.operations.some((o) => o.kind === 'append-markdown' && o.dest.endsWith('AGENTS.md')));
+});
+
+test('codex developer profile installs skills, agents, mcp toml, and command skip reason', () => {
+  const project = tmpProject();
+  const plan = buildPlan({ target: 'codex', profile: 'developer', projectRoot: project });
+  applyPlan(plan);
+
+  assert.ok(fs.existsSync(path.join(project, '.agents/rules/developer/architecture.md')));
+  assert.ok(fs.existsSync(path.join(project, '.agents/skills/architecture-review/SKILL.md')));
+  assert.ok(fs.existsSync(path.join(project, '.codex/agents/code-reviewer.md')));
+  assert.ok(fs.existsSync(path.join(project, '.codex/agents/architecture-reviewer.md')));
+
+  const toml = fs.readFileSync(path.join(project, '.codex/config.toml'), 'utf8');
+  assert.match(toml, /\[mcp_servers\.company-docs\]/);
+  assert.match(toml, /url = "https:\/\/mcp\.internal\.example\.com\/docs"/);
+  assert.match(toml, /\[mcp_servers\.filesystem\]/);
+  assert.match(toml, /command = "npx"/);
+
+  const skipOps = plan.operations.filter((o) => o.kind === 'skip');
+  assert.ok(skipOps.some((o) => o.sourceRel === 'commands' && /no native slash-command/.test(o.reason)));
+});
+
+test('codex AGENTS.md managed block and TOML merge are add-only/idempotent', () => {
+  const project = tmpProject();
+  fs.writeFileSync(path.join(project, 'AGENTS.md'), '# Existing instructions\n\nKeep this.\n');
+  fs.mkdirSync(path.join(project, '.codex'), { recursive: true });
+  fs.writeFileSync(
+    path.join(project, '.codex/config.toml'),
+    'model = "gpt-5"\n\n[mcp_servers.company-docs]\nurl = "https://custom.example"\n',
+  );
+
+  const plan = buildPlan({ target: 'codex', profile: 'developer', projectRoot: project });
+  applyPlan(plan, { installedAt: '2026-01-01T00:00:00Z' });
+  applyPlan(plan, { installedAt: '2026-01-01T00:00:01Z' });
+
+  const agents = fs.readFileSync(path.join(project, 'AGENTS.md'), 'utf8');
+  assert.match(agents, /# Existing instructions/);
+  assert.equal((agents.match(/agent-deploy:codex:start/g) || []).length, 1);
+
+  const toml = fs.readFileSync(path.join(project, '.codex/config.toml'), 'utf8');
+  assert.match(toml, /model = "gpt-5"/);
+  assert.match(toml, /url = "https:\/\/custom\.example"/);
+  assert.equal((toml.match(/\[mcp_servers\.company-docs\]/g) || []).length, 1);
+  assert.match(toml, /\[mcp_servers\.filesystem\]/);
+});
+
 test('cursor flattens rules to .mdc and records a skip+reason for slash commands', () => {
   const project = tmpProject();
   const plan = buildPlan({ target: 'cursor', profile: 'developer', projectRoot: project });

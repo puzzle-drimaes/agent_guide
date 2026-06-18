@@ -35,7 +35,7 @@ export function buildState({ adapter, input, request, resolution, manifestVersio
     target: {
       id: adapter.id,
       target: adapter.target,
-      scope: adapter.scope,
+      scope: adapter.scopeOf(input),
       root: adapter.resolveRoot(input),
       statePath: adapter.statePath(input),
     },

@@ -2,9 +2,10 @@
 // To support a 3rd tool (Gemini CLI, Codex, OpenCode...), write one adapter
 // module and add it to this list.
 import claudeProject from './claude.js';
+import codexProject from './codex.js';
 import cursorProject from './cursor.js';
 
-const ADAPTERS = Object.freeze([claudeProject, cursorProject]);
+const ADAPTERS = Object.freeze([codexProject, claudeProject, cursorProject]);
 
 export function listAdapters() {
   return ADAPTERS.slice();

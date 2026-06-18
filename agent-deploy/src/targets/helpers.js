@@ -28,6 +28,8 @@ function resolveBaseRoot(scope, input) {
 // One operation in an install plan. Kinds:
 //   copy-file  -> copy sourcePath to dest
 //   merge-json -> deep-merge mergePayload into the JSON already at dest
+//   merge-toml -> add-only merge of mergePayload into the TOML already at dest
+//   append-markdown -> upsert a managed markdown block into dest
 //   skip       -> capability unsupported by this target; nothing written, but
 //                 recorded (with `reason`) in the plan + install-state
 export function fileOp(fields) {
@@ -42,6 +44,8 @@ export function fileOp(fields) {
     ...(fields.scope !== undefined ? { scope: fields.scope } : {}),
     ...(fields.reason !== undefined ? { reason: fields.reason } : {}),
     ...(fields.mergePayload !== undefined ? { mergePayload: fields.mergePayload } : {}),
+    ...(fields.content !== undefined ? { content: fields.content } : {}),
+    ...(fields.markerId !== undefined ? { markerId: fields.markerId } : {}),
   };
 }
 
@@ -111,6 +115,37 @@ export function mergeJsonOp({ moduleId, assetRoot, sourceRel, dest }) {
   });
 }
 
+// Read a canonical JSON asset and produce an add-only merge-toml op against `dest`.
+export function mergeTomlOp({ moduleId, assetRoot, sourceRel, dest, convert }) {
+  const srcAbs = path.join(assetRoot, sourceRel);
+  if (!fs.existsSync(srcAbs)) return null;
+  const payload = JSON.parse(fs.readFileSync(srcAbs, 'utf8'));
+  return fileOp({
+    kind: 'merge-toml',
+    moduleId,
+    sourceRel,
+    sourcePath: srcAbs,
+    dest,
+    strategy: 'merge-toml-add-only',
+    mergePayload: typeof convert === 'function' ? convert(payload) : payload,
+  });
+}
+
+// Upsert a managed Markdown block into a root instruction file.
+export function appendMarkdownOp({
+  moduleId, sourceRel, dest, markerId, content, strategy = 'managed-markdown-block',
+}) {
+  return fileOp({
+    kind: 'append-markdown',
+    moduleId,
+    sourceRel,
+    dest,
+    strategy,
+    markerId,
+    content,
+  });
+}
+
 export function createAdapter(config) {
   const adapter = {
     id: config.id,
@@ -132,6 +167,10 @@ export function createAdapter(config) {
       return path.join(adapter.baseRoot(input), ...config.rootSegments);
     },
     statePath(input = {}) {
+      if (typeof config.statePath === 'function') return config.statePath(input, adapter);
+      if (Array.isArray(config.stateSegments)) {
+        return path.join(adapter.baseRoot(input), ...config.stateSegments);
+      }
       return path.join(adapter.resolveRoot(input), config.stateFile || 'agent-install-state.json');
     },
     supportsModule(module) {

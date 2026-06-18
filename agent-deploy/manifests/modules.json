@@ -5,7 +5,7 @@
       "id": "baseline-rules",
       "description": "Common security + prompt-defense rules (everyone)",
       "paths": ["rules/common"],
-      "targets": ["claude", "cursor"],
+      "targets": ["claude", "cursor", "codex"],
       "dependencies": [],
       "cost": "light",
       "stability": "stable",
@@ -15,7 +15,7 @@
       "id": "language-rules",
       "description": "Language-specific coding style (developer)",
       "paths": ["rules/python"],
-      "targets": ["claude", "cursor"],
+      "targets": ["claude", "cursor", "codex"],
       "dependencies": ["baseline-rules"],
       "cost": "light",
       "stability": "stable"
@@ -24,7 +24,7 @@
       "id": "architecture-rules",
       "description": "Software architecture rules for company product code",
       "paths": ["rules/developer"],
-      "targets": ["claude", "cursor"],
+      "targets": ["claude", "cursor", "codex"],
       "dependencies": ["baseline-rules"],
       "cost": "light",
       "stability": "stable"
@@ -33,7 +33,7 @@
       "id": "review-agent",
       "description": "Code-reviewer subagent (read-only, least-agency)",
       "paths": ["agents/code-reviewer.md"],
-      "targets": ["claude", "cursor"],
+      "targets": ["claude", "cursor", "codex"],
       "dependencies": ["baseline-rules"],
       "cost": "light",
       "stability": "stable"
@@ -42,7 +42,7 @@
       "id": "architecture-review-agent",
       "description": "Architecture-reviewer subagent (read-only)",
       "paths": ["agents/architecture-reviewer.md"],
-      "targets": ["claude", "cursor"],
+      "targets": ["claude", "cursor", "codex"],
       "dependencies": ["architecture-rules"],
       "cost": "light",
       "stability": "stable"
@@ -51,16 +51,16 @@
       "id": "architecture-review-skill",
       "description": "Architecture-review workflow skill (layer-violation checklist)",
       "paths": ["skills/architecture-review"],
-      "targets": ["claude", "cursor"],
+      "targets": ["claude", "cursor", "codex"],
       "dependencies": ["architecture-rules"],
       "cost": "light",
       "stability": "stable"
     },
     {
       "id": "planning-command",
-      "description": "/plan slash command (Claude; Cursor records skip+reason)",
+      "description": "/plan slash command (Claude; Codex/Cursor record skip+reason)",
       "paths": ["commands"],
-      "targets": ["claude", "cursor"],
+      "targets": ["claude", "cursor", "codex"],
       "dependencies": [],
       "cost": "light",
       "stability": "beta"
@@ -69,7 +69,7 @@
       "id": "mcp-baseline",
       "description": "Company-approved MCP servers",
       "paths": ["mcp"],
-      "targets": ["claude", "cursor"],
+      "targets": ["claude", "cursor", "codex"],
       "dependencies": [],
       "cost": "light",
       "stability": "stable"

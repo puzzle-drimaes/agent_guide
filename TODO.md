@@ -161,12 +161,15 @@ docs/plans/codex/company-wide-agent-rollout/00-open-decisions.md
 - [x] path-safety
 - [x] symlink guard
 - [x] manifest validation
+- [x] Codex adapter
+- [x] Codex project scope smoke test
+- [x] TOML add-only merge for Codex MCP config
 
 주의:
 
 ```text
 현재 환경에서 `node --test`는 child process 제한으로 일부 실패할 수 있다.
-일반 CI 환경에서 재검증해야 한다.
+샌드박스 밖 실행에서는 `npm --prefix agent-deploy test`가 전체 통과했다.
 ```
 
 ### 2.2 Codex adapter 추가
@@ -195,15 +198,23 @@ project/
 
 해야 할 일:
 
-- [ ] `codex.js` adapter 작성
-- [ ] `rules`를 `AGENTS.md` 또는 `.agents/rules/`로 변환
-- [ ] `skills`를 `.agents/skills/`로 설치
-- [ ] `agents`를 `.codex/agents/`로 설치
-- [ ] `mcp`/config를 `.codex/config.toml`에 병합하는 정책 설계
-- [ ] TOML add-only merge 구현
-- [ ] registry에 codex 등록
-- [ ] Codex project scope smoke test 추가
-- [ ] unsupported capability는 skip reason 기록
+- [x] `codex.js` adapter 작성
+- [x] `rules`를 `AGENTS.md` managed block과 `.agents/rules/`로 변환
+- [x] `skills`를 `.agents/skills/`로 설치
+- [x] `agents`를 `.codex/agents/`로 설치
+- [x] `mcp`/config를 `.codex/config.toml`에 병합하는 정책 설계
+- [x] TOML add-only merge 구현
+- [x] registry에 codex 등록
+- [x] Codex project scope smoke test 추가
+- [x] unsupported capability는 skip reason 기록
+
+구현 메모:
+
+```text
+Codex adapter는 project scope에서 AGENTS.md를 덮어쓰지 않고 managed block으로 upsert한다.
+MCP 설정은 assets/mcp/servers.json을 .codex/config.toml의 [mcp_servers.*] TOML 섹션으로 add-only merge한다.
+설치 상태는 .agent-deploy/install-state.json에 기록한다.
+```
 
 ### 2.3 Gemini adapter 추가
 
@@ -730,7 +741,7 @@ docs/plans/codex/company-wide-agent-rollout/10-pilot.md
 ### 9.2 Pilot 전 완료 조건
 
 - [ ] P0 결정사항 확정
-- [ ] Codex adapter 동작
+- [x] Codex adapter 동작
 - [ ] Claude adapter 동작
 - [ ] minimal/developer/product/business profile 초안
 - [ ] install.sh/install.bat 동작
@@ -837,20 +848,19 @@ docs/plans/codex/company-wide-agent-rollout/13-governance-and-roadmap.md
 
 ```text
 1. P0 결정사항 확정
-2. agent-deploy Codex adapter 구현
-3. agent-deploy Gemini adapter 구현
-4. company core rules 추가
-5. commit convention rule 추가
-6. architecture rule 보강
-7. profiles/modules 재구성
-8. install.sh/install.bat 검증
-9. Linux/macOS zip bundle build
-10. Windows exe packaging 설계
-11. backup/conflict policy 추가
-12. update/repair/uninstall 설계
-13. Pilot 2주 진행
-14. Prompt DB/Slack/GitHub governance 자동화
-15. 전사 rollout
+2. agent-deploy Gemini adapter 구현
+3. company core rules 추가
+4. commit convention rule 추가
+5. architecture rule 보강
+6. profiles/modules 재구성
+7. install.sh/install.bat 검증
+8. Linux/macOS zip bundle build
+9. Windows exe packaging 설계
+10. backup/conflict policy 추가
+11. update/repair/uninstall 설계
+12. Pilot 2주 진행
+13. Prompt DB/Slack/GitHub governance 자동화
+14. 전사 rollout
 ```
 
 ---

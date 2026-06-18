@@ -463,7 +463,7 @@ manifest validation OK
 
 ```text
 현재 sandbox 환경에서 node --test는 child process 제한 때문에 일부 실패할 수 있다.
-일반 CI 환경에서 반드시 재검증해야 한다.
+샌드박스 밖 실행에서는 `npm --prefix agent-deploy test`가 전체 통과했다.
 ```
 
 ---
@@ -614,6 +614,56 @@ CLI/Automation:
 jira : https://<YOUR_SPACE>.atlassian.net/browse/{TICKET-KEY}
 ```
 
+### 4.6 Codex adapter 1차 구현
+
+생성/수정된 주요 파일:
+
+```text
+agent-deploy/src/targets/codex.js
+agent-deploy/src/toml-merge.js
+agent-deploy/src/targets/registry.js
+agent-deploy/src/targets/helpers.js
+agent-deploy/src/apply.js
+agent-deploy/manifests/modules.json
+agent-deploy/test/smoke.test.js
+docs/specs/codex-adapter/
+```
+
+구현 내용:
+
+- [x] Codex target adapter 추가.
+- [x] project scope 기본 설치 지원.
+- [x] `AGENTS.md` managed block upsert 지원.
+- [x] canonical rules를 `.agents/rules/`로 설치.
+- [x] canonical skills를 `.agents/skills/`로 설치.
+- [x] canonical agents를 `.codex/agents/`로 설치.
+- [x] `assets/mcp/servers.json`을 `.codex/config.toml`로 add-only TOML merge.
+- [x] Codex 미지원 slash command는 skip reason으로 기록.
+- [x] Codex install-state를 `.agent-deploy/install-state.json`에 기록.
+- [x] Codex minimal/developer smoke test 추가.
+
+검증 결과:
+
+```text
+npm --prefix agent-deploy run validate
+  → manifest validation OK
+
+rtk proxy node agent-deploy/test/smoke.test.js
+  → 11개 중 9개 통과
+
+샌드박스 밖 실행:
+npm --prefix agent-deploy test
+  → 11개 중 11개 통과
+```
+
+주의:
+
+```text
+현재 sandbox에서는 child process 제한으로 기존 CLI JSON 테스트 2개가 spawnSync node EPERM으로 실패한다.
+샌드박스 밖에서는 동일한 전체 테스트가 통과했다.
+Codex 관련 신규 테스트는 sandbox 안팎에서 통과했다.
+```
+
 ---
 
 ## 5. 아직 완료가 아닌 것
@@ -621,7 +671,7 @@ jira : https://<YOUR_SPACE>.atlassian.net/browse/{TICKET-KEY}
 다음은 아직 완료되지 않았다. 자세한 순서는 `TODO.md` 참고.
 
 - [ ] P0 결정사항 실제 승인.
-- [ ] Codex adapter 구현.
+- [x] Codex adapter 구현.
 - [ ] Gemini adapter 구현.
 - [ ] commit convention asset 실제 추가.
 - [ ] source attribution / knowledge sharing rules 실제 추가.
@@ -665,13 +715,14 @@ jira : https://<YOUR_SPACE>.atlassian.net/browse/{TICKET-KEY}
 - 단계별 planning 문서화
 - 결정 레지스터 작성
 - agent-deploy prototype 평가
+- Codex adapter 1차 구현
 - project scope 기본 전략 확정
 - architecture/commit convention 계획 추가
 - report.html 통합 리포트 작성
 ```
 
-아직 남은 핵심은 구현이다.
+아직 남은 핵심은 Gemini adapter와 파일럿 운영 수준의 lifecycle 구현이다.
 
 ```text
-agent-deploy를 실제 파일럿 가능한 사내 installer MVP로 확장해야 한다.
+agent-deploy를 실제 파일럿 가능한 사내 installer MVP로 계속 확장해야 한다.
 ```

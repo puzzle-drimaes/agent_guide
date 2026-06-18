@@ -46,10 +46,11 @@ Codex mapping:
 
 | Canonical asset | Codex destination |
 |---|---|
-| `rules/common/*.md` | `AGENTS.md` 또는 `.agents/rules/` |
+| `rules/common/*.md` | `AGENTS.md` managed block + `.agents/rules/` |
 | `skills/*/SKILL.md` | `.agents/skills/*/SKILL.md` |
-| `agents/*.toml` | `.codex/agents/*.toml` |
-| `mcp/servers.json` | `.codex/config.toml` 또는 MCP config |
+| `agents/*.md` | `.codex/agents/*.md` |
+| `commands/*.md` | skip+reason |
+| `mcp/servers.json` | `.codex/config.toml` add-only TOML merge |
 
 ## Claude 설치 구조
 
