@@ -92,9 +92,11 @@ Gemini mapping:
 
 | Canonical asset | Gemini destination |
 |---|---|
-| `rules/common/*.md` | `GEMINI.md` |
-| `commands/*.toml` | `.gemini/commands/*.toml` |
+| `rules/common/*.md` | `GEMINI.md` managed block + `.gemini/rules/` |
+| `commands/*.md` | `.gemini/commands/*.md` |
 | `agents/*.md` | `.gemini/agents/*.md` |
+| `skills/*/SKILL.md` | `.gemini/skills/*/SKILL.md` fallback |
+| `mcp/servers.json` | skip+reason until MCP policy is finalized |
 
 ## Adapter 구현 체크리스트
 

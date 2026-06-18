@@ -106,6 +106,50 @@ test('codex AGENTS.md managed block and TOML merge are add-only/idempotent', () 
   assert.match(toml, /\[mcp_servers\.filesystem\]/);
 });
 
+test('gemini minimal profile installs GEMINI.md, project rules, and shared install-state', () => {
+  const project = tmpProject();
+  applyPlan(buildPlan({ target: 'gemini', profile: 'minimal', projectRoot: project }));
+
+  assert.ok(fs.existsSync(path.join(project, 'GEMINI.md')));
+  assert.ok(fs.existsSync(path.join(project, '.gemini/rules/common/security.md')));
+  assert.ok(!fs.existsSync(path.join(project, '.gemini/rules/developer/architecture.md')), 'architecture scoped out of minimal');
+  assert.ok(fs.existsSync(path.join(project, '.agent-deploy/install-state.json')));
+
+  const state = JSON.parse(fs.readFileSync(path.join(project, '.agent-deploy/install-state.json'), 'utf8'));
+  assert.equal(state.target.target, 'gemini');
+  assert.ok(state.operations.some((o) => o.kind === 'append-markdown' && o.dest.endsWith('GEMINI.md')));
+});
+
+test('gemini developer profile installs commands, fallback agents/skills, and mcp skip reason', () => {
+  const project = tmpProject();
+  const plan = buildPlan({ target: 'gemini', profile: 'developer', projectRoot: project });
+  applyPlan(plan);
+
+  assert.ok(fs.existsSync(path.join(project, '.gemini/rules/developer/architecture.md')));
+  assert.ok(fs.existsSync(path.join(project, '.gemini/commands/plan.md')));
+  assert.ok(fs.existsSync(path.join(project, '.gemini/agents/code-reviewer.md')));
+  assert.ok(fs.existsSync(path.join(project, '.gemini/agents/architecture-reviewer.md')));
+  assert.ok(fs.existsSync(path.join(project, '.gemini/skills/architecture-review/SKILL.md')));
+
+  const skipOps = plan.operations.filter((o) => o.kind === 'skip');
+  assert.ok(skipOps.some((o) => o.sourceRel === 'mcp' && /MCP config policy/.test(o.reason)));
+});
+
+test('gemini GEMINI.md managed block is add-only/idempotent', () => {
+  const project = tmpProject();
+  fs.writeFileSync(path.join(project, 'GEMINI.md'), '# Existing Gemini instructions\n\nKeep this.\n');
+
+  const plan = buildPlan({ target: 'gemini', profile: 'developer', projectRoot: project });
+  applyPlan(plan, { installedAt: '2026-01-01T00:00:00Z' });
+  applyPlan(plan, { installedAt: '2026-01-01T00:00:01Z' });
+
+  const gemini = fs.readFileSync(path.join(project, 'GEMINI.md'), 'utf8');
+  assert.match(gemini, /# Existing Gemini instructions/);
+  assert.equal((gemini.match(/agent-deploy:gemini:start/g) || []).length, 1);
+  assert.match(gemini, /\.gemini\/commands\//);
+  assert.match(gemini, /\.gemini\/skills\//);
+});
+
 test('cursor flattens rules to .mdc and records a skip+reason for slash commands', () => {
   const project = tmpProject();
   const plan = buildPlan({ target: 'cursor', profile: 'developer', projectRoot: project });

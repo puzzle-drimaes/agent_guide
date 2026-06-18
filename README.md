@@ -44,7 +44,7 @@ references/     ECC, k-sdd 참고 소스
 
 5. 검증
    → 테스트, dry-run, diff, install-state, skip reason 확인
-   → sandbox 제한이 있으면 외부/CI 환경에서 재검증
+   → 자동화 테스트 또는 CI에서 최종 통과 여부 확인
 
 6. 리뷰와 보고
    → 변경 요약, 검증 결과, 남은 일을 기록

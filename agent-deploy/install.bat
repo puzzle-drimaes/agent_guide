@@ -3,6 +3,7 @@ rem agent-deploy bundle installer (Windows).
 rem
 rem Unzip the bundle, then from inside your project run:
 rem   install.bat --target codex --profile developer             (project — DEFAULT)
+rem   install.bat --target gemini --profile developer            (project GEMINI.md, .gemini ...)
 rem   install.bat --target claude --profile developer --global   (user-global %USERPROFILE%\.claude ...)
 rem   install.bat --target codex --profile developer --dry-run   (preview only)
 setlocal enabledelayedexpansion

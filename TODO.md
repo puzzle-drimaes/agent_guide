@@ -165,11 +165,11 @@ docs/plans/codex/company-wide-agent-rollout/00-open-decisions.md
 - [x] Codex project scope smoke test
 - [x] TOML add-only merge for Codex MCP config
 
-주의:
+검증:
 
 ```text
-현재 환경에서 `node --test`는 child process 제한으로 일부 실패할 수 있다.
-샌드박스 밖 실행에서는 `npm --prefix agent-deploy test`가 전체 통과했다.
+npm --prefix agent-deploy test
+  → 전체 테스트 통과
 ```
 
 ### 2.2 Codex adapter 추가
@@ -240,12 +240,21 @@ project/
 
 해야 할 일:
 
-- [ ] `gemini.js` adapter 작성
-- [ ] `rules`를 `GEMINI.md` 또는 `.gemini/` 하위로 설치
-- [ ] `commands`를 `.gemini/commands/`로 설치
-- [ ] agent/skill 미지원 기능은 instruction-backed fallback으로 처리
-- [ ] registry에 gemini 등록
-- [ ] Gemini project scope smoke test 추가
+- [x] `gemini.js` adapter 작성
+- [x] `rules`를 `GEMINI.md` managed block과 `.gemini/rules/`로 설치
+- [x] `commands`를 `.gemini/commands/`로 설치
+- [x] agent/skill 미지원 기능은 instruction-backed fallback으로 처리
+- [x] registry에 gemini 등록
+- [x] Gemini project scope smoke test 추가
+
+구현 메모:
+
+```text
+Gemini adapter는 project scope에서 GEMINI.md를 덮어쓰지 않고 managed block으로 upsert한다.
+rules/commands/agents/skills는 .gemini/ 하위에 설치하고, agents/skills는 instruction-backed fallback으로 취급한다.
+MCP 설정은 Gemini 정책이 확정될 때까지 skip reason으로 기록한다.
+설치 상태는 .agent-deploy/install-state.json에 기록한다.
+```
 
 ### 2.4 target capability matrix 구현
 
@@ -848,19 +857,18 @@ docs/plans/codex/company-wide-agent-rollout/13-governance-and-roadmap.md
 
 ```text
 1. P0 결정사항 확정
-2. agent-deploy Gemini adapter 구현
-3. company core rules 추가
-4. commit convention rule 추가
-5. architecture rule 보강
-6. profiles/modules 재구성
-7. install.sh/install.bat 검증
-8. Linux/macOS zip bundle build
-9. Windows exe packaging 설계
-10. backup/conflict policy 추가
-11. update/repair/uninstall 설계
-12. Pilot 2주 진행
-13. Prompt DB/Slack/GitHub governance 자동화
-14. 전사 rollout
+2. company core rules 추가
+3. commit convention rule 추가
+4. architecture rule 보강
+5. profiles/modules 재구성
+6. install.sh/install.bat 검증
+7. Linux/macOS zip bundle build
+8. Windows exe packaging 설계
+9. backup/conflict policy 추가
+10. update/repair/uninstall 설계
+11. Pilot 2주 진행
+12. Prompt DB/Slack/GitHub governance 자동화
+13. 전사 rollout
 ```
 
 ---

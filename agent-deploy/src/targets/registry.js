@@ -4,8 +4,9 @@
 import claudeProject from './claude.js';
 import codexProject from './codex.js';
 import cursorProject from './cursor.js';
+import geminiProject from './gemini.js';
 
-const ADAPTERS = Object.freeze([codexProject, claudeProject, cursorProject]);
+const ADAPTERS = Object.freeze([codexProject, claudeProject, geminiProject, cursorProject]);
 
 export function listAdapters() {
   return ADAPTERS.slice();

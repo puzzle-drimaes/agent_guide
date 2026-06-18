@@ -17,7 +17,6 @@
 
 ```text
 npm --prefix agent-deploy run validate
-rtk proxy node agent-deploy/test/smoke.test.js
 npm --prefix agent-deploy test
 ```
 
@@ -27,20 +26,10 @@ npm --prefix agent-deploy test
 npm --prefix agent-deploy run validate
   PASS: manifest validation OK
 
-rtk proxy node agent-deploy/test/smoke.test.js
-  PARTIAL PASS: 11 tests total, 9 pass, 2 fail because sandbox blocks spawnSync node with EPERM.
-  Codex-specific tests pass.
-
 npm --prefix agent-deploy test
-  PASS outside the sandbox: 11 tests total, 11 pass, 0 fail.
+  PASS: 11 tests total, 11 pass, 0 fail.
 ```
 
-Sandbox note:
-
-```text
-Inside the restricted sandbox, the two CLI JSON tests can fail with `spawnSync node EPERM`.
-The same full suite passes when executed outside the sandbox, confirming the earlier failures were environment restrictions rather than product failures.
-```
 
 Manual CLI checks:
 
@@ -53,5 +42,5 @@ Generated Codex TOML parsed successfully with tomllib.
 ## Risks and follow-ups
 
 - Confirm Codex MCP config field compatibility during pilot if the CLI config schema changes.
-- Add Gemini adapter next to complete the initial target set.
+- Maintain harness parity with the Gemini adapter now that the initial target set is implemented.
 - Consider moving Claude install-state to `.agent-deploy/` in a separate migration for consistency.

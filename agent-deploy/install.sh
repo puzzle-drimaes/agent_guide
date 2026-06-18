@@ -3,6 +3,7 @@
 #
 # Unzip the bundle, then from inside your project run:
 #   ./install.sh --target codex --profile developer             # project (this repo) — DEFAULT
+#   ./install.sh --target gemini --profile developer            # project (GEMINI.md, .gemini …)
 #   ./install.sh --target claude --profile developer --global   # user-global (~/.claude …)
 #   ./install.sh --target codex --profile developer --dry-run    # preview, write nothing
 #
