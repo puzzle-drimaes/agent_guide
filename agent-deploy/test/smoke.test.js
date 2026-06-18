@@ -9,6 +9,7 @@ import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { buildPlan } from '../src/planner.js';
 import { applyPlan } from '../src/apply.js';
+import { checkAssetSchemas } from '../scripts/check-asset-schema.js';
 
 const CLI = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../src/cli.js');
 
@@ -254,4 +255,43 @@ test('home scope refuses to escape the home base root', () => {
   // tamper: redirect an op outside the home root
   plan.operations[0].dest = path.join(home, '..', 'escape.md');
   assert.throws(() => applyPlan(plan), /must stay within/);
+});
+
+test('asset schema guard passes for all shipped assets', () => {
+  const { errors, checked } = checkAssetSchemas();
+  assert.deepEqual(errors, [], `unexpected asset schema errors:\n${errors.join('\n')}`);
+  assert.ok(checked >= 14, `expected to check shipped assets, got ${checked}`);
+});
+
+test('asset schema guard catches malformed frontmatter', () => {
+  const root = tmpProject();
+  // agent: missing required `description`, an unknown key, and a name that
+  // does not match the filename -> three distinct violations.
+  fs.mkdirSync(path.join(root, 'agents'), { recursive: true });
+  fs.writeFileSync(
+    path.join(root, 'agents/bad-agent.md'),
+    '---\nname: wrong-name\ntools: ["Read"]\ncolor: blue\n---\n\n# x\n'
+  );
+  // skill dir with no SKILL.md, plus a skill whose array key is malformed.
+  fs.mkdirSync(path.join(root, 'skills/no-file'), { recursive: true });
+  fs.mkdirSync(path.join(root, 'skills/good'), { recursive: true });
+  fs.writeFileSync(
+    path.join(root, 'skills/good/SKILL.md'),
+    '---\nname: good\ndescription:\n---\n\n# y\n'
+  );
+  // rule with no frontmatter is valid; rule with an unknown key is not.
+  fs.mkdirSync(path.join(root, 'rules/common'), { recursive: true });
+  fs.writeFileSync(path.join(root, 'rules/common/plain.md'), '# plain rule, no frontmatter\n');
+  fs.writeFileSync(path.join(root, 'rules/common/bad.md'), '---\nscope: project\n---\n\n# z\n');
+
+  const { errors } = checkAssetSchemas(root);
+  const joined = errors.join('\n');
+  assert.match(joined, /bad-agent\.md: missing required key 'description'/);
+  assert.match(joined, /bad-agent\.md: unknown frontmatter key 'color'/);
+  assert.match(joined, /bad-agent\.md: name 'wrong-name' must match 'bad-agent'/);
+  assert.match(joined, /skills\/no-file: missing SKILL\.md/);
+  assert.match(joined, /good\/SKILL\.md: 'description' must be a non-empty string/);
+  assert.match(joined, /common\/bad\.md: unknown frontmatter key 'scope'/);
+  // the plain frontmatter-less rule must NOT produce an error
+  assert.ok(!/plain\.md/.test(joined), `plain rule should pass:\n${joined}`);
 });

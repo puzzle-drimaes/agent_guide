@@ -664,17 +664,29 @@ agent-deploy/install.bat
 현재:
 
 - [x] manifest validation
+- [x] rule drift check
+- [x] entry parity check
+- [x] asset frontmatter schema validation (`scripts/check-asset-schema.js`, validate에 통합)
+- [x] skill schema validation (위 가드에 포함: name/description/allowed-tools/argument-hint)
+- [x] agent schema validation (위 가드에 포함: name=파일명/description/tools/model)
+- [x] rule schema validation (위 가드에 포함: frontmatter optional, present 시 paths만 허용)
 
 추가:
 
-- [ ] asset frontmatter schema validation
-- [ ] skill schema validation
-- [ ] agent schema validation
-- [ ] rule schema validation
 - [ ] install-state schema runtime validation
 - [ ] unicode safety scan
 - [ ] secret scan
 - [ ] workflow security validation
+
+구현 메모(2026-06-18):
+
+```text
+check-asset-schema.js는 closed schema(unknown key error) + 타입 검사 + name 일치(agent=파일명, skill=디렉터리명)를 검증한다.
+frontmatter 파서는 zero-dependency(라이브러리 없음)로 `key: scalar`와 `key: ["a","b"]` 형태만 지원한다.
+rule은 frontmatter가 optional이며 present 시 paths(string[])만 허용한다.
+npm run validate가 4종 가드(manifest/rule-drift/entry-parity/asset-schema)로 확장됐고, smoke test는 14 → 16으로 증가했다.
+새 frontmatter 키를 추가하려면 SCHEMAS를 함께 갱신해야 한다(의도된 리뷰 포인트).
+```
 
 ### 7.2 MCP governance
 
