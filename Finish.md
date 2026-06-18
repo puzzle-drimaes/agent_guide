@@ -467,6 +467,54 @@ manifest validation OK
 
 ---
 
+## 3-B. 현재 프로젝트 dogfooding 적용 상태
+
+현재 프로젝트에 배포 예정 개발 룰을 먼저 적용했다.
+
+적용된 진입점:
+
+```text
+AGENTS.md
+CLAUDE.md
+GEMINI.md
+```
+
+적용된 canonical rule source:
+
+```text
+.agents/rules/common/company-ai-principles.md
+.agents/rules/common/security.md
+.agents/rules/common/source-attribution.md
+.agents/rules/common/knowledge-sharing.md
+.agents/rules/developer/harness-engineering.md
+.agents/rules/developer/architecture.md
+.agents/rules/developer/git-commit-convention.md
+```
+
+적용된 skill:
+
+```text
+.agents/skills/architecture-review/SKILL.md
+.agents/skills/commit-message-writer/SKILL.md
+.agents/skills/harness-parity-review/SKILL.md
+```
+
+의미:
+
+- [x] 하네스 엔지니어링 룰을 현재 프로젝트에 먼저 적용.
+- [x] 코딩 아키텍처 룰을 현재 프로젝트에 먼저 적용.
+- [x] Git commit convention 룰을 현재 프로젝트에 먼저 적용.
+- [x] Claude/Codex/Gemini 공통 진입점 문서를 생성.
+- [x] canonical source first 원칙에 따라 `.agents/rules/`를 기준 위치로 사용.
+
+남은 일:
+
+- [ ] 동일 내용을 `agent-deploy/assets/`로 승격.
+- [ ] modules/profile manifest에 포함.
+- [ ] adapter가 각 harness 파일로 변환하도록 구현.
+
+---
+
 ## 4. 방향성 결정 완료/변경 이력
 
 ### 4.1 전역 설정 → 프로젝트별 설정으로 변경

@@ -252,6 +252,21 @@ docs/plans/codex/company-wide-agent-rollout/02b-harness-engineering-principles.m
 
 현재 `agent-deploy/assets/`는 아직 starter 수준이다. 아래 회사 표준 asset을 추가해야 한다.
 
+현재 프로젝트에는 dogfooding 용도로 아래 룰을 먼저 적용했다.
+
+```text
+AGENTS.md
+CLAUDE.md
+GEMINI.md
+.agents/rules/common/
+.agents/rules/developer/harness-engineering.md
+.agents/rules/developer/architecture.md
+.agents/rules/developer/git-commit-convention.md
+.agents/skills/
+```
+
+주의: 이 파일들은 현재 프로젝트에 먼저 적용한 기준이다. 다음 단계에서는 동일 내용을 `agent-deploy/assets/`와 manifest/profile에 반영해야 실제 배포 bundle에 포함된다.
+
 ### 3.1 공통 rules 추가
 
 대상:
@@ -300,6 +315,29 @@ agent-deploy/assets/skills/architecture-review/SKILL.md
 
 ```text
 docs/plans/codex/company-wide-agent-rollout/02d-project-coding-architecture-rules.md
+```
+
+### 3.2-B 하네스 엔지니어링 rules 추가/보강
+
+현재 프로젝트에 먼저 추가됨:
+
+```text
+.agents/rules/developer/harness-engineering.md
+.agents/skills/harness-parity-review/SKILL.md
+```
+
+해야 할 일:
+
+- [ ] `agent-deploy/assets/rules/developer/harness-engineering.md`로 승격
+- [ ] `agent-deploy/assets/skills/harness-parity-review/SKILL.md`로 승격
+- [ ] modules.json에 `harness-engineering-rules` 추가
+- [ ] developer profile에 포함
+- [ ] Codex/Claude/Gemini adapter별 semantic equivalence test 추가
+
+참고 문서:
+
+```text
+docs/plans/codex/company-wide-agent-rollout/02b-harness-engineering-principles.md
 ```
 
 ### 3.3 commit convention rules 추가
