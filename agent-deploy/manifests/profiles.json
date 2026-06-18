@@ -18,6 +18,30 @@
       "spec-mode-selector-skill",
       "harness-parity-review-skill"
     ],
+    "business": [
+      "baseline-rules",
+      "prompt-asset-skill",
+      "prompt-library",
+      "business-prompts",
+      "meeting-summary-skill",
+      "customer-response-skill"
+    ],
+    "product": [
+      "baseline-rules",
+      "prompt-asset-skill",
+      "prompt-library",
+      "product-prompts",
+      "meeting-summary-skill",
+      "product-spec-skill"
+    ],
+    "governance": [
+      "baseline-rules",
+      "prompt-asset-skill",
+      "prompt-library",
+      "kpi-report-skill",
+      "quarterly-review-skill",
+      "prompt-db-curation-skill"
+    ],
     "developer": [
       "baseline-rules",
       "language-rules",
@@ -57,6 +81,14 @@
       "spec-writing-skill",
       "prompt-asset-skill",
       "prompt-library",
+      "product-prompts",
+      "business-prompts",
+      "meeting-summary-skill",
+      "customer-response-skill",
+      "product-spec-skill",
+      "quarterly-review-skill",
+      "kpi-report-skill",
+      "prompt-db-curation-skill",
       "planning-command",
       "mcp-baseline"
     ]

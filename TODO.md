@@ -469,11 +469,13 @@ governance
 - [x] `assets/skills/prompt-asset/` (knowledge capture, 전 직무 공통; core/developer/full)
 - [x] `assets/prompts/_universal-template.md` (범용 프롬프트 골격, prompt-asset-skill 모듈에 동봉)
 - [x] `assets/prompts/` 스타터 라이브러리 (dev/doc/comparison/research, `prompt-library` 모듈; core/developer/full)
-- [ ] `assets/skills/meeting-summary/`
-- [ ] `assets/skills/customer-response/`
-- [ ] `assets/prompts/product/`
-- [ ] `assets/prompts/business/`
-- [ ] `assets/prompts/governance/`
+- [x] `assets/skills/meeting-summary/` (회의록 정리, business/product)
+- [x] `assets/skills/customer-response/` (고객 응대 초안, business)
+- [x] `assets/skills/product-spec/` (기획 요구사항 정리, product)
+- [x] `assets/skills/quarterly-review/` `kpi-report/` `prompt-db-curation/` (governance)
+- [x] `assets/prompts/product/` (prd / user-story / prioritization, `product-prompts` 모듈; product/full)
+- [x] `assets/prompts/business/` (faq / proposal / announcement, `business-prompts` 모듈; business/full)
+- [ ] `assets/prompts/governance/` (skill로 충분 — 보류)
 
 ---
 
@@ -497,9 +499,9 @@ agent-deploy/manifests/profiles.json
 - [x] `review-agent` / `architecture-review-agent`
 - [x] developer core skills (`architecture-review`, `spec-mode-selector`, `harness-parity-review`, `commit-message-writer`)
 - [x] developer workflow skills (`company-plan`, `company-code-review`, `spec-writing`)
-- [ ] `product-skills`
-- [ ] `business-skills`
-- [ ] `governance-skills`
+- [x] `product-skills` (meeting-summary, product-spec)
+- [x] `business-skills` (meeting-summary, customer-response)
+- [x] `governance-skills` (quarterly-review, kpi-report, prompt-db-curation)
 - [x] `spec-driven-development-rules` / `spec-mode-selector-skill`
 - [ ] `mcp-baseline`은 default 제외 또는 profile별 선택
 
@@ -544,6 +546,7 @@ agent-deploy/manifests/profiles.json
 해야 할 일:
 
 - [ ] 기존 `core/full` 유지 여부 결정
+- [x] `business` / `product` / `governance` 비개발 profile 신설 (baseline + prompt 자산 + 직무 skill)
 - [x] profile별 module dependencies 정리
 - [x] manifest validation 통과
 - [x] Codex/Claude/Gemini profile별 install smoke test 보강

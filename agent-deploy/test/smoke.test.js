@@ -271,6 +271,49 @@ test('home scope refuses to escape the home base root', () => {
   assert.throws(() => applyPlan(plan), /must stay within/);
 });
 
+test('claude business profile installs non-developer skills, no developer-only assets', () => {
+  const project = tmpProject();
+  applyPlan(buildPlan({ target: 'claude', profile: 'business', projectRoot: project }));
+
+  assertCommonCoreRules(path.join(project, '.claude'));
+  assert.ok(fs.existsSync(path.join(project, '.claude/skills/meeting-summary/SKILL.md')));
+  assert.ok(fs.existsSync(path.join(project, '.claude/skills/customer-response/SKILL.md')));
+  assert.ok(fs.existsSync(path.join(project, '.claude/prompts/_universal-template.md')));
+  assert.ok(fs.existsSync(path.join(project, '.claude/prompts/business/faq.md')));
+  // business gets business-prompts, not product-prompts
+  assert.ok(!fs.existsSync(path.join(project, '.claude/prompts/product/prd.md')));
+  // business is non-developer: no architecture rules / dev workflow skills
+  assert.ok(!fs.existsSync(path.join(project, '.claude/rules/developer/architecture.md')));
+  assert.ok(!fs.existsSync(path.join(project, '.claude/skills/spec-writing/SKILL.md')));
+});
+
+test('codex product profile installs product-spec + meeting-summary under shared root', () => {
+  const project = tmpProject();
+  applyPlan(buildPlan({ target: 'codex', profile: 'product', projectRoot: project }));
+
+  assertCommonCoreRules(path.join(project, '.agents'));
+  assert.ok(fs.existsSync(path.join(project, '.agents/skills/product-spec/SKILL.md')));
+  assert.ok(fs.existsSync(path.join(project, '.agents/skills/meeting-summary/SKILL.md')));
+  assert.ok(!fs.existsSync(path.join(project, '.agents/skills/customer-response/SKILL.md')));
+  // product-prompts mirror under the shared .agents/ root
+  assert.ok(fs.existsSync(path.join(project, '.agents/prompts/product/prd.md')));
+  assert.ok(!fs.existsSync(path.join(project, '.agents/prompts/business/faq.md')));
+});
+
+test('claude governance profile installs governance skills + prompt-db-curation', () => {
+  const project = tmpProject();
+  applyPlan(buildPlan({ target: 'claude', profile: 'governance', projectRoot: project }));
+
+  assertCommonCoreRules(path.join(project, '.claude'));
+  assert.ok(fs.existsSync(path.join(project, '.claude/skills/quarterly-review/SKILL.md')));
+  assert.ok(fs.existsSync(path.join(project, '.claude/skills/kpi-report/SKILL.md')));
+  assert.ok(fs.existsSync(path.join(project, '.claude/skills/prompt-db-curation/SKILL.md')));
+  // prompt-db-curation depends on prompt-asset, so the capture skill is pulled in too
+  assert.ok(fs.existsSync(path.join(project, '.claude/skills/prompt-asset/SKILL.md')));
+  // governance is non-developer: no architecture rules
+  assert.ok(!fs.existsSync(path.join(project, '.claude/rules/developer/architecture.md')));
+});
+
 test('asset schema guard passes for all shipped assets', () => {
   const { errors, checked } = checkAssetSchemas();
   assert.deepEqual(errors, [], `unexpected asset schema errors:\n${errors.join('\n')}`);

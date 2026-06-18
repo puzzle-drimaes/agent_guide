@@ -311,6 +311,150 @@
       "stability": "stable"
     },
     {
+      "id": "meeting-summary-skill",
+      "description": "Meeting-notes summarization skill (decisions/action items/risks/open questions)",
+      "paths": [
+        "skills/meeting-summary"
+      ],
+      "targets": [
+        "claude",
+        "cursor",
+        "codex",
+        "gemini"
+      ],
+      "dependencies": [
+        "baseline-rules"
+      ],
+      "cost": "light",
+      "stability": "stable"
+    },
+    {
+      "id": "customer-response-skill",
+      "description": "Customer-reply drafting skill with tone/risk checks and a human-review gate",
+      "paths": [
+        "skills/customer-response"
+      ],
+      "targets": [
+        "claude",
+        "cursor",
+        "codex",
+        "gemini"
+      ],
+      "dependencies": [
+        "baseline-rules"
+      ],
+      "cost": "light",
+      "stability": "stable"
+    },
+    {
+      "id": "product-spec-skill",
+      "description": "Product spec authoring skill (problem/requirements/non-goals/acceptance criteria)",
+      "paths": [
+        "skills/product-spec"
+      ],
+      "targets": [
+        "claude",
+        "cursor",
+        "codex",
+        "gemini"
+      ],
+      "dependencies": [
+        "baseline-rules"
+      ],
+      "cost": "light",
+      "stability": "stable"
+    },
+    {
+      "id": "quarterly-review-skill",
+      "description": "Quarterly governance review skill (standing agenda, evidence-backed decisions, follow-up PRs)",
+      "paths": [
+        "skills/quarterly-review"
+      ],
+      "targets": [
+        "claude",
+        "cursor",
+        "codex",
+        "gemini"
+      ],
+      "dependencies": [
+        "baseline-rules"
+      ],
+      "cost": "light",
+      "stability": "stable"
+    },
+    {
+      "id": "kpi-report-skill",
+      "description": "KPI report drafting skill (Adoption/Usage/Quality/Business Impact)",
+      "paths": [
+        "skills/kpi-report"
+      ],
+      "targets": [
+        "claude",
+        "cursor",
+        "codex",
+        "gemini"
+      ],
+      "dependencies": [
+        "baseline-rules"
+      ],
+      "cost": "light",
+      "stability": "stable"
+    },
+    {
+      "id": "product-prompts",
+      "description": "Product starter prompts (PRD / user story / prioritization)",
+      "paths": [
+        "prompts/product"
+      ],
+      "targets": [
+        "claude",
+        "cursor",
+        "codex",
+        "gemini"
+      ],
+      "dependencies": [
+        "prompt-asset-skill"
+      ],
+      "cost": "light",
+      "stability": "stable"
+    },
+    {
+      "id": "business-prompts",
+      "description": "Business starter prompts (FAQ / proposal / announcement)",
+      "paths": [
+        "prompts/business"
+      ],
+      "targets": [
+        "claude",
+        "cursor",
+        "codex",
+        "gemini"
+      ],
+      "dependencies": [
+        "prompt-asset-skill"
+      ],
+      "cost": "light",
+      "stability": "stable"
+    },
+    {
+      "id": "prompt-db-curation-skill",
+      "description": "Prompt DB hygiene skill (merge/deprecate/promote/missing-tags); counterpart of prompt-asset",
+      "paths": [
+        "skills/prompt-db-curation"
+      ],
+      "targets": [
+        "claude",
+        "cursor",
+        "codex",
+        "gemini"
+      ],
+      "dependencies": [
+        "prompt-asset-skill"
+      ],
+      "cost": "light",
+      "stability": "stable"
+    },
+    {
       "id": "planning-command",
       "description": "/plan slash command (Claude/Gemini install; Codex/Cursor record skip+reason)",
       "paths": [
