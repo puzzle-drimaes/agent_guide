@@ -16,16 +16,37 @@ function tmpProject() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'agent-deploy-'));
 }
 
+function assertCommonCoreRules(root) {
+  assert.ok(fs.existsSync(path.join(root, 'rules/common/company-ai-principles.md')));
+  assert.ok(fs.existsSync(path.join(root, 'rules/common/knowledge-sharing.md')));
+  assert.ok(fs.existsSync(path.join(root, 'rules/common/security.md')));
+  assert.ok(fs.existsSync(path.join(root, 'rules/common/source-attribution.md')));
+}
+
+function assertDeveloperCoreRules(root) {
+  assert.ok(fs.existsSync(path.join(root, 'rules/developer/architecture.md')));
+  assert.ok(fs.existsSync(path.join(root, 'rules/developer/git-commit-convention.md')));
+  assert.ok(fs.existsSync(path.join(root, 'rules/developer/harness-engineering.md')));
+  assert.ok(fs.existsSync(path.join(root, 'rules/developer/spec-driven-development.md')));
+}
+
+function assertDeveloperWorkflowSkills(root) {
+  assert.ok(fs.existsSync(path.join(root, 'skills/architecture-review/SKILL.md')));
+  assert.ok(fs.existsSync(path.join(root, 'skills/commit-message-writer/SKILL.md')));
+  assert.ok(fs.existsSync(path.join(root, 'skills/harness-parity-review/SKILL.md')));
+  assert.ok(fs.existsSync(path.join(root, 'skills/spec-mode-selector/SKILL.md')));
+}
+
 test('claude developer profile installs rules, architecture assets, agent, command, mcp', () => {
   const project = tmpProject();
   const plan = buildPlan({ target: 'claude', profile: 'developer', projectRoot: project });
   applyPlan(plan, { installedAt: '2026-01-01T00:00:00Z' });
 
-  assert.ok(fs.existsSync(path.join(project, '.claude/rules/common/security.md')));
+  assertCommonCoreRules(path.join(project, '.claude'));
   assert.ok(fs.existsSync(path.join(project, '.claude/rules/python/coding-style.md')));
-  // C2: architecture assets, scoped to developer
-  assert.ok(fs.existsSync(path.join(project, '.claude/rules/developer/architecture.md')));
-  assert.ok(fs.existsSync(path.join(project, '.claude/skills/architecture-review/SKILL.md')));
+  // C2: developer core assets, scoped to developer
+  assertDeveloperCoreRules(path.join(project, '.claude'));
+  assertDeveloperWorkflowSkills(path.join(project, '.claude'));
   assert.ok(fs.existsSync(path.join(project, '.claude/agents/architecture-reviewer.md')));
   assert.ok(fs.existsSync(path.join(project, '.claude/agents/code-reviewer.md')));
   assert.ok(fs.existsSync(path.join(project, '.claude/commands/plan.md')));
@@ -36,15 +57,19 @@ test('claude developer profile installs rules, architecture assets, agent, comma
   const state = JSON.parse(fs.readFileSync(path.join(project, '.claude/agent-install-state.json'), 'utf8'));
   assert.equal(state.schemaVersion, 'agentdeploy.install.v1');
   assert.ok(state.resolution.selectedModules.includes('architecture-rules'));
+  assert.ok(state.resolution.selectedModules.includes('harness-engineering-rules'));
+  assert.ok(state.resolution.selectedModules.includes('spec-driven-development-rules'));
+  assert.ok(state.resolution.selectedModules.includes('commit-convention-rules'));
   // C1: every operation carries scope
   assert.ok(state.operations.every((o) => o.scope === 'project'));
 });
 
-test('minimal profile does NOT include developer architecture assets', () => {
+test('minimal profile installs common core rules but NOT developer assets', () => {
   const project = tmpProject();
   applyPlan(buildPlan({ target: 'claude', profile: 'minimal', projectRoot: project }));
-  assert.ok(fs.existsSync(path.join(project, '.claude/rules/common/security.md')));
+  assertCommonCoreRules(path.join(project, '.claude'));
   assert.ok(!fs.existsSync(path.join(project, '.claude/rules/developer/architecture.md')), 'architecture scoped out of minimal');
+  assert.ok(!fs.existsSync(path.join(project, '.claude/rules/developer/spec-driven-development.md')), 'SDD scoped out of minimal');
   assert.ok(!fs.existsSync(path.join(project, '.claude/skills')), 'no skills in minimal');
 });
 
@@ -53,8 +78,9 @@ test('codex minimal profile installs AGENTS.md, project rules, and shared instal
   applyPlan(buildPlan({ target: 'codex', profile: 'minimal', projectRoot: project }));
 
   assert.ok(fs.existsSync(path.join(project, 'AGENTS.md')));
-  assert.ok(fs.existsSync(path.join(project, '.agents/rules/common/security.md')));
+  assertCommonCoreRules(path.join(project, '.agents'));
   assert.ok(!fs.existsSync(path.join(project, '.agents/rules/developer/architecture.md')), 'architecture scoped out of minimal');
+  assert.ok(!fs.existsSync(path.join(project, '.agents/rules/developer/spec-driven-development.md')), 'SDD scoped out of minimal');
   assert.ok(fs.existsSync(path.join(project, '.agent-deploy/install-state.json')));
 
   const state = JSON.parse(fs.readFileSync(path.join(project, '.agent-deploy/install-state.json'), 'utf8'));
@@ -67,8 +93,9 @@ test('codex developer profile installs skills, agents, mcp toml, and command ski
   const plan = buildPlan({ target: 'codex', profile: 'developer', projectRoot: project });
   applyPlan(plan);
 
-  assert.ok(fs.existsSync(path.join(project, '.agents/rules/developer/architecture.md')));
-  assert.ok(fs.existsSync(path.join(project, '.agents/skills/architecture-review/SKILL.md')));
+  assertCommonCoreRules(path.join(project, '.agents'));
+  assertDeveloperCoreRules(path.join(project, '.agents'));
+  assertDeveloperWorkflowSkills(path.join(project, '.agents'));
   assert.ok(fs.existsSync(path.join(project, '.codex/agents/code-reviewer.md')));
   assert.ok(fs.existsSync(path.join(project, '.codex/agents/architecture-reviewer.md')));
 
@@ -111,8 +138,9 @@ test('gemini minimal profile installs GEMINI.md, project rules, and shared insta
   applyPlan(buildPlan({ target: 'gemini', profile: 'minimal', projectRoot: project }));
 
   assert.ok(fs.existsSync(path.join(project, 'GEMINI.md')));
-  assert.ok(fs.existsSync(path.join(project, '.gemini/rules/common/security.md')));
+  assertCommonCoreRules(path.join(project, '.gemini'));
   assert.ok(!fs.existsSync(path.join(project, '.gemini/rules/developer/architecture.md')), 'architecture scoped out of minimal');
+  assert.ok(!fs.existsSync(path.join(project, '.gemini/rules/developer/spec-driven-development.md')), 'SDD scoped out of minimal');
   assert.ok(fs.existsSync(path.join(project, '.agent-deploy/install-state.json')));
 
   const state = JSON.parse(fs.readFileSync(path.join(project, '.agent-deploy/install-state.json'), 'utf8'));
@@ -125,11 +153,12 @@ test('gemini developer profile installs commands, fallback agents/skills, and mc
   const plan = buildPlan({ target: 'gemini', profile: 'developer', projectRoot: project });
   applyPlan(plan);
 
-  assert.ok(fs.existsSync(path.join(project, '.gemini/rules/developer/architecture.md')));
+  assertCommonCoreRules(path.join(project, '.gemini'));
+  assertDeveloperCoreRules(path.join(project, '.gemini'));
   assert.ok(fs.existsSync(path.join(project, '.gemini/commands/plan.md')));
   assert.ok(fs.existsSync(path.join(project, '.gemini/agents/code-reviewer.md')));
   assert.ok(fs.existsSync(path.join(project, '.gemini/agents/architecture-reviewer.md')));
-  assert.ok(fs.existsSync(path.join(project, '.gemini/skills/architecture-review/SKILL.md')));
+  assertDeveloperWorkflowSkills(path.join(project, '.gemini'));
 
   const skipOps = plan.operations.filter((o) => o.kind === 'skip');
   assert.ok(skipOps.some((o) => o.sourceRel === 'mcp' && /MCP config policy/.test(o.reason)));
@@ -157,6 +186,8 @@ test('cursor flattens rules to .mdc and records a skip+reason for slash commands
 
   assert.ok(fs.existsSync(path.join(project, '.cursor/rules/common-security.mdc')));
   assert.ok(fs.existsSync(path.join(project, '.cursor/rules/developer-architecture.mdc')));
+  assert.ok(fs.existsSync(path.join(project, '.cursor/rules/developer-harness-engineering.mdc')));
+  assert.ok(fs.existsSync(path.join(project, '.cursor/rules/developer-spec-driven-development.mdc')));
   assert.ok(fs.existsSync(path.join(project, '.cursor/mcp.json')));
   assert.ok(!fs.existsSync(path.join(project, '.cursor/commands')), 'nothing written for commands');
 

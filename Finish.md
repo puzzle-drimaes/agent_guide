@@ -441,13 +441,22 @@ agent-deploy/
 확인된 asset:
 
 ```text
+agent-deploy/assets/rules/common/company-ai-principles.md
 agent-deploy/assets/rules/common/security.md
+agent-deploy/assets/rules/common/source-attribution.md
+agent-deploy/assets/rules/common/knowledge-sharing.md
 agent-deploy/assets/rules/python/coding-style.md
 agent-deploy/assets/rules/developer/architecture.md
+agent-deploy/assets/rules/developer/git-commit-convention.md
+agent-deploy/assets/rules/developer/harness-engineering.md
+agent-deploy/assets/rules/developer/spec-driven-development.md
 agent-deploy/assets/agents/code-reviewer.md
 agent-deploy/assets/agents/architecture-reviewer.md
 agent-deploy/assets/commands/plan.md
 agent-deploy/assets/skills/architecture-review/SKILL.md
+agent-deploy/assets/skills/commit-message-writer/SKILL.md
+agent-deploy/assets/skills/harness-parity-review/SKILL.md
+agent-deploy/assets/skills/spec-mode-selector/SKILL.md
 agent-deploy/assets/mcp/servers.json
 ```
 
@@ -513,10 +522,12 @@ GEMINI.md
 
 남은 일:
 
-- [ ] 동일 내용을 `agent-deploy/assets/`로 승격.
-- [ ] modules/profile manifest에 포함.
-- [ ] adapter가 각 harness 파일로 변환하도록 구현.
-- [ ] SDD-lite/full을 developer/sdd profile에 반영.
+- [x] 동일 내용을 `agent-deploy/assets/`로 승격.
+- [x] modules/profile manifest에 포함.
+- [x] adapter가 각 harness 파일로 변환하도록 구현.
+- [x] SDD rules/skills를 developer/sdd profile에 반영.
+- [ ] `.agents/rules` ↔ `agent-deploy/assets/rules` drift check 추가.
+- [ ] `docs/specs/<feature>/` reusable template 추가.
 
 ---
 
@@ -687,6 +698,47 @@ npm --prefix agent-deploy test
   → 14개 중 14개 통과
 ```
 
+### 4.8 Company core rules asset 승격
+
+생성/수정된 주요 파일:
+
+```text
+agent-deploy/assets/rules/common/
+agent-deploy/assets/rules/developer/
+agent-deploy/assets/skills/spec-mode-selector/SKILL.md
+agent-deploy/assets/skills/harness-parity-review/SKILL.md
+agent-deploy/assets/skills/commit-message-writer/SKILL.md
+agent-deploy/manifests/modules.json
+agent-deploy/manifests/profiles.json
+agent-deploy/test/smoke.test.js
+docs/specs/company-core-assets/
+```
+
+구현 내용:
+
+- [x] `.agents/rules/common`의 company AI principles, security, source attribution, knowledge sharing 룰을 deploy asset으로 승격.
+- [x] `.agents/rules/developer`의 architecture, Git commit convention, harness engineering, SDD 룰을 deploy asset으로 승격.
+- [x] spec-mode-selector, harness-parity-review, commit-message-writer skill을 target-neutral asset으로 추가.
+- [x] developer rule modules를 파일 단위로 분리해 `minimal` profile에 developer rules가 섞이지 않게 정리.
+- [x] `developer`, `full`, `sdd` profile을 core rules/skills 기준으로 갱신.
+- [x] Codex/Claude/Gemini smoke test가 common rules, developer rules, workflow skills, skip reason을 검증하도록 보강.
+- [x] Cursor adapter가 file-level rule module도 flatten할 수 있게 보강.
+
+검증 결과:
+
+```text
+npm --prefix agent-deploy run validate
+  → manifest validation OK
+
+npm --prefix agent-deploy test
+  → 14개 중 14개 통과
+```
+
+후속 메모:
+
+- `.agents/rules`와 `agent-deploy/assets/rules`의 drift check는 별도 작업으로 남김.
+- Gemini MCP native policy는 아직 확정 전이므로 skip reason 유지.
+
 ---
 
 ## 5. 아직 완료가 아닌 것
@@ -696,9 +748,10 @@ npm --prefix agent-deploy test
 - [ ] P0 결정사항 실제 승인.
 - [x] Codex adapter 구현.
 - [x] Gemini adapter 구현.
-- [ ] commit convention asset 실제 추가.
-- [ ] source attribution / knowledge sharing rules 실제 추가.
-- [ ] profiles/modules 재구성.
+- [x] commit convention asset 실제 추가.
+- [x] source attribution / knowledge sharing rules 실제 추가.
+- [x] profiles/modules 재구성.
+- [ ] `.agents/rules`와 deploy assets drift check.
 - [ ] Windows exe packaging.
 - [ ] Linux/macOS zip bundle build.
 - [ ] update/repair/uninstall.

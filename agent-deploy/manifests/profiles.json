@@ -1,15 +1,34 @@
 {
   "version": 1,
   "profiles": {
-    "minimal": ["baseline-rules"],
-    "core": ["baseline-rules", "review-agent", "mcp-baseline"],
+    "minimal": [
+      "baseline-rules"
+    ],
+    "core": [
+      "baseline-rules",
+      "review-agent",
+      "mcp-baseline"
+    ],
+    "sdd": [
+      "baseline-rules",
+      "harness-engineering-rules",
+      "spec-driven-development-rules",
+      "spec-mode-selector-skill",
+      "harness-parity-review-skill"
+    ],
     "developer": [
       "baseline-rules",
       "language-rules",
       "review-agent",
       "architecture-rules",
+      "harness-engineering-rules",
+      "spec-driven-development-rules",
+      "commit-convention-rules",
       "architecture-review-agent",
       "architecture-review-skill",
+      "spec-mode-selector-skill",
+      "harness-parity-review-skill",
+      "commit-message-writer-skill",
       "planning-command",
       "mcp-baseline"
     ],
@@ -18,8 +37,14 @@
       "language-rules",
       "review-agent",
       "architecture-rules",
+      "harness-engineering-rules",
+      "spec-driven-development-rules",
+      "commit-convention-rules",
       "architecture-review-agent",
       "architecture-review-skill",
+      "spec-mode-selector-skill",
+      "harness-parity-review-skill",
+      "commit-message-writer-skill",
       "planning-command",
       "mcp-baseline"
     ]

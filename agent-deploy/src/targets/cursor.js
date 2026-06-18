@@ -3,6 +3,7 @@
 // agents/skills mirror under .cursor/, slash-commands have no Cursor surface
 // (recorded as a skip+reason), MCP merges into .cursor/mcp.json.
 // Same canonical source, different shape -> this is the adapter's whole job.
+import fs from 'node:fs';
 import path from 'node:path';
 import {
   createAdapter, mirrorOps, mergeJsonOp, skipOp, fileOp, walkFiles,
@@ -14,8 +15,8 @@ import {
 // README files are dropped. Works whether sourceRel is the whole `rules` dir,
 // a subdir, or a single file.
 function cursorRuleOps({ moduleId, assetRoot, sourceRel, root }) {
-  const walked = walkFiles(path.join(assetRoot, sourceRel));
-  const rels = walked.length ? walked : ['']; // '' = sourceRel is itself a file
+  const abs = path.join(assetRoot, sourceRel);
+  const rels = fs.statSync(abs).isFile() ? [''] : walkFiles(abs); // '' = sourceRel is itself a file
   const ops = [];
   for (const rel of rels) {
     const fullRel = rel ? `${sourceRel}/${rel}` : sourceRel;

@@ -269,13 +269,13 @@ docs/plans/codex/company-wide-agent-rollout/02b-harness-engineering-principles.m
 - [ ] `docs/harness-capability-matrix.md` 작성
 - [ ] Claude/Codex/Gemini/Cursor capability 정리
 - [ ] adapter별 native/fallback/skip 정책 작성
-- [ ] harness parity test 추가
+- [x] harness parity smoke test 보강 (Codex/Claude/Gemini core rules/skills + skip reason)
 
 ---
 
 ## 3. 회사 표준 asset 추가
 
-현재 `agent-deploy/assets/`는 아직 starter 수준이다. 아래 회사 표준 asset을 추가해야 한다.
+현재 `agent-deploy/assets/`에는 company core rules 1차 세트가 승격됐다. 아래 목록은 완료된 항목과 후속 확장 항목을 함께 추적한다.
 
 현재 프로젝트에는 dogfooding 용도로 아래 룰을 먼저 적용했다.
 
@@ -291,7 +291,7 @@ GEMINI.md
 .agents/skills/
 ```
 
-주의: 이 파일들은 현재 프로젝트에 먼저 적용한 기준이다. 다음 단계에서는 동일 내용을 `agent-deploy/assets/`와 manifest/profile에 반영해야 실제 배포 bundle에 포함된다.
+주의: 이 파일들은 현재 프로젝트에 먼저 적용한 기준이며, 2026-06-18에 1차 company core rules/skills가 `agent-deploy/assets/`와 manifest/profile에 반영됐다. 이후에는 drift check와 직무별 확장을 추가해야 한다.
 
 ### 3.1 공통 rules 추가
 
@@ -303,10 +303,10 @@ agent-deploy/assets/rules/common/
 
 해야 할 일:
 
-- [ ] `company-ai-principles.md` 추가
-- [ ] `source-attribution.md` 추가
-- [ ] `knowledge-sharing.md` 추가
-- [ ] `security.md` 보강
+- [x] `company-ai-principles.md` 추가
+- [x] `source-attribution.md` 추가
+- [x] `knowledge-sharing.md` 추가
+- [x] `security.md` 보강
 
 포함해야 할 핵심:
 
@@ -330,12 +330,12 @@ agent-deploy/assets/skills/architecture-review/SKILL.md
 
 해야 할 일:
 
-- [ ] 현재 asset 내용 검토
-- [ ] Backend Clean/Hexagonal rule 보강
-- [ ] Frontend feature-based architecture rule 보강
-- [ ] Mobile/Desktop MVVM + Clean Architecture rule 보강
-- [ ] CLI/Automation Command → UseCase → Adapter rule 보강
-- [ ] architecture-reviewer가 계층 위반을 체크하도록 명시
+- [x] 현재 asset 내용 검토
+- [x] Backend Clean/Hexagonal rule 보강
+- [x] Frontend feature-based architecture rule 보강
+- [x] Mobile/Desktop MVVM + Clean Architecture rule 보강
+- [x] CLI/Automation Command → UseCase → Adapter rule 보강
+- [x] architecture-reviewer가 계층 위반을 체크하도록 명시
 
 참고 문서:
 
@@ -354,11 +354,11 @@ docs/plans/codex/company-wide-agent-rollout/02d-project-coding-architecture-rule
 
 해야 할 일:
 
-- [ ] `agent-deploy/assets/rules/developer/harness-engineering.md`로 승격
-- [ ] `agent-deploy/assets/skills/harness-parity-review/SKILL.md`로 승격
-- [ ] modules.json에 `harness-engineering-rules` 추가
-- [ ] developer profile에 포함
-- [ ] Codex/Claude/Gemini adapter별 semantic equivalence test 추가
+- [x] `agent-deploy/assets/rules/developer/harness-engineering.md`로 승격
+- [x] `agent-deploy/assets/skills/harness-parity-review/SKILL.md`로 승격
+- [x] modules.json에 `harness-engineering-rules` 추가
+- [x] developer profile에 포함
+- [x] Codex/Claude/Gemini adapter별 semantic equivalence test 추가
 
 참고 문서:
 
@@ -388,12 +388,12 @@ full: A → B → C → D → E → F → G → H → Z
 
 해야 할 일:
 
-- [ ] `agent-deploy/assets/rules/developer/spec-driven-development.md`로 승격
-- [ ] `agent-deploy/assets/skills/spec-mode-selector/SKILL.md`로 승격
-- [ ] modules.json에 `sdd-lite` 또는 `spec-driven-development-rules` 추가
-- [ ] developer profile에 SDD-lite 기본 포함
-- [ ] sdd profile에 SDD-full workflow 포함
-- [ ] Codex/Claude/Gemini adapter별 SDD 지시문 변환 방식 정의
+- [x] `agent-deploy/assets/rules/developer/spec-driven-development.md`로 승격
+- [x] `agent-deploy/assets/skills/spec-mode-selector/SKILL.md`로 승격
+- [x] modules.json에 `spec-driven-development-rules` 추가
+- [x] developer profile에 SDD 기본 포함
+- [x] sdd profile에 SDD rules/skills 포함
+- [x] Codex/Claude/Gemini adapter별 SDD 지시문 설치 경로 smoke test 보강
 - [ ] `docs/specs/<feature>/` 템플릿 추가
 
 참고 문서:
@@ -414,27 +414,37 @@ agent-deploy/assets/skills/commit-message-writer/SKILL.md
 
 해야 할 일:
 
-- [ ] 제공된 commit convention을 rule asset으로 작성
-- [ ] `[type] 한글 제목` 형식 명시
-- [ ] 허용 type 명시
+- [x] 제공된 commit convention을 rule asset으로 작성
+- [x] `[type] 한글 제목` 형식 명시
+- [x] 허용 type 명시
   - feat
   - fix
   - refactor
   - chore
   - docs
   - test
-- [ ] 본문 섹션 명시
+- [x] 본문 섹션 명시
   - 1. 내용
   - 2. 수정 내역
   - 3. 영향도
-- [ ] Jira 링크 필수 명시
-- [ ] Jira 티켓 없을 때 agent가 사용자에게 확인하도록 명시
-- [ ] commit-message-writer skill 작성
+- [x] Jira 링크 필수 명시
+- [x] Jira 티켓 없을 때 agent가 사용자에게 확인하도록 명시
+- [x] commit-message-writer skill 작성
 
 참고 문서:
 
 ```text
 docs/plans/codex/company-wide-agent-rollout/02e-git-commit-convention-plan.md
+```
+
+
+완료 메모(2026-06-18):
+
+```text
+- company core common/developer rules 1차 승격 완료
+- spec-mode-selector / harness-parity-review / commit-message-writer skill asset 추가
+- developer/full/sdd profiles 갱신
+- Codex/Claude/Gemini smoke test 보강 및 validate/test 통과
 ```
 
 ### 3.4 직무별 skills/prompts 추가
@@ -475,20 +485,18 @@ agent-deploy/manifests/profiles.json
 
 ### 4.1 modules 추가
 
-추가할 module:
+추가/정리할 module:
 
-- [ ] `common-rules`
-- [ ] `security-rules`
-- [ ] `source-attribution-rules`
-- [ ] `knowledge-sharing-rules`
-- [ ] `architecture-rules`
-- [ ] `commit-convention-rules`
-- [ ] `review-agents`
-- [ ] `developer-skills`
+- [x] `baseline-rules` (`rules/common` 전체: common/security/source-attribution/knowledge-sharing)
+- [ ] `security-rules` / `source-attribution-rules` / `knowledge-sharing-rules` 세분화 여부 결정
+- [x] `architecture-rules`
+- [x] `commit-convention-rules`
+- [x] `review-agent` / `architecture-review-agent`
+- [x] developer core skills (`architecture-review`, `spec-mode-selector`, `harness-parity-review`, `commit-message-writer`)
 - [ ] `product-skills`
 - [ ] `business-skills`
 - [ ] `governance-skills`
-- [ ] `sdd-lite`
+- [x] `spec-driven-development-rules` / `spec-mode-selector-skill`
 - [ ] `mcp-baseline`은 default 제외 또는 profile별 선택
 
 ### 4.2 profiles 재구성
@@ -532,9 +540,9 @@ agent-deploy/manifests/profiles.json
 해야 할 일:
 
 - [ ] 기존 `core/full` 유지 여부 결정
-- [ ] profile별 module dependencies 정리
-- [ ] manifest validation 통과
-- [ ] profile별 install smoke test 추가
+- [x] profile별 module dependencies 정리
+- [x] manifest validation 통과
+- [x] Codex/Claude/Gemini profile별 install smoke test 보강
 
 ---
 
