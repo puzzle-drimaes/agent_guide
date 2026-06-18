@@ -463,12 +463,12 @@ governance
 
 해야 할 일:
 
-- [ ] `assets/skills/company-plan/`
-- [ ] `assets/skills/company-code-review/`
+- [x] `assets/skills/company-plan/` (Plan First, developer)
+- [x] `assets/skills/company-code-review/` (Review Before Done, developer)
+- [x] `assets/skills/spec-writing/` (SDD-full spec authoring, developer)
 - [ ] `assets/skills/prompt-asset/`
 - [ ] `assets/skills/meeting-summary/`
 - [ ] `assets/skills/customer-response/`
-- [ ] `assets/skills/spec-writing/`
 - [ ] `assets/prompts/product/`
 - [ ] `assets/prompts/business/`
 - [ ] `assets/prompts/governance/`
@@ -494,6 +494,7 @@ agent-deploy/manifests/profiles.json
 - [x] `commit-convention-rules`
 - [x] `review-agent` / `architecture-review-agent`
 - [x] developer core skills (`architecture-review`, `spec-mode-selector`, `harness-parity-review`, `commit-message-writer`)
+- [x] developer workflow skills (`company-plan`, `company-code-review`, `spec-writing`)
 - [ ] `product-skills`
 - [ ] `business-skills`
 - [ ] `governance-skills`

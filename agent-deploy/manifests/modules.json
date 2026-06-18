@@ -217,6 +217,60 @@
       "stability": "stable"
     },
     {
+      "id": "company-plan-skill",
+      "description": "Plan First workflow skill (restate, judge SDD mode, evidence, gate)",
+      "paths": [
+        "skills/company-plan"
+      ],
+      "targets": [
+        "claude",
+        "cursor",
+        "codex",
+        "gemini"
+      ],
+      "dependencies": [
+        "spec-driven-development-rules"
+      ],
+      "cost": "light",
+      "stability": "stable"
+    },
+    {
+      "id": "company-code-review-skill",
+      "description": "Review Before Done workflow skill (self-review, reviewer agents, approval gate)",
+      "paths": [
+        "skills/company-code-review"
+      ],
+      "targets": [
+        "claude",
+        "cursor",
+        "codex",
+        "gemini"
+      ],
+      "dependencies": [
+        "review-agent"
+      ],
+      "cost": "light",
+      "stability": "stable"
+    },
+    {
+      "id": "spec-writing-skill",
+      "description": "SDD-full spec authoring skill (docs/specs/<feature> from template)",
+      "paths": [
+        "skills/spec-writing"
+      ],
+      "targets": [
+        "claude",
+        "cursor",
+        "codex",
+        "gemini"
+      ],
+      "dependencies": [
+        "spec-driven-development-rules"
+      ],
+      "cost": "light",
+      "stability": "stable"
+    },
+    {
       "id": "planning-command",
       "description": "/plan slash command (Claude/Gemini install; Codex/Cursor record skip+reason)",
       "paths": [

@@ -911,6 +911,7 @@ SDD mode: lite (가드 스크립트 1개 + 테스트 2개 + validate 연결, 기
 - project scope 기본 전략 확정
 - architecture/commit convention 계획 추가
 - report.html 통합 리포트 작성
+- developer 직무 workflow skill 추가 (company-plan / company-code-review / spec-writing)
 ```
 
 아직 남은 핵심은 회사 표준 asset 보강과 파일럿 운영 수준의 lifecycle 구현이다.

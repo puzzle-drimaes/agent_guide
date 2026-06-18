@@ -29,6 +29,9 @@
       "spec-mode-selector-skill",
       "harness-parity-review-skill",
       "commit-message-writer-skill",
+      "company-plan-skill",
+      "company-code-review-skill",
+      "spec-writing-skill",
       "planning-command",
       "mcp-baseline"
     ],
@@ -45,6 +48,9 @@
       "spec-mode-selector-skill",
       "harness-parity-review-skill",
       "commit-message-writer-skill",
+      "company-plan-skill",
+      "company-code-review-skill",
+      "spec-writing-skill",
       "planning-command",
       "mcp-baseline"
     ]

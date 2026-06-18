@@ -36,6 +36,9 @@ function assertDeveloperWorkflowSkills(root) {
   assert.ok(fs.existsSync(path.join(root, 'skills/commit-message-writer/SKILL.md')));
   assert.ok(fs.existsSync(path.join(root, 'skills/harness-parity-review/SKILL.md')));
   assert.ok(fs.existsSync(path.join(root, 'skills/spec-mode-selector/SKILL.md')));
+  assert.ok(fs.existsSync(path.join(root, 'skills/company-plan/SKILL.md')));
+  assert.ok(fs.existsSync(path.join(root, 'skills/company-code-review/SKILL.md')));
+  assert.ok(fs.existsSync(path.join(root, 'skills/spec-writing/SKILL.md')));
 }
 
 test('claude developer profile installs rules, architecture assets, agent, command, mcp', () => {
