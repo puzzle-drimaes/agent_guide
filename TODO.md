@@ -39,6 +39,7 @@ Claude/Codex/Gemini 등 어떤 AI 도구를 쓰더라도,
    - capability-aware fallback
 
 5. 회사 개발 룰도 agent asset으로 배포한다.
+   - spec driven development rules
    - architecture rules
    - commit convention rules
    - security/source/knowledge sharing rules
@@ -88,16 +89,16 @@ docs/plans/codex/company-wide-agent-rollout/00-open-decisions.md
 
 - [ ] D01 정규 소스 저장 위치 확정
   - 권장: 별도 private repo `company-agent-kit`
-- [ ] D02 1차 지원 AI 도구 확정
+- [x] D02 1차 지원 AI 도구 확정
   - 권장: Codex + Claude 먼저, Gemini는 Pilot 중 추가
-- [ ] D03 개발자/비개발자 전달 방식 확정
+- [x] D03 개발자/비개발자 전달 방식 확정
   - 개발자: project bundle installer
   - 비개발자: profile guide, Custom Instructions, Prompt DB, 필요 시 bundle
-- [ ] D04 배포 채널 확정
+- [x] D04 배포 채널 확정
   - Windows installer exe
   - Linux/macOS zip bundle
   - 내부 파일 서버 또는 GitHub Releases
-- [ ] D04-B 기본 설치 범위 확정
+- [x] D04-B 기본 설치 범위 확정
   - 결정 방향: project scope 기본, user/global scope 옵션
 - [ ] D05 지식 DB 위치 확정
   - 권장: Notion + GitHub + Slack
@@ -107,20 +108,24 @@ docs/plans/codex/company-wide-agent-rollout/00-open-decisions.md
 
 ### 1.2 P1 결정사항 확정
 
-- [ ] D08-A Installer 내부 아키텍처 패턴 확정
+- [x] D08-A Installer 내부 아키텍처 패턴 확정
   - 결정 방향: Clean Architecture + Hexagonal Architecture
   - MVVM은 Windows GUI/Web UI에만 적용
-- [ ] D08-B 개발 프로젝트 코딩 아키텍처 표준 확정
+- [x] D08-B 개발 프로젝트 코딩 아키텍처 표준 확정
   - Backend: Clean/Hexagonal
   - Frontend: Feature-based
   - Mobile/Desktop: MVVM + Clean Architecture
   - CLI/Automation: Command → UseCase → Adapter
-- [ ] D08-C Git Commit Convention 표준 확정
+- [x] D08-C Git Commit Convention 표준 확정
   - `[type] 한글 제목`
   - `1. 내용`
   - `2. 수정 내역`
   - `3. 영향도`
   - `jira : ...`
+- [x] D08-D Spec Driven Development 적용 방식 확정
+  - agent가 SDD-none/lite/full 직접 판단
+  - none/lite/full은 같은 A~Z 흐름의 압축률 차이
+  - 불필요한 QnA 없이 합리적 가정으로 진행
 - [ ] D08 1차 profile 범위 확정
   - 권장: minimal, developer, product, business
 - [ ] D09 installer 실행 방식 확정
@@ -260,6 +265,7 @@ CLAUDE.md
 GEMINI.md
 .agents/rules/common/
 .agents/rules/developer/harness-engineering.md
+.agents/rules/developer/spec-driven-development.md
 .agents/rules/developer/architecture.md
 .agents/rules/developer/git-commit-convention.md
 .agents/skills/
@@ -338,6 +344,43 @@ docs/plans/codex/company-wide-agent-rollout/02d-project-coding-architecture-rule
 
 ```text
 docs/plans/codex/company-wide-agent-rollout/02b-harness-engineering-principles.md
+```
+
+### 3.2-C Spec Driven Development rules 추가/보강
+
+현재 프로젝트에 먼저 추가됨:
+
+```text
+.agents/rules/developer/spec-driven-development.md
+.agents/skills/spec-mode-selector/SKILL.md
+```
+
+핵심 결정:
+
+```text
+SDD-none, SDD-lite, SDD-full은 서로 다른 프로세스가 아니다.
+같은 A~Z 흐름을 공유하고, 중간 단계와 산출물의 깊이만 다르다.
+
+none: A → C → Z
+lite: A → C → E → F → G → Z
+full: A → B → C → D → E → F → G → H → Z
+```
+
+해야 할 일:
+
+- [ ] `agent-deploy/assets/rules/developer/spec-driven-development.md`로 승격
+- [ ] `agent-deploy/assets/skills/spec-mode-selector/SKILL.md`로 승격
+- [ ] modules.json에 `sdd-lite` 또는 `spec-driven-development-rules` 추가
+- [ ] developer profile에 SDD-lite 기본 포함
+- [ ] sdd profile에 SDD-full workflow 포함
+- [ ] Codex/Claude/Gemini adapter별 SDD 지시문 변환 방식 정의
+- [ ] `docs/specs/<feature>/` 템플릿 추가
+
+참고 문서:
+
+```text
+docs/plans/codex/company-wide-agent-rollout/07-workflow-standardization.md
+references/k-sdd/
 ```
 
 ### 3.3 commit convention rules 추가

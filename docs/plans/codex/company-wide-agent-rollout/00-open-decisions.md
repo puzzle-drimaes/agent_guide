@@ -33,6 +33,12 @@ P3: 운영 고도화 단계에서 결정
 
 ### D01. 정규 소스 저장 위치
 
+상태:
+
+```text
+Proposed
+```
+
 질문:
 
 ```text
@@ -67,6 +73,12 @@ Phase 1 시작 전
 
 ### D02. 1차 지원 대상 AI 도구
 
+상태:
+
+```text
+Accepted
+```
+
 질문:
 
 ```text
@@ -86,6 +98,13 @@ Phase 1 시작 전
 Codex + Claude를 먼저 안정화하고, Gemini는 Pilot 중 추가
 ```
 
+결정:
+
+```text
+1차 구현은 Codex + Claude를 우선한다.
+Gemini는 adapter contract와 fallback 정책을 먼저 열어두고 Pilot 중 추가한다.
+```
+
 이유:
 
 - 현재 agent-deploy에는 Claude adapter가 있다.
@@ -101,6 +120,12 @@ Installer MVP 구현 전
 ---
 
 ### D03. 개발자/비개발자 전달 방식
+
+상태:
+
+```text
+Accepted
+```
 
 질문:
 
@@ -120,6 +145,13 @@ Installer MVP 구현 전
 개발자는 CLI 또는 bundle, 비개발자는 OS별 installer/bundle/Custom Instructions/Prompt DB 중심
 ```
 
+결정:
+
+```text
+개발자는 project bundle installer를 기본으로 한다.
+비개발자는 동일한 방법론을 가이드, Prompt DB, Custom Instructions, 필요 시 bundle로 전달한다.
+```
+
 원칙:
 
 ```text
@@ -135,6 +167,12 @@ Installer MVP 구현 전
 ---
 
 ### D04. 배포 채널
+
+상태:
+
+```text
+Accepted
+```
 
 질문:
 
@@ -178,6 +216,12 @@ Pilot 전
 ---
 
 ### D04-B. 기본 설치 범위
+
+상태:
+
+```text
+Accepted
+```
 
 질문:
 
@@ -234,6 +278,12 @@ Installer MVP 구현 전
 
 ### D05. 지식 DB 위치
 
+상태:
+
+```text
+Proposed
+```
+
 질문:
 
 ```text
@@ -264,6 +314,12 @@ Slack: 알림과 회고 수집 입구
 ---
 
 ### D06. 공용 계정 매핑 방식
+
+상태:
+
+```text
+Proposed
+```
 
 질문:
 
@@ -300,6 +356,12 @@ Pilot 대상 선정 전
 
 ### D07. 민감정보 입력 금지 범위
 
+상태:
+
+```text
+Proposed
+```
+
 질문:
 
 ```text
@@ -328,6 +390,12 @@ Pilot 대상 선정 전
 ## P1. Pilot 전 결정
 
 ### D08-A. Installer 내부 아키텍처 패턴
+
+상태:
+
+```text
+Accepted
+```
 
 질문:
 
@@ -384,6 +452,12 @@ Installer MVP 구현 전
 ---
 
 ### D08-B. 개발 프로젝트 코딩 아키텍처 표준
+
+상태:
+
+```text
+Accepted
+```
 
 질문:
 
@@ -443,6 +517,12 @@ developer profile 작성 전
 
 ### D08-C. Git Commit Convention 표준
 
+상태:
+
+```text
+Accepted
+```
+
 질문:
 
 ```text
@@ -489,7 +569,87 @@ developer profile 작성 전
 
 ---
 
+### D08-D. Spec Driven Development 적용 방식
+
+상태:
+
+```text
+Accepted
+```
+
+질문:
+
+```text
+AI agent가 작업 지시를 받았을 때 SDD-none, SDD-lite, SDD-full 중 어떤 깊이로 진행할지 누가 판단할 것인가?
+```
+
+결정:
+
+```text
+agent가 작업 지시를 분석해 SDD mode를 직접 판단한다.
+작업자에게 불필요한 QnA를 요청하지 않는다.
+none/lite/full은 서로 다른 프로세스가 아니라 같은 A~Z 흐름의 압축률 차이로 정의한다.
+```
+
+공통 단계:
+
+```text
+A. Analyze       작업 지시 해석 / mode 판단
+B. Discover      관련 구조, 정책, 제약 확인
+C. Criteria      실행 기준, 성공 기준, 영향 범위 정리
+D. Design        구조, 대안, 경계 설계
+E. Tasks         작업 단위 분해
+F. Implement     실제 변경
+G. Verify        테스트, diff, 규칙 위반 확인
+H. Review        리뷰, 리스크, 회고
+Z. Report        결과 보고 / 기록
+```
+
+mode별 흐름:
+
+```text
+SDD-none:
+  A → C → Z
+
+SDD-lite:
+  A → C → E → F → G → Z
+
+SDD-full:
+  A → B → C → D → E → F → G → H → Z
+```
+
+QnA 원칙:
+
+```text
+기본은 질문하지 않고 합리적 가정을 명시한 뒤 진행한다.
+질문은 파괴적 작업, 보안/credential, 비용 발생, 외부 배포, 요구사항 충돌로 제한한다.
+```
+
+profile 반영:
+
+```text
+developer profile:
+  SDD-lite 기본 포함
+
+sdd profile:
+  SDD-full workflow 포함
+```
+
+결정 시점:
+
+```text
+developer profile 작성 전
+```
+
+---
+
 ### D08. 1차 profile 범위
+
+상태:
+
+```text
+Proposed
+```
 
 질문:
 
@@ -519,6 +679,12 @@ governance
 
 ### D09. installer 실행 방식
 
+상태:
+
+```text
+Proposed
+```
+
 질문:
 
 ```text
@@ -542,6 +708,12 @@ Pilot 사용자는 어떤 방식으로 installer를 실행할 것인가?
 ---
 
 ### D10. provenance 식별자
+
+상태:
+
+```text
+Proposed
+```
 
 질문:
 
@@ -573,6 +745,12 @@ install-state에 누구/어떤 계정/어떤 머신에서 설치했는지 기록
 
 ### D11. Prompt DB 승인 방식
 
+상태:
+
+```text
+Proposed
+```
+
 질문:
 
 ```text
@@ -594,6 +772,12 @@ install-state에 누구/어떤 계정/어떤 머신에서 설치했는지 기록
 
 ### D12. KPI 목표값
 
+상태:
+
+```text
+Proposed
+```
+
 질문:
 
 ```text
@@ -608,6 +792,60 @@ PR 노하우 작성률: 80% 이상
 Prompt DB 등록: 월 10개 이상
 출처 표기율: 90% 이상
 Pilot 설치 성공률: 80% 이상
+```
+
+---
+
+## Codex adapter 착수 기준
+
+Codex adapter 구현 전 준비 작업은 이 문서의 `P0/P1` 결정 중 아래 항목을 기준으로 시작한다.
+
+```text
+D02 1차 지원 대상 AI 도구: Accepted
+D03 개발자/비개발자 전달 방식: Accepted
+D04 배포 채널: Accepted
+D04-B 기본 설치 범위: Accepted
+D08-A Installer 내부 아키텍처 패턴: Accepted
+D08-B 개발 프로젝트 코딩 아키텍처 표준: Accepted
+D08-C Git Commit Convention 표준: Accepted
+```
+
+Codex adapter의 1차 구현 기준:
+
+```text
+기본 scope:
+  project
+
+root instruction:
+  AGENTS.md
+
+canonical rule source:
+  .agents/rules/
+
+skills:
+  .agents/skills/
+
+Codex-specific config:
+  .codex/
+
+install state:
+  .agent-deploy/install-state.json
+```
+
+하네스 엔지니어링 기준:
+
+```text
+파일 구조의 동일성이 아니라 semantic equivalence를 목표로 한다.
+Codex가 native로 지원하지 않는 capability는 instruction-backed fallback 또는 skip reason으로 처리한다.
+target별 차이는 core가 아니라 target adapter가 흡수한다.
+```
+
+다음 구현 문서:
+
+```text
+docs/plans/codex/company-wide-agent-rollout/02b-harness-engineering-principles.md
+docs/plans/codex/company-wide-agent-rollout/03-installer-mvp.md
+docs/plans/codex/company-wide-agent-rollout/08-target-adapters.md
 ```
 
 ---

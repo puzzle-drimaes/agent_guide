@@ -176,6 +176,7 @@ docs/plans/codex/company-wide-agent-rollout/00-open-decisions.md
 - [x] installer 내부 아키텍처 패턴.
 - [x] 프로젝트 코딩 아키텍처 표준.
 - [x] Git Commit Convention 표준.
+- [x] Spec Driven Development none/lite/full 적용 방식.
 - [x] Prompt DB 승인 방식.
 - [x] KPI 목표값.
 - [x] MCP 기본 포함 여부.
@@ -487,6 +488,7 @@ GEMINI.md
 .agents/rules/common/source-attribution.md
 .agents/rules/common/knowledge-sharing.md
 .agents/rules/developer/harness-engineering.md
+.agents/rules/developer/spec-driven-development.md
 .agents/rules/developer/architecture.md
 .agents/rules/developer/git-commit-convention.md
 ```
@@ -497,11 +499,13 @@ GEMINI.md
 .agents/skills/architecture-review/SKILL.md
 .agents/skills/commit-message-writer/SKILL.md
 .agents/skills/harness-parity-review/SKILL.md
+.agents/skills/spec-mode-selector/SKILL.md
 ```
 
 의미:
 
 - [x] 하네스 엔지니어링 룰을 현재 프로젝트에 먼저 적용.
+- [x] SDD-none/lite/full 자동 판단 룰을 현재 프로젝트에 먼저 적용.
 - [x] 코딩 아키텍처 룰을 현재 프로젝트에 먼저 적용.
 - [x] Git commit convention 룰을 현재 프로젝트에 먼저 적용.
 - [x] Claude/Codex/Gemini 공통 진입점 문서를 생성.
@@ -512,6 +516,7 @@ GEMINI.md
 - [ ] 동일 내용을 `agent-deploy/assets/`로 승격.
 - [ ] modules/profile manifest에 포함.
 - [ ] adapter가 각 harness 파일로 변환하도록 구현.
+- [ ] SDD-lite/full을 developer/sdd profile에 반영.
 
 ---
 

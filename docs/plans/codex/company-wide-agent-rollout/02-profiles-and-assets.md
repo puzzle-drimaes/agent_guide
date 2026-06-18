@@ -83,6 +83,7 @@ security-rules
 source-attribution-rules
 knowledge-sharing-rules
 architecture-rules
+spec-driven-development-rules
 commit-convention-rules
 developer-rules
 product-rules
@@ -110,6 +111,7 @@ mcp-baseline
     "developer": [
       "common-rules",
       "security-rules",
+      "spec-driven-development-rules",
       "architecture-rules",
       "commit-convention-rules",
       "developer-rules",

@@ -28,6 +28,7 @@ Claude 전용 판단이 필요하더라도 원본 룰의 의미를 바꾸지 않
 - `agent-deploy/`를 installer core로 확장.
 - target별 차이는 adapter로 흡수.
 - 하네스 엔지니어링은 `.agents/rules/developer/harness-engineering.md` 기준.
+- SDD mode는 `.agents/rules/developer/spec-driven-development.md` 기준으로 agent가 직접 판단.
 - 개발 아키텍처는 `.agents/rules/developer/architecture.md` 기준.
 - commit message는 `.agents/rules/developer/git-commit-convention.md` 기준.
 - 민감정보 입력/저장 금지.
