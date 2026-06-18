@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "profiles": {
+    "minimal": ["baseline-rules"],
+    "core": ["baseline-rules", "review-agent", "mcp-baseline"],
+    "developer": [
+      "baseline-rules",
+      "language-rules",
+      "review-agent",
+      "architecture-rules",
+      "architecture-review-agent",
+      "architecture-review-skill",
+      "planning-command",
+      "mcp-baseline"
+    ],
+    "full": [
+      "baseline-rules",
+      "language-rules",
+      "review-agent",
+      "architecture-rules",
+      "architecture-review-agent",
+      "architecture-review-skill",
+      "planning-command",
+      "mcp-baseline"
+    ]
+  }
+}

@@ -1,0 +1,78 @@
+{
+  "version": 1,
+  "modules": [
+    {
+      "id": "baseline-rules",
+      "description": "Common security + prompt-defense rules (everyone)",
+      "paths": ["rules/common"],
+      "targets": ["claude", "cursor"],
+      "dependencies": [],
+      "cost": "light",
+      "stability": "stable",
+      "defaultInstall": true
+    },
+    {
+      "id": "language-rules",
+      "description": "Language-specific coding style (developer)",
+      "paths": ["rules/python"],
+      "targets": ["claude", "cursor"],
+      "dependencies": ["baseline-rules"],
+      "cost": "light",
+      "stability": "stable"
+    },
+    {
+      "id": "architecture-rules",
+      "description": "Software architecture rules for company product code",
+      "paths": ["rules/developer"],
+      "targets": ["claude", "cursor"],
+      "dependencies": ["baseline-rules"],
+      "cost": "light",
+      "stability": "stable"
+    },
+    {
+      "id": "review-agent",
+      "description": "Code-reviewer subagent (read-only, least-agency)",
+      "paths": ["agents/code-reviewer.md"],
+      "targets": ["claude", "cursor"],
+      "dependencies": ["baseline-rules"],
+      "cost": "light",
+      "stability": "stable"
+    },
+    {
+      "id": "architecture-review-agent",
+      "description": "Architecture-reviewer subagent (read-only)",
+      "paths": ["agents/architecture-reviewer.md"],
+      "targets": ["claude", "cursor"],
+      "dependencies": ["architecture-rules"],
+      "cost": "light",
+      "stability": "stable"
+    },
+    {
+      "id": "architecture-review-skill",
+      "description": "Architecture-review workflow skill (layer-violation checklist)",
+      "paths": ["skills/architecture-review"],
+      "targets": ["claude", "cursor"],
+      "dependencies": ["architecture-rules"],
+      "cost": "light",
+      "stability": "stable"
+    },
+    {
+      "id": "planning-command",
+      "description": "/plan slash command (Claude; Cursor records skip+reason)",
+      "paths": ["commands"],
+      "targets": ["claude", "cursor"],
+      "dependencies": [],
+      "cost": "light",
+      "stability": "beta"
+    },
+    {
+      "id": "mcp-baseline",
+      "description": "Company-approved MCP servers",
+      "paths": ["mcp"],
+      "targets": ["claude", "cursor"],
+      "dependencies": [],
+      "cost": "light",
+      "stability": "stable"
+    }
+  ]
+}

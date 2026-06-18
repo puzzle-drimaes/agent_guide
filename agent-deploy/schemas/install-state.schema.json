@@ -1,0 +1,64 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "agent-deploy install state (provenance)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "installedAt", "target", "request", "resolution", "source", "operations"],
+  "properties": {
+    "schemaVersion": { "const": "agentdeploy.install.v1" },
+    "installedAt": { "type": "string", "minLength": 1 },
+    "target": {
+      "type": "object",
+      "required": ["id", "target", "scope", "root", "statePath"],
+      "properties": {
+        "id": { "type": "string" },
+        "target": { "type": "string" },
+        "scope": { "enum": ["home", "project"] },
+        "root": { "type": "string" },
+        "statePath": { "type": "string" }
+      }
+    },
+    "request": {
+      "type": "object",
+      "required": ["profile", "modules", "seedIds"],
+      "properties": {
+        "profile": { "type": ["string", "null"] },
+        "modules": { "type": "array", "items": { "type": "string" } },
+        "seedIds": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "resolution": {
+      "type": "object",
+      "required": ["selectedModules", "skippedModules"],
+      "properties": {
+        "selectedModules": { "type": "array", "items": { "type": "string" } },
+        "skippedModules": { "type": "array" }
+      }
+    },
+    "source": {
+      "type": "object",
+      "required": ["repoVersion", "repoCommit", "manifestVersion"],
+      "properties": {
+        "repoVersion": { "type": ["string", "null"] },
+        "repoCommit": { "type": ["string", "null"] },
+        "manifestVersion": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "operations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["kind", "moduleId", "dest", "strategy", "scope"],
+        "properties": {
+          "kind": { "enum": ["copy-file", "merge-json", "skip"] },
+          "moduleId": { "type": "string" },
+          "sourceRel": { "type": ["string", "null"] },
+          "dest": { "type": ["string", "null"] },
+          "strategy": { "type": "string" },
+          "scope": { "enum": ["project", "home"] },
+          "reason": { "type": "string" }
+        }
+      }
+    }
+  }
+}

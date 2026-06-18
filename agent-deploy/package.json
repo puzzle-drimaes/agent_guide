@@ -1,0 +1,25 @@
+{
+  "name": "agent-deploy",
+  "version": "0.1.0",
+  "description": "Manifest-driven, adapter-based installer for distributing AI coding agent configs across tools (internal reference skeleton).",
+  "type": "module",
+  "bin": {
+    "agent-deploy": "src/cli.js"
+  },
+  "files": [
+    "src",
+    "manifests",
+    "schemas",
+    "assets",
+    "install.sh",
+    "install.bat"
+  ],
+  "scripts": {
+    "validate": "node scripts/validate-manifests.js",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT"
+}

@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "company-docs": {
+      "type": "http",
+      "url": "https://mcp.internal.example.com/docs",
+      "env": {
+        "MCP_TOKEN": "${COMPANY_MCP_TOKEN}"
+      }
+    },
+    "filesystem": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "."]
+    }
+  }
+}

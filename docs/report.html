@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>사내 Agent 설치·배포 — 통합 분석 &amp; 추출 로드맵 (ECC + k-sdd)</title>
+<style>
+  :root{
+    --ink:#1e293b;--muted:#64748b;--line:#e2e8f0;--soft:#f8fafc;
+    --indigo:#4f46e5;--teal:#0d9488;--violet:#7c3aed;--sky:#0ea5e9;
+    --ok:#16a34a;--bad:#dc2626;--warn:#d97706;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans KR",sans-serif;
+    color:var(--ink);background:#eef2f7;line-height:1.65;font-size:15px}
+  a{color:var(--indigo);text-decoration:none}
+  header.hero{background:linear-gradient(120deg,#0f172a,#312e81 45%,#0f766e);color:#fff;padding:52px 24px}
+  .wrap{max-width:1040px;margin:0 auto;padding:0 20px}
+  .hero h1{margin:0 0 10px;font-size:32px;letter-spacing:-.5px}
+  .hero p{margin:4px 0;color:#c7d2fe}
+  .hero .meta{margin-top:18px;font-size:13px;color:#a5b4fc;display:flex;gap:18px;flex-wrap:wrap}
+  .hero .meta b{color:#e0e7ff;font-weight:600}
+  main{max-width:1040px;margin:-30px auto 60px;padding:0 20px}
+  section{background:#fff;border:1px solid var(--line);border-radius:14px;padding:26px 30px;margin:20px 0;box-shadow:0 1px 3px rgba(15,23,42,.06)}
+  h2{font-size:21px;margin:0 0 4px;display:flex;align-items:center;gap:10px}
+  h2 .n{background:var(--indigo);color:#fff;font-size:13px;width:26px;height:26px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto}
+  h2 + .sub{color:var(--muted);margin:0 0 18px;font-size:14px}
+  h3{font-size:15.5px;margin:22px 0 8px;color:#0f172a;display:flex;align-items:center;gap:8px}
+  h3 .dot{width:9px;height:9px;border-radius:3px;display:inline-block}
+  table{width:100%;border-collapse:collapse;margin:10px 0;font-size:13.5px}
+  th,td{text-align:left;padding:9px 11px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:var(--soft);color:#334155;font-weight:600;font-size:12.5px;text-transform:uppercase;letter-spacing:.4px}
+  tbody tr:hover{background:#fafbff}
+  code{background:#f1f5f9;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:12.5px;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;color:#0f172a}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:12px;margin:16px 0}
+  .stat{background:linear-gradient(135deg,#eef2ff,#f0fdfa);border:1px solid #e0e7ff;border-radius:12px;padding:14px;text-align:center}
+  .stat b{display:block;font-size:24px;color:var(--indigo);line-height:1.1}
+  .stat span{font-size:12px;color:var(--muted)}
+  .toc{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .toc a{background:#eef2ff;border:1px solid #e0e7ff;border-radius:999px;padding:5px 13px;font-size:13px;color:#4338ca}
+  .toc a:hover{background:#e0e7ff}
+  .flow{background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 20px;font-family:ui-monospace,Menlo,monospace;font-size:13px;overflow-x:auto;white-space:pre;line-height:1.7}
+  .flow .a{color:#a5b4fc}.flow .b{color:#7dd3fc}.flow .c{color:#86efac}
+  .src{display:inline-block;font-size:10.5px;font-weight:700;padding:1px 6px;border-radius:5px;white-space:nowrap}
+  .s-ecc{background:#e0e7ff;color:#4338ca}.s-ksdd{background:#ccfbf1;color:#0f766e}.s-both{background:#fef3c7;color:#b45309}.s-impl{background:#dcfce7;color:#15803d}
+  .pill{font-size:11px;padding:2px 7px;border-radius:6px;font-weight:700}
+  .p0{background:#fee2e2;color:#b91c1c}.p1{background:#ffedd5;color:#c2410c}.p2{background:#e0f2fe;color:#0369a1}
+  .copy{background:#dcfce7;color:#15803d}
+  .callout{border-left:4px solid var(--indigo);background:#f5f3ff;border-radius:0 10px 10px 0;padding:12px 16px;margin:14px 0;font-size:14px}
+  .callout.teal{border-color:var(--teal);background:#f0fdfa}
+  .callout.warn{border-color:var(--warn);background:#fffbeb}
+  ul.tight{margin:8px 0;padding-left:20px}ul.tight li{margin:5px 0}
+  .legend{font-size:12px;color:var(--muted);margin:6px 0 0}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:760px){.two{grid-template-columns:1fr}}
+  .box{border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+  .box.ecc{border-top:3px solid var(--indigo)}.box.ksdd{border-top:3px solid var(--teal)}
+  .box h4{margin:0 0 8px;font-size:15px}
+  footer{max-width:1040px;margin:0 auto 50px;padding:0 20px;color:var(--muted);font-size:12.5px;text-align:center}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="wrap">
+    <h1>사내 Agent 설치·배포 — 통합 분석 &amp; 추출 로드맵</h1>
+    <p>ECC + k-sdd 분석을 합본한 단일 리포트 — <b>기법 카탈로그 + 추출 우선순위 + agent-deploy 현황</b></p>
+    <div class="meta">
+      <span>대상: <b>ECC/ · k-sdd/</b></span>
+      <span>목표: <b>모든 사람 × 모든 OS × 모든 에이전트, 같은 방향성</b></span>
+      <span>작성: <b>Claude</b></span>
+      <span>날짜: <b>2026-06-17</b></span>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section>
+    <h2><span class="n">0</span>개요</h2>
+    <p class="sub">두 오픈소스에서 <b>사내 AI 코딩 에이전트 설치·배포 시스템</b>에 재사용할 하네스 엔지니어링 기법을 추출·통합한다. 두 프로젝트는 같은 문제("단일 표준 → 여러 AI 툴 일관 배포")를 다른 깊이로 푼다 — 경쟁이 아니라 상보적.</p>
+    <div class="stats">
+      <div class="stat"><b>67</b><span>ECC agents</span></div>
+      <div class="stat"><b>271</b><span>ECC skills</span></div>
+      <div class="stat"><b>114</b><span>ECC rules</span></div>
+      <div class="stat"><b>48</b><span>ECC hooks</span></div>
+      <div class="stat"><b>11</b><span>ECC 어댑터</span></div>
+      <div class="stat"><b>17</b><span>k-sdd skills</span></div>
+      <div class="stat"><b>8</b><span>k-sdd 에이전트</span></div>
+      <div class="stat"><b>0</b><span>k-sdd 의존성</span></div>
+    </div>
+    <p class="legend">출처 표기: <span class="src s-ecc">ECC</span> <span class="src s-ksdd">k-sdd</span> <span class="src s-both">둘다</span> <span class="src s-impl">agent-deploy 구현됨</span> · 모든 수치는 저장소 실측.</p>
+    <div class="toc">
+      <a href="#cmp">① 성격 비교</a>
+      <a href="#arch">② 배포 아키텍처</a>
+      <a href="#cat">③ 통합 기법 카탈로그</a>
+      <a href="#road">④ 추출 우선순위</a>
+      <a href="#status">⑤ agent-deploy 현황</a>
+      <a href="#caution">⑥ 주의할 점</a>
+      <a href="#concl">⑦ 통합 결론</a>
+    </div>
+  </section>
+
+  <section id="cmp">
+    <h2><span class="n">1</span>ECC vs k-sdd — 한눈에</h2>
+    <div class="two">
+      <div class="box ecc">
+        <h4>ECC <span class="src s-ecc">넓이</span></h4>
+        <ul class="tight">
+          <li>~10개 툴(어댑터 11) 대상 <b>배포 엔진</b> + 방대한 운영 자산</li>
+          <li>강점: 어댑터·3계층 매니페스트·provenance·<b>공급망 보안</b></li>
+          <li>역할: <b>운영 자산 &amp; 하네스 패턴 라이브러리</b></li>
+        </ul>
+      </div>
+      <div class="box ksdd">
+        <h4>k-sdd <span class="src s-ksdd">깊이</span></h4>
+        <ul class="tight">
+          <li>경량 <b>설치 엔진</b> + Spec-Driven 방법론</li>
+          <li>강점: manifest→plan→apply·path-safety·<b>자율 구현 루프</b></li>
+          <li>역할: <b>설치 엔진 뼈대 &amp; SDD 워크플로우</b></li>
+        </ul>
+      </div>
+    </div>
+    <table>
+      <thead><tr><th>축</th><th>ECC</th><th>k-sdd</th></tr></thead>
+      <tbody>
+        <tr><td>배포 인프라 넓이</td><td>강함(어댑터 11)</td><td>경량(8 타깃)</td></tr>
+        <tr><td>설치 엔진 명료성</td><td>대규모·복잡</td><td><b>선명·이식 쉬움</b></td></tr>
+        <tr><td>자율 구현 방법론</td><td>오케스트레이션 가이드</td><td><b>impl/review/debug 루프</b></td></tr>
+        <tr><td>공급망 보안</td><td><b>스캔·유니코드·서명 관점</b></td><td>path-safety 중심</td></tr>
+        <tr><td>승인 게이트</td><td>GATE 마커</td><td><b>spec.json 상태머신</b></td></tr>
+      </tbody>
+    </table>
+    <div class="callout">결론: <b>k-sdd = 설치 엔진 뼈대, ECC = 자산·패턴·보안 라이브러리.</b> 사내 시스템은 둘을 합쳐 <code>agent-deploy</code>로 구현한다.</div>
+  </section>
+
+  <section id="arch">
+    <h2><span class="n">2</span>통합 배포 아키텍처 — "하나의 정의 → N개 툴"</h2>
+    <p class="sub">정규 소스를 설치 타임에 각 툴 네이티브 설정으로 변환하는 4단 파이프라인(두 프로젝트 공통).</p>
+    <div class="flow"><span class="a">[정규 소스 assets/]</span>      <span class="b">[매니페스트]</span>           <span class="c">[타깃 어댑터]</span>        [파일 연산]
+rules/ skills/ agents/    components→modules→     claude / cursor /     copy-file
+hooks/ mcp/ commands/       profiles            codex / gemini / …    merge-json / skip+reason
+                         (의존성·순환·target필터)  (정규→네이티브 매핑)   + path-safety + provenance</div>
+    <table>
+      <thead><tr><th>레이어</th><th>핵심</th><th>출처</th></tr></thead>
+      <tbody>
+        <tr><td>매니페스트</td><td>components→modules→profiles, 서브경로·단일파일 스코핑</td><td><span class="src s-both">둘다</span></td></tr>
+        <tr><td>타깃 어댑터</td><td>공통 인터페이스로 툴별 매핑 — 새 툴 = 어댑터 1개</td><td><span class="src s-both">둘다</span></td></tr>
+        <tr><td>비파괴 적용</td><td>deepMerge(JSON)·add-only(TOML)·append(memory)</td><td><span class="src s-both">둘다</span></td></tr>
+        <tr><td>provenance</td><td>install-state: 버전·커밋·연산·scope 기록</td><td><span class="src s-both">둘다</span></td></tr>
+        <tr><td>안전</td><td>path-safety·symlink·dry-run·plan/apply 분리</td><td><span class="src s-ksdd">k-sdd</span></td></tr>
+      </tbody>
+    </table>
+    <div class="callout teal"><b>설치 범위(scope) — project 기본 · global 옵션.</b> 기본은 <b>프로젝트별 설치</b>(repo 내 <code>.claude/</code>·<code>.cursor/</code> → PR로 리뷰·공유). 사용자가 원하면 번들 스크립트의 <code>--global</code>로 <b>전역 설치</b>(<code>~/.claude/</code> 등, 어떤 IDE/CLI에서나 공유). 두 scope 모두 path-safety는 해당 base root로 적용.</div>
+  </section>
+
+  <section id="cat">
+    <h2><span class="n">3</span>통합 재사용 기법 카탈로그</h2>
+    <p class="sub">중복 제거·출처 표기. 4개 레이어로 분류.</p>
+
+    <h3><span class="dot" style="background:var(--sky)"></span>A. 배포·설치 레이어</h3>
+    <table>
+      <thead><tr><th>기법</th><th>요지</th><th>출처</th></tr></thead>
+      <tbody>
+        <tr><td>타깃 어댑터 패턴</td><td>1정의→N툴, 새 툴은 어댑터 1개로 확장</td><td><span class="src s-both">둘다</span></td></tr>
+        <tr><td>계층형 매니페스트</td><td>components/modules/profiles 데이터로 큐레이션</td><td><span class="src s-both">둘다</span></td></tr>
+        <tr><td>의존성 해석 + 순환 검출</td><td>모듈 의존 자동 확장, 사이클 차단</td><td><span class="src s-impl">구현</span></td></tr>
+        <tr><td>provenance(install-state)</td><td>repoCommit·manifestVersion·연산·scope 기록</td><td><span class="src s-both">둘다</span></td></tr>
+        <tr><td>비파괴 머지</td><td>deepMerge·TOML add-only·sticky append</td><td><span class="src s-both">둘다</span></td></tr>
+        <tr><td>계획/적용 분리 + dry-run</td><td>변경 검토 후 적용</td><td><span class="src s-both">둘다</span></td></tr>
+        <tr><td>경로/심볼릭 안전 가드</td><td>root 밖·symlink escape 차단</td><td><span class="src s-ksdd">k-sdd</span></td></tr>
+        <tr><td>스키마 검증 + CI 불변식</td><td>경로 실존·dest 충돌·드리프트 CI 차단</td><td><span class="src s-ecc">ECC</span></td></tr>
+        <tr><td>카테고리 덮어쓰기 정책</td><td>managed=overwrite/memory=append/config=merge</td><td><span class="src s-ksdd">k-sdd</span></td></tr>
+        <tr><td>버전 핀 + 멱등 publish(provenance)</td><td>태그 기반 재현·안전 배포</td><td><span class="src s-both">둘다</span></td></tr>
+        <tr><td>번들/바이너리/스크립트 전달</td><td>zip + install.sh/.bat, exe 옵션</td><td><span class="src s-impl">구현</span></td></tr>
+      </tbody>
+    </table>
+
+    <h3><span class="dot" style="background:var(--indigo)"></span>B. 하네스 콘텐츠 레이어</h3>
+    <table>
+      <thead><tr><th>기법</th><th>요지</th><th>출처</th></tr></thead>
+      <tbody>
+        <tr><td>skills-first + thin command shim</td><td>워크플로우는 skill, command는 호환 shim</td><td><span class="src s-ecc">ECC</span></td></tr>
+        <tr><td>구조화 frontmatter 계약</td><td>agent/skill/rule/command 표준 스키마</td><td><span class="src s-both">둘다</span></td></tr>
+        <tr><td>에이전트별 도구 스코핑</td><td>least-agency — read-only/write 분리</td><td><span class="src s-ecc">ECC</span></td></tr>
+        <tr><td>태스크별 모델 라우팅</td><td>haiku→sonnet→opus 비용 통제</td><td><span class="src s-ecc">ECC</span></td></tr>
+        <tr><td>description 트리거(긍정+부정)</td><td>자동 발동 정확도↑</td><td><span class="src s-ecc">ECC</span></td></tr>
+        <tr><td>점진적 공개 skills</td><td>SKILL.md 짧게, 참조 온디맨드</td><td><span class="src s-ecc">ECC</span></td></tr>
+        <tr><td>계층형 rules(공통+도메인별)</td><td>glob 스코핑, 도메인이 공통 override</td><td><span class="src s-both">둘다</span></td></tr>
+        <tr><td>커밋/Git 규약</td><td>conventional commit + 명시적 staging + PR 노하우 한 줄</td><td><span class="src s-both">둘다</span></td></tr>
+        <tr><td>공유 규칙 단일 소스 주입</td><td>frontmatter 선언으로 다중 스킬 공유</td><td><span class="src s-ksdd">k-sdd</span></td></tr>
+        <tr><td>소프트웨어 아키텍처 룰(설치 자산)</td><td>Clean/Feature/MVVM + 아키텍처 리뷰</td><td><span class="src s-impl">구현</span></td></tr>
+        <tr><td>컨텍스트 모드 프로파일</td><td>dev/research/review 행동 전환</td><td><span class="src s-ecc">ECC</span></td></tr>
+      </tbody>
+    </table>
+
+    <h3><span class="dot" style="background:var(--teal)"></span>C. 자율 구현 &amp; 거버넌스 레이어</h3>
+    <table>
+      <thead><tr><th>기법</th><th>요지</th><th>출처</th></tr></thead>
+      <tbody>
+        <tr><td>명시적 승인 게이트</td><td>spec.json 상태머신 / GATE 마커</td><td><span class="src s-both">둘다</span></td></tr>
+        <tr><td>경계 우선 연쇄</td><td>File Structure Plan→_Boundary:_→리뷰</td><td><span class="src s-ksdd">k-sdd</span></td></tr>
+        <tr><td>구조화 핸드오프</td><td>STATUS/VERDICT 필드만 신뢰</td><td><span class="src s-ksdd">k-sdd</span></td></tr>
+        <tr><td>독립 적대적 리뷰어</td><td>self-report 불신, diff 직접 검증</td><td><span class="src s-both">둘다</span></td></tr>
+        <tr><td>fresh-context 디버그 + bounded retry</td><td>실패 이력 없이, 라운드 상한</td><td><span class="src s-ksdd">k-sdd</span></td></tr>
+        <tr><td>완료 검증 게이트</td><td>신선한 증거 없이 완료 주장 거부</td><td><span class="src s-ksdd">k-sdd</span></td></tr>
+        <tr><td>EARS 요구사항</td><td>검증 가능한 단일 행위 acceptance</td><td><span class="src s-ksdd">k-sdd</span></td></tr>
+        <tr><td>의존성 wave 병렬 디스패치</td><td>독립 스펙 병렬 + 일관성 리뷰</td><td><span class="src s-ksdd">k-sdd</span></td></tr>
+        <tr><td>자기 검증 루프 / 컴플라이언스 측정</td><td>pass@k, "규칙이 실제 지켜지나"</td><td><span class="src s-ecc">ECC</span></td></tr>
+        <tr><td>15분 태스크 분해 + 워킹 컨텍스트</td><td>pass@1↑, 메모리 위생</td><td><span class="src s-ecc">ECC</span></td></tr>
+      </tbody>
+    </table>
+
+    <h3><span class="dot" style="background:var(--bad)"></span>D. 보안·공급망 레이어</h3>
+    <table>
+      <thead><tr><th>기법</th><th>요지</th><th>출처</th></tr></thead>
+      <tbody>
+        <tr><td>Prompt Defense Baseline</td><td>역할변경·시크릿·외부콘텐츠 통일 프리앰블</td><td><span class="src s-ecc">ECC</span></td></tr>
+        <tr><td>공급망 IOC/유니코드/workflow 스캔</td><td>skill/hook 배포 = 공격면 → CI 스캔</td><td><span class="src s-ecc">ECC</span></td></tr>
+        <tr><td>MCP 카탈로그 + DISABLED 필터</td><td>승인 서버만, 환경별 on/off, 토큰 플레이스홀더</td><td><span class="src s-ecc">ECC</span></td></tr>
+        <tr><td>stale-replay 가드</td><td>세션 메모리 주입 시 "참조용" 래핑</td><td><span class="src s-ecc">ECC</span></td></tr>
+        <tr><td>아티팩트 서명</td><td>패키지/바이너리 서명 → 변조·OS 차단 방지</td><td><span class="src s-both">권장</span></td></tr>
+      </tbody>
+    </table>
+    <div class="callout">핵심 명제(ECC <code>the-security-guide.md</code>): <i>"never let the convenience layer outrun the isolation layer"</i> — 편의 레이어가 격리 레이어를 앞지르게 두지 마라.</div>
+  </section>
+
+  <section id="road">
+    <h2><span class="n">4</span>추출 우선순위 (P0 → P2)</h2>
+    <p class="sub"><span class="pill p0">P0</span> 즉시 · <span class="pill p1">P1</span> 다음 · <span class="pill p2">P2</span> 후속</p>
+    <table>
+      <thead><tr><th>우선</th><th>항목</th><th>출처/위치</th><th>용도</th></tr></thead>
+      <tbody>
+        <tr><td><span class="pill p0">P0</span></td><td>매니페스트(modules/profiles/components) 모델</td><td><span class="src s-both">둘다</span> <code>manifests/</code></td><td>설치 선택 단위 설계</td></tr>
+        <tr><td><span class="pill p0">P0</span></td><td>타깃 어댑터 계약</td><td><span class="src s-both">둘다</span> <code>install-targets/</code>·<code>targets/</code></td><td>Codex/Claude/Gemini 매핑</td></tr>
+        <tr><td><span class="pill p0">P0</span></td><td>plan→apply + path-safety</td><td><span class="src s-ksdd">k-sdd</span> <code>src/plan</code>·<code>pathSafety.ts</code></td><td>dry-run·안전 write</td></tr>
+        <tr><td><span class="pill p0">P0</span></td><td>install-state provenance + 스키마</td><td><span class="src s-ecc">ECC</span> <code>install-state.js</code></td><td>감사·재설치·롤백</td></tr>
+        <tr><td><span class="pill p0">P0</span></td><td>직무별 starter 자산(rules/skills/agents)</td><td><span class="src s-ecc">ECC</span> 선별</td><td>"같은 방법론" 핵심</td></tr>
+        <tr><td><span class="pill p1">P1</span></td><td>품질·보안 hook</td><td><span class="src s-ecc">ECC</span> <code>scripts/hooks/*</code>(48)</td><td>developer/security 프로파일</td></tr>
+        <tr><td><span class="pill p1">P1</span></td><td>CI asset/manifest 검증</td><td><span class="src s-ecc">ECC</span> <code>scripts/ci/validate-*</code></td><td>품질 게이트</td></tr>
+        <tr><td><span class="pill p1">P1</span></td><td>공급망 스캔 + 서명</td><td><span class="src s-ecc">ECC</span> + 신규</td><td>배포 보안</td></tr>
+        <tr><td><span class="pill p1">P1</span></td><td>SDD-lite 워크플로우</td><td><span class="src s-ksdd">k-sdd</span> <code>templates/shared/settings</code></td><td>대형 기능 프로파일</td></tr>
+        <tr><td><span class="pill p2">P2</span></td><td>impl/review/debug 자율 루프</td><td><span class="src s-ksdd">k-sdd</span> <code>kiro-*</code></td><td>장시간 구현(sdd)</td></tr>
+        <tr><td><span class="pill p2">P2</span></td><td>session/worktree/orchestration</td><td><span class="src s-ecc">ECC</span> <code>session-*</code>·<code>ecc2/</code></td><td>고급 운영</td></tr>
+        <tr><td><span class="pill p2">P2</span></td><td>uninstall/update/drift 생애주기</td><td>신규</td><td>v1→v2 운영</td></tr>
+      </tbody>
+    </table>
+
+    <h3><span class="dot" style="background:var(--ok)"></span>Starter Asset v1 (1차 배포 세트)</h3>
+    <p class="sub">"같은 방법론"으로 먼저 깔 최소 세트. 모든 프로파일은 <code>minimal</code> 포함.</p>
+    <table>
+      <thead><tr><th>module</th><th>포함</th><th>프로파일</th><th>비고</th></tr></thead>
+      <tbody>
+        <tr><td><code>common-rules</code></td><td>Prompt Defense 베이스라인 + 시크릿 금지</td><td>minimal(전원)</td><td><span class="src s-impl">구현</span></td></tr>
+        <tr><td><code>source-citation</code></td><td>외부 자료 출처·라이선스 표기(룰 ⑥)</td><td>minimal</td><td>신규</td></tr>
+        <tr><td><code>commit-convention</code></td><td>conventional commit + 명시 staging + PR 노하우(룰 ①)</td><td>minimal</td><td><span class="src s-both">둘다</span></td></tr>
+        <tr><td><code>language-rules</code></td><td>TS/Python/Go 등 언어별 스타일</td><td>developer</td><td><span class="src s-impl">구현</span></td></tr>
+        <tr><td><code>architecture-rules</code></td><td>Clean/Feature/MVVM + 계층 경계</td><td>developer/sdd</td><td><span class="src s-impl">자산</span></td></tr>
+        <tr><td><code>review-agents</code></td><td>code-reviewer · architecture-reviewer(read-only)</td><td>developer</td><td><span class="src s-impl">자산</span></td></tr>
+        <tr><td><code>developer-skills</code></td><td>plan(게이트) · code-review · architecture-review</td><td>developer</td><td><span class="src s-impl">자산</span></td></tr>
+        <tr><td><code>prompt-asset</code></td><td>재사용 프롬프트 등록 규약(룰 ⑤) — Notion DB</td><td>전 직무</td><td>신규</td></tr>
+        <tr><td><code>mcp-baseline</code></td><td>승인된 MCP 서버(시크릿은 플레이스홀더)</td><td>core+</td><td><span class="src s-impl">구현</span></td></tr>
+      </tbody>
+    </table>
+    <p class="legend">비개발자 프로파일(product/design/business/manager)도 <code>minimal</code> + 직무 prompts로 같은 방향성을 공유.</p>
+  </section>
+
+  <section id="status">
+    <h2><span class="n">5</span>agent-deploy 현황 (이미 구현 vs 남은 것)</h2>
+    <p class="sub">본 repo <code>agent-deploy/</code>에 구현된 것과 미구현. ✅는 <b>스모크 테스트 수준에서 기본 동작만 확인</b>(프로덕션 검증 아님), 자산 항목은 파일 설치·스코핑까지를 의미.</p>
+    <div class="two">
+      <div class="box" style="border-top:3px solid var(--ok)">
+        <h4 style="color:var(--ok)">✅ 구현됨</h4>
+        <ul class="tight">
+          <li>매니페스트(modules/profiles) + 의존성 해석·순환 검출</li>
+          <li>타깃 어댑터(claude/cursor) + 서브경로·단일파일 스코핑</li>
+          <li>install-state provenance + 스키마</li>
+          <li>비파괴 deepMerge + path-safety + symlink 가드</li>
+          <li>계획/적용 분리 + dry-run + <code>--json</code></li>
+          <li>scope: project 기본 + <code>--global</code>(home)</li>
+          <li>skip+reason 연산, op에 scope/reason 기록</li>
+          <li>아키텍처 룰 + architecture-review <b>자산(프롬프트 .md) 추가·developer 스코핑·설치</b> <span style="color:var(--muted)">(리뷰 동작 자체는 에이전트가 읽는 지침이며 기능 검증은 별도)</span></li>
+          <li>번들 스크립트 install.sh/install.bat + CI 불변식 검증</li>
+        </ul>
+      </div>
+      <div class="box" style="border-top:3px solid var(--bad)">
+        <h4 style="color:var(--bad)">⬜ 남은 것</h4>
+        <ul class="tight">
+          <li>Codex / Gemini 어댑터</li>
+          <li>공급망 스캔(IOC/유니코드) + 아티팩트 서명</li>
+          <li>uninstall(provenance 역재생) / update-diff / drift repair</li>
+          <li>merge-toml(Codex 설정) / append-markdown</li>
+          <li>MCP DISABLED 필터 + 승인 카탈로그 거버넌스</li>
+          <li>harness parity test / capability matrix 문서</li>
+          <li>SDD-lite·impl/review/debug 자율 루프 자산</li>
+          <li>Windows .exe / 웹 설정 생성기(비개발자)</li>
+        </ul>
+      </div>
+    </div>
+    <div class="callout teal">계획 문서 연계(<code>docs/plans/claude/</code>): 보안·생애주기 <code>docs/plans/claude/03-safety-and-lifecycle.md</code> · 하네스 원칙 <code>docs/plans/claude/08-harness-engineering.md</code> · 자산 <code>docs/plans/claude/02-shared-method-and-assets.md</code>.</div>
+  </section>
+
+  <section id="caution">
+    <h2><span class="n">6</span>주의할 점</h2>
+    <ul class="tight">
+      <li><b>범위 과다</b> — ECC 전체(271 skills)는 20명 규모엔 무겁다. starter set부터.</li>
+      <li><b>하네스 기능 차이</b> — hook/skill/MCP 지원이 도구마다 다름 → semantic equivalence + skip+reason 기록.</li>
+      <li><b>SDD 과잉</b> — requirements/design/tasks를 전 업무 강제 시 adoption↓. <code>sdd</code>는 선택 프로파일.</li>
+      <li><b>spec = contract</b> — 진실의 원천은 코드+테스트. spec은 부분 간 계약일 뿐.</li>
+      <li><b>MCP 보안</b> — filesystem/npx MCP는 기본 제외, allowlist + 버전 고정.</li>
+      <li><b>Hook 강제 수준</b> — warning/soft → 전사 rollout 후 required로 점진.</li>
+      <li><b>install-state는 기반</b> — 단순 기록이 아니라 update/repair/uninstall의 토대로 설계.</li>
+    </ul>
+  </section>
+
+  <section id="concl">
+    <h2><span class="n">7</span>통합 결론</h2>
+    <div class="flow">사내 표준 배포 시스템 = <span class="c">agent-deploy</span>
+  ├─ 설치 엔진 뼈대        ← <span class="b">k-sdd</span> (manifest→plan→apply, path-safety, bundle)
+  ├─ 자산·패턴·보안 라이브러리 ← <span class="a">ECC</span> (어댑터, provenance, 공급망 스캔, 룰/스킬/에이전트)
+  ├─ 자율 구현 방법론       ← <span class="b">k-sdd</span> (게이트, 경계우선, 핸드오프, 적대적 리뷰)
+  └─ 거버넌스(6룰/KPI)      ← 사내 (PR노하우·회고·프롬프트DB↔스킬 승격)</div>
+    <div class="callout"><b>한 줄</b>: ECC의 넓은 배포 인프라 + k-sdd의 선명한 설치 엔진·자율 구현 루프를, <b>project 기본 / 전역 옵션의 번들</b>로 사내 2~3개 툴에 축소 이식한다. 골격(<code>agent-deploy</code>)은 이미 동작하며, 남은 것은 어댑터 확장·보안·생애주기다.</div>
+  </section>
+</main>
+
+<footer>
+  통합 분석 리포트 · 작성 Claude · 2026-06-17 · 세부: <code>[claude]report_ecc.html</code> · <code>[claude]report_k-sdd.html</code> · 비교: <code>[codex]report_*.html</code>
+</footer>
+</body>
+</html>
