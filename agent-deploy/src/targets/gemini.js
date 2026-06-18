@@ -66,7 +66,7 @@ export default createAdapter({
             ops.push(skipOp({
               moduleId: module.id,
               sourceRel,
-              reason: 'Gemini MCP config policy is not finalized in this MVP; no MCP files were written',
+              reason: 'Gemini MCP config policy: intentionally skipped until Gemini ships a stable project-scope MCP config contract; no MCP files written (see docs/specs/gemini-adapter/mcp-policy.md)',
             }));
             break;
           default:

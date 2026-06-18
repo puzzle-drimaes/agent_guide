@@ -526,8 +526,8 @@ GEMINI.md
 - [x] modules/profile manifest에 포함.
 - [x] adapter가 각 harness 파일로 변환하도록 구현.
 - [x] SDD rules/skills를 developer/sdd profile에 반영.
-- [ ] `.agents/rules` ↔ `agent-deploy/assets/rules` drift check 추가.
-- [ ] `docs/specs/<feature>/` reusable template 추가.
+- [x] `.agents/rules` ↔ `agent-deploy/assets/rules` drift check 추가 (`npm run validate`에 통합).
+- [x] `docs/specs/<feature>/` reusable template 추가 (`docs/specs/_template/`).
 
 ---
 
@@ -736,8 +736,82 @@ npm --prefix agent-deploy test
 
 후속 메모:
 
-- `.agents/rules`와 `agent-deploy/assets/rules`의 drift check는 별도 작업으로 남김.
-- Gemini MCP native policy는 아직 확정 전이므로 skip reason 유지.
+- `.agents/rules`와 `agent-deploy/assets/rules`의 drift check는 4.9에서 추가됨.
+- Gemini MCP native policy는 4.9에서 의도된 skip-with-reason 정책으로 확정됨.
+
+---
+
+### 4.9 후속: rule drift check / spec template / Gemini MCP 정책
+
+생성/수정된 주요 파일:
+
+```text
+agent-deploy/scripts/check-rule-drift.js
+agent-deploy/package.json
+docs/specs/_template/
+docs/specs/README.md
+docs/specs/gemini-adapter/mcp-policy.md
+agent-deploy/src/targets/gemini.js
+```
+
+구현 내용:
+
+- [x] `.agents/rules` ↔ `agent-deploy/assets/rules` content drift check 스크립트 추가.
+- [x] `npm run validate`가 manifest validation + drift check를 함께 실행하도록 연결.
+- [x] canonical source가 없는 번들 모드에서는 drift check가 자동 skip.
+- [x] drift 음성 테스트로 가드 동작 확인 (실제 drift는 exit 1, 동기화 상태는 exit 0).
+- [x] SDD-full 재사용 템플릿 `docs/specs/_template/`(requirements/design/tasks/review) 추가, README에 사용법 반영.
+- [x] Gemini MCP를 의도된 skip-with-reason 정책으로 확정하고 `docs/specs/gemini-adapter/mcp-policy.md`에 결정/재검토 트리거 기록.
+
+검증 결과:
+
+```text
+npm --prefix agent-deploy run validate
+  → manifest validation OK
+  → rule drift check OK (8 canonical rules in sync with assets)
+
+npm --prefix agent-deploy test
+  → 14개 중 14개 통과
+```
+
+SDD mode: lite (작은 가드 스크립트 + 문서 템플릿 + 정책 문서화).
+
+---
+
+### 4.10 후속: 진입점 parity 정책(C) + 자동 가드(B)
+
+배경: 루트 진입점(AGENTS.md/CLAUDE.md/GEMINI.md)은 canonical `.agents/rules/`를 가리키는 포인터다. 의미는 같지만 in-context 깊이가 비대칭이고, 진입점 parity를 강제하는 자동 장치가 없었다.
+
+생성/수정된 주요 파일:
+
+```text
+.agents/rules/developer/harness-engineering.md            (#6 Entry pointer parity 추가)
+agent-deploy/assets/rules/developer/harness-engineering.md (재승격)
+agent-deploy/scripts/check-entry-parity.js
+agent-deploy/package.json
+```
+
+구현 내용:
+
+- [x] (C) "포인터 + canonical source = semantic equivalence 충족" 모델을 harness-engineering 룰의 정식 원칙(#6 Entry pointer parity)으로 명문화.
+- [x] (C) canonical 룰을 먼저 수정하고 `agent-deploy/assets`로 재승격 (canonical-source-first dogfooding, drift check로 동기화 확인).
+- [x] (B) entry-parity 가드 추가: 각 진입점이 canonical source를 가리키는지, 모든 canonical 룰을 커버하는지, dangling 룰 경로가 없는지 검사.
+- [x] (B) `npm run validate`가 manifest + rule drift + entry parity 3중 검사를 실행하도록 연결.
+- [x] 음성 테스트로 가드 확인: dangling ref와 미커버 신규 룰 모두 exit 1, 정상 상태 exit 0.
+
+검증 결과:
+
+```text
+npm --prefix agent-deploy run validate
+  → manifest validation OK
+  → rule drift check OK (8 canonical rules in sync with assets)
+  → entry parity check OK (3 entry files cover 8 canonical rules)
+
+npm --prefix agent-deploy test
+  → 14개 중 14개 통과
+```
+
+SDD mode: lite (정책 1개 명문화 + 가드 스크립트 1개 + validate 연결).
 
 ---
 
@@ -751,7 +825,7 @@ npm --prefix agent-deploy test
 - [x] commit convention asset 실제 추가.
 - [x] source attribution / knowledge sharing rules 실제 추가.
 - [x] profiles/modules 재구성.
-- [ ] `.agents/rules`와 deploy assets drift check.
+- [x] `.agents/rules`와 deploy assets drift check.
 - [ ] Windows exe packaging.
 - [ ] Linux/macOS zip bundle build.
 - [ ] update/repair/uninstall.

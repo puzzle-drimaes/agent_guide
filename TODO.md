@@ -252,7 +252,7 @@ project/
 ```text
 Gemini adapter는 project scope에서 GEMINI.md를 덮어쓰지 않고 managed block으로 upsert한다.
 rules/commands/agents/skills는 .gemini/ 하위에 설치하고, agents/skills는 instruction-backed fallback으로 취급한다.
-MCP 설정은 Gemini 정책이 확정될 때까지 skip reason으로 기록한다.
+MCP 설정은 의도된 skip-with-reason 정책으로 확정했다(docs/specs/gemini-adapter/mcp-policy.md). 재검토 트리거 충족 시 native 설치로 전환한다.
 설치 상태는 .agent-deploy/install-state.json에 기록한다.
 ```
 
@@ -270,6 +270,7 @@ docs/plans/codex/company-wide-agent-rollout/02b-harness-engineering-principles.m
 - [ ] Claude/Codex/Gemini/Cursor capability 정리
 - [ ] adapter별 native/fallback/skip 정책 작성
 - [x] harness parity smoke test 보강 (Codex/Claude/Gemini core rules/skills + skip reason)
+- [x] 루트 진입점(AGENTS/CLAUDE/GEMINI) parity 자동 가드 추가 (`check-entry-parity.js`, validate에 통합)
 
 ---
 
@@ -291,7 +292,7 @@ GEMINI.md
 .agents/skills/
 ```
 
-주의: 이 파일들은 현재 프로젝트에 먼저 적용한 기준이며, 2026-06-18에 1차 company core rules/skills가 `agent-deploy/assets/`와 manifest/profile에 반영됐다. 이후에는 drift check와 직무별 확장을 추가해야 한다.
+주의: 이 파일들은 현재 프로젝트에 먼저 적용한 기준이며, 2026-06-18에 1차 company core rules/skills가 `agent-deploy/assets/`와 manifest/profile에 반영됐다. drift check는 `npm run validate`에 통합됐고, 이후에는 직무별 확장을 추가해야 한다.
 
 ### 3.1 공통 rules 추가
 
@@ -394,7 +395,7 @@ full: A → B → C → D → E → F → G → H → Z
 - [x] developer profile에 SDD 기본 포함
 - [x] sdd profile에 SDD rules/skills 포함
 - [x] Codex/Claude/Gemini adapter별 SDD 지시문 설치 경로 smoke test 보강
-- [ ] `docs/specs/<feature>/` 템플릿 추가
+- [x] `docs/specs/<feature>/` 템플릿 추가 (`docs/specs/_template/`)
 
 참고 문서:
 

@@ -90,6 +90,33 @@ project/
 
 user/global scope는 선택 옵션으로 제공한다.
 
+### 6. Entry pointer parity
+
+루트 진입점 파일(`AGENTS.md`, `CLAUDE.md`, `GEMINI.md`)은 룰 본문을 각자 보관하지 않고 canonical source(`.agents/rules/`)를 가리키는 포인터로 둔다.
+
+진입점 사이의 parity 기준은 "파일 내용 동일"이 아니라 다음 두 가지다.
+
+```text
+single source: 모든 진입점이 같은 canonical 룰 집합을 가리킨다.
+no contradiction: 진입점끼리 서로 다른 규칙을 말하지 않는다.
+```
+
+canonical 룰을 in-context로 가져오는 방식은 harness capability에 따라 다를 수 있고 모두 허용한다.
+
+```text
+Claude:  CLAUDE.md @import 또는 참조 후 읽기
+Codex:   AGENTS.md 인라인 또는 참조 후 읽기
+Gemini:  GEMINI.md 참조 후 읽기
+```
+
+위 single source + no contradiction가 성립하면 semantic equivalence를 충족한 것으로 본다. 모든 룰을 in-context로 강제 인라인할 필요는 없다.
+
+진입점이 canonical 룰을 빠뜨리거나 존재하지 않는 룰 경로를 가리키는 drift는 자동 검사로 막는다.
+
+```text
+agent-deploy/scripts/check-entry-parity.js
+```
+
 ## agent-deploy 구현 규칙
 
 - manifest는 canonical asset을 가리킨다.
@@ -120,4 +147,5 @@ target별로 최소 아래 항목을 기록한다.
 - project scope가 기본이고 global은 옵션인가?
 - install-state로 추적 가능한가?
 - target adapter 밖에 도구별 분기가 과도하게 퍼져 있지 않은가?
+- 루트 진입점(AGENTS/CLAUDE/GEMINI)이 같은 canonical 룰 집합을 빠짐없이 가리키는가?
 

@@ -15,7 +15,7 @@
     "install.bat"
   ],
   "scripts": {
-    "validate": "node scripts/validate-manifests.js",
+    "validate": "node scripts/validate-manifests.js && node scripts/check-rule-drift.js && node scripts/check-entry-parity.js",
     "test": "node --test"
   },
   "engines": {

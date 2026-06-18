@@ -1,2 +1,9 @@
 # Editor and IDE local settings
 .vscode/
+
+# Per-tool / personal agent config (deployed adapter output or local settings;
+# regenerable from canonical .agents/ — not shared source)
+.claude/
+.codex/
+.gemini/
+.cursor/
