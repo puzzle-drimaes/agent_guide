@@ -7,6 +7,7 @@
     "core": [
       "baseline-rules",
       "review-agent",
+      "prompt-asset-skill",
       "mcp-baseline"
     ],
     "sdd": [
@@ -32,6 +33,7 @@
       "company-plan-skill",
       "company-code-review-skill",
       "spec-writing-skill",
+      "prompt-asset-skill",
       "planning-command",
       "mcp-baseline"
     ],
@@ -51,6 +53,7 @@
       "company-plan-skill",
       "company-code-review-skill",
       "spec-writing-skill",
+      "prompt-asset-skill",
       "planning-command",
       "mcp-baseline"
     ]

@@ -466,7 +466,7 @@ governance
 - [x] `assets/skills/company-plan/` (Plan First, developer)
 - [x] `assets/skills/company-code-review/` (Review Before Done, developer)
 - [x] `assets/skills/spec-writing/` (SDD-full spec authoring, developer)
-- [ ] `assets/skills/prompt-asset/`
+- [x] `assets/skills/prompt-asset/` (knowledge capture, 전 직무 공통; core/developer/full)
 - [ ] `assets/skills/meeting-summary/`
 - [ ] `assets/skills/customer-response/`
 - [ ] `assets/prompts/product/`

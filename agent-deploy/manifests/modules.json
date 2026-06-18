@@ -271,6 +271,24 @@
       "stability": "stable"
     },
     {
+      "id": "prompt-asset-skill",
+      "description": "Knowledge-capture skill: turn a reusable prompt into a Prompt DB entry and propose promotion",
+      "paths": [
+        "skills/prompt-asset"
+      ],
+      "targets": [
+        "claude",
+        "cursor",
+        "codex",
+        "gemini"
+      ],
+      "dependencies": [
+        "baseline-rules"
+      ],
+      "cost": "light",
+      "stability": "stable"
+    },
+    {
       "id": "planning-command",
       "description": "/plan slash command (Claude/Gemini install; Codex/Cursor record skip+reason)",
       "paths": [

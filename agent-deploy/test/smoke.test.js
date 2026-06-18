@@ -212,6 +212,8 @@ test('merge-json preserves pre-existing user keys', () => {
   const mcp = JSON.parse(fs.readFileSync(path.join(project, '.mcp.json'), 'utf8'));
   assert.ok(mcp.mcpServers['my-personal'], 'user key preserved');
   assert.ok(mcp.mcpServers['company-docs'], 'company key added');
+  // prompt-asset is cross-role knowledge capture: present from the core profile up
+  assert.ok(fs.existsSync(path.join(project, '.claude/skills/prompt-asset/SKILL.md')));
 });
 
 test('apply --dry-run --json emits valid JSON on stdout (no trailing text)', () => {

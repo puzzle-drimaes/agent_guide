@@ -912,6 +912,7 @@ SDD mode: lite (가드 스크립트 1개 + 테스트 2개 + validate 연결, 기
 - architecture/commit convention 계획 추가
 - report.html 통합 리포트 작성
 - developer 직무 workflow skill 추가 (company-plan / company-code-review / spec-writing)
+- prompt-asset 지식 캡처 skill 추가 (전 직무 공통, Prompt DB 13필드 + 승격 루프)
 ```
 
 아직 남은 핵심은 회사 표준 asset 보강과 파일럿 운영 수준의 lifecycle 구현이다.
