@@ -290,10 +290,10 @@
       "stability": "stable"
     },
     {
-      "id": "knowhow-asset-skill",
+      "id": "external-doc-asset-skill",
       "description": "Knowhow capture and promotion skill: turn reusable team practice into a sanitized asset candidate",
       "paths": [
-        "skills/knowhow-asset"
+        "skills/external-doc-asset"
       ],
       "targets": [
         "claude",

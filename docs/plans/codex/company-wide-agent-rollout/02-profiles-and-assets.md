@@ -99,7 +99,7 @@ agent-deploy/assets/
   │   ├─ product/
   │   └─ business/
   │
-  ├─ knowhow/            # 향후 추가 후보: 개인/팀 노하우 asset
+  ├─ knowhow/            # 향후 추가 후보: 개인/팀 공유 문서 asset
   │   ├─ developer/
   │   ├─ product/
   │   ├─ business/
@@ -172,7 +172,7 @@ governance-skills
 prompt-library
 product-prompts
 business-prompts
-knowhow-assets
+external-doc-assets
 mcp-baseline
 ```
 

@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "agent-deploy markdown asset frontmatter draft",
-  "description": "Schema for parsed YAML frontmatter in Markdown assets. Draft-only until prompt/template/knowhow migration is complete.",
+  "description": "Schema for parsed YAML frontmatter in Markdown assets. Draft-only until prompt/template/doc migration is complete.",
   "type": "object",
   "additionalProperties": true,
   "required": ["id", "asset_type", "title", "description", "audience", "owner", "stability"],
@@ -11,7 +11,7 @@
       "pattern": "^[a-z0-9][a-z0-9-]*$"
     },
     "asset_type": {
-      "enum": ["rule", "skill", "prompt", "template", "knowhow", "agent", "command"]
+      "enum": ["rule", "skill", "prompt", "template", "doc", "agent", "command"]
     },
     "title": {
       "type": "string",
@@ -106,7 +106,7 @@
   "allOf": [
     {
       "if": {
-        "properties": { "asset_type": { "const": "knowhow" } }
+        "properties": { "asset_type": { "const": "doc" } }
       },
       "then": {
         "required": ["promotion_status", "sensitivity"]

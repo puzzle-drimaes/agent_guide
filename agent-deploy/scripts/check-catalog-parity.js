@@ -2,7 +2,7 @@
 // Catalog parity guard.
 // Keeps assets/catalog.draft.json aligned with files, module manifests, profile
 // manifests, and draft frontmatter when present. The catalog is still draft-stage:
-// structural drift is blocking, while missing prompt/template/knowhow frontmatter
+// structural drift is blocking, while missing prompt/template/doc frontmatter
 // remains a non-blocking warning until the metadata migration is complete.
 import fs from 'node:fs';
 import path from 'node:path';
@@ -25,7 +25,7 @@ const REQUIRED_ENTRY_KEYS = [
   'owner',
   'reviewStatus',
 ];
-const FRONTMATTER_PARITY_TYPES = new Set(['prompt', 'template', 'knowhow']);
+const FRONTMATTER_PARITY_TYPES = new Set(['prompt', 'template', 'doc']);
 
 const readJson = (file) => JSON.parse(fs.readFileSync(file, 'utf8'));
 

@@ -1,14 +1,14 @@
 ---
-name: knowhow-asset
-description: Capture personal or team knowhow as a sanitized Markdown asset candidate and decide whether it can be promoted to a shared catalog/profile asset. Triggers on "knowhow 공유", "노하우 자산화", "promote knowhow", "make this knowhow reusable".
+name: external-doc-asset
+description: Capture personal or team shared documents as sanitized Markdown asset candidates and decide whether it can be promoted to a shared catalog/profile asset. Triggers on "externals 문서 공유", "공유 문서 자산화", "promote external document", "make this external document reusable".
 allowed-tools: ["Read"]
-argument-hint: "[knowhow note / workflow / reusable practice]"
+argument-hint: "[external document / workflow / reusable practice]"
 ---
 
-# Knowhow Asset (Candidate → Promotion)
+# External Document Asset (Candidate → Promotion)
 
 Use this skill when a person or team wants to turn reusable working knowledge into a
-shareable Markdown asset. A knowhow item starts as a candidate, not as a default
+shareable Markdown asset. An external shared document starts as a candidate, not as a default
 bundle asset. Promotion requires sanitization, evidence, ownership, and review.
 
 ## Required context
@@ -32,7 +32,7 @@ agent-deploy/docs/ASSET_SCHEMA_AND_CATALOG.md
 
 Capture only when all are true:
 
-1. The knowhow is reusable beyond one chat, task, or person.
+1. The shared document is reusable beyond one chat, task, or person.
 2. The content can be shared after removing secrets, customer identifiers, private keys,
    unreleased contracts, and other sensitive details.
 3. An owner is known, and at least one reviewer can validate the practice.
@@ -49,29 +49,29 @@ Choose the narrowest type that matches the reuse shape:
 prompt    → reusable instruction for generating an output
 template  → fill-in document skeleton
 skill     → repeatable workflow an agent should follow
-knowhow   → team practice, checklist, playbook, heuristic, or troubleshooting note
+doc       → shared document, team practice, checklist, playbook, heuristic, or troubleshooting note
 agent     → focused subagent persona with least-agency boundaries
 ```
 
-Use `knowhow` when the value is mainly human/team practice rather than a prompt body or
+Use `doc` when the value is mainly a shared document or human/team practice rather than a prompt body or
 agent procedure.
 
-## Draft knowhow frontmatter
+## Draft shared document frontmatter
 
-For a knowhow candidate, produce this frontmatter. Keep `promotion_status: candidate`
+For a shared document candidate, produce this frontmatter. Keep `promotion_status: candidate`
 until review evidence exists.
 
 ```yaml
 ---
 id: <stable-kebab-case-id>
-asset_type: knowhow
+asset_type: doc
 title: <human readable title>
 description: <what this helps with>
 audience: ["developer"]
 owner: <team-alias>
 stability: draft
 version: "0.1.0"
-tags: ["knowhow"]
+tags: ["external-doc"]
 reviewers: ["<reviewer-or-team>"]
 promotion_status: candidate
 sensitivity: internal
@@ -119,20 +119,20 @@ Recommend promotion only when the candidate has evidence:
 Promotion options:
 
 ```text
-- keep as candidate knowhow pack
-- promote to shared knowhow asset
+- keep as candidate external document pack
+- promote to shared document asset
 - convert to prompt/template/skill/agent if that type fits better
 - reject/deprecate with reason
 ```
 
-Do not silently add confidential knowhow to default profiles. If `sensitivity` is
+Do not silently add confidential shared documents to default profiles. If `sensitivity` is
 `confidential`, recommend a separately approved internal pack instead.
 
 ## Output
 
 ```text
 Capture decision: capture | cleanup first | skip (reason)
-Recommended asset type: knowhow | prompt | template | skill | agent
+Recommended asset type: doc | prompt | template | skill | agent
 Sanitization notes:
 Draft frontmatter:
 Draft body:

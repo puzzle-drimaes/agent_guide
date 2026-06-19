@@ -3,8 +3,15 @@
 이 문서는 `agent-deploy`가 배포할 Markdown 기반 AI 업무 자산의 frontmatter schema와
 asset catalog 초안을 정의한다.
 
+외부/shared asset pack 적용 방식은 별도 설계 문서를 따른다.
+
+```text
+agent-deploy/docs/ASSET_PACKS.md
+docs/specs/external-shared-asset-packs/
+```
+
 목표는 모든 `*.md`를 같은 방식으로 취급하는 것이 아니라, 각 자산의 운영 의미를 명시해
-초보자는 검증된 템플릿을 선택하고, 숙련자는 자신의 knowhow를 공유 가능한 asset으로 승격할 수
+초보자는 검증된 템플릿을 선택하고, 숙련자는 자신의 공유 문서를 검증 가능한 asset으로 승격할 수
 있게 만드는 것이다.
 
 ## 1. 범위
@@ -17,12 +24,12 @@ asset catalog 초안을 정의한다.
 | `skill` | 이미 배포 중 | agent가 특정 작업에서 따르는 절차 |
 | `prompt` | 이미 배포 중 | 특정 결과물을 만들기 위한 재사용 요청문 |
 | `template` | prompt 안에 혼재 | 사용자가 채워 넣는 문서 골격 |
-| `knowhow` | 추가 예정 | 개인/팀의 재사용 가능한 작업 노하우 |
+| `doc` | 추가 예정 | 개인/팀의 공유 문서, 체크리스트, 플레이북 |
 | `agent` | 이미 배포 중 | target이 지원할 때 쓰는 전문 subagent 정의 |
 | `command` | 이미 배포 중 | slash command 또는 instruction-backed command |
 
 Pilot 단계에서는 기존 prompt 파일을 즉시 모두 수정하지 않는다. 먼저 schema와 catalog를 설계하고,
-새로 추가되는 prompt/template/knowhow부터 frontmatter를 요구한다. 기존 자산은 catalog 초안으로
+새로 추가되는 prompt/template/doc부터 frontmatter를 요구한다. 기존 자산은 catalog 초안으로
 분류한 뒤 점진적으로 frontmatter를 보강한다.
 
 ## 2. 공통 frontmatter 필드
@@ -46,7 +53,7 @@ tags: ["prd", "requirements", "product"]
 | Field | 필수 | Type | 설명 |
 |---|---:|---|---|
 | `id` | 예 | string | catalog/module에서 참조하는 안정적인 식별자 |
-| `asset_type` | 예 | enum | `rule`, `skill`, `prompt`, `template`, `knowhow`, `agent`, `command` |
+| `asset_type` | 예 | enum | `rule`, `skill`, `prompt`, `template`, `doc`, `agent`, `command` |
 | `title` | 예 | string | 사람이 읽는 이름 |
 | `description` | 예 | string | asset의 사용 목적 |
 | `audience` | 예 | string[] | 대상 역할. 예: `developer`, `product`, `business`, `governance`, `all` |
@@ -111,12 +118,12 @@ output_format: markdown
 | `required_sections` | 권장 | string[] | 결과물에 반드시 포함될 섹션 |
 | `output_format` | 권장 | string | `markdown`, `table`, `checklist` 등 |
 
-### 3.3 `knowhow`
+### 3.3 `doc`
 
 ```yaml
 ---
 id: frontend-review-checklist
-asset_type: knowhow
+asset_type: doc
 title: 프론트엔드 리뷰 체크리스트
 description: 팀에서 반복적으로 발견한 UI/상태관리 리뷰 포인트를 정리한다.
 audience: ["developer"]
@@ -138,7 +145,7 @@ sensitivity: internal
 | `sensitivity` | 예 | enum | `public`, `internal`, `confidential` |
 | `examples` | 권장 | string[] | 대표 사용 예시 또는 fixture 경로 |
 
-`knowhow`는 민감정보가 섞일 가능성이 높으므로 `sensitivity=confidential`이면 bundle 기본 profile에
+`doc`는 민감정보가 섞일 가능성이 높으므로 `sensitivity=confidential`이면 bundle 기본 profile에
 포함하지 않는다. 별도 승인된 내부 pack이나 project-local asset으로만 적용한다.
 
 ## 4. Catalog 설계
@@ -212,16 +219,16 @@ agent-deploy/assets/catalog.draft.json
    - `schemas/asset-catalog.schema.json`
    - `assets/catalog.draft.json`
 2. **Non-blocking check**
-   - prompt/template/knowhow metadata 누락을 warning으로 출력
+   - prompt/template/doc metadata 누락을 warning으로 출력
 3. **Blocking check for new assets**
-   - 새로 추가되는 prompt/template/knowhow에는 frontmatter 필수
+   - 새로 추가되는 prompt/template/doc에는 frontmatter 필수
 4. **Catalog parity check**
    - catalog entry와 실제 파일/frontmatter/module/profile의 일치성 검증
 
 ## 7. 운영 원칙
 
 - canonical rule은 항상 profile의 기반 레이어로 둔다.
-- prompt/template/knowhow는 role별 추가 레이어로 둔다.
-- 개인 knowhow는 기본 배포에 바로 넣지 않고 `candidate` 상태로 시작한다.
+- prompt/template/doc는 role별 추가 레이어로 둔다.
+- 개인 공유 문서는 기본 배포에 바로 넣지 않고 `candidate` 상태로 시작한다.
 - 외부 자료를 기반으로 한 asset은 `source`와 `license`를 남긴다.
 - target이 특정 asset type을 native로 지원하지 않으면 instruction-backed fallback 또는 skip reason을 남긴다.

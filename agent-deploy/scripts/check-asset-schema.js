@@ -13,7 +13,7 @@
 // is the intended review point.
 //
 // The draft asset-frontmatter JSON schema is also loaded as a non-blocking
-// warning layer for prompt/template/knowhow metadata migration. It should make
+// warning layer for prompt/template/doc metadata migration. It should make
 // catalog-readiness visible without blocking today's shipped bundle.
 import fs from 'node:fs';
 import path from 'node:path';
@@ -298,7 +298,7 @@ export function checkAssetSchemas(assetRoot = DEFAULT_ASSET_ROOT) {
   for (const [dirName, assetType] of [
     ['prompts', 'prompt'],
     ['templates', 'template'],
-    ['knowhow', 'knowhow'],
+    ['docs', 'doc'],
   ]) {
     for (const f of walkMd(path.join(assetRoot, dirName))) {
       const rel = toPosix(path.relative(assetRoot, f));

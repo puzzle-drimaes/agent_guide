@@ -220,7 +220,7 @@ test('merge-json preserves pre-existing user keys', () => {
   assert.ok(mcp.mcpServers['company-docs'], 'company key added');
   // prompt-asset is cross-role knowledge capture: present from the core profile up
   assert.ok(fs.existsSync(path.join(project, '.claude/skills/prompt-asset/SKILL.md')));
-  assert.ok(fs.existsSync(path.join(project, '.claude/skills/knowhow-asset/SKILL.md')));
+  assert.ok(fs.existsSync(path.join(project, '.claude/skills/external-doc-asset/SKILL.md')));
   // universal skeleton ships with the skill; starter task templates ship with prompt-library
   assert.ok(fs.existsSync(path.join(project, '.claude/prompts/_universal-template.md')));
   assert.ok(fs.existsSync(path.join(project, '.claude/prompts/dev-implementation.md')));
@@ -351,7 +351,7 @@ test('gemini business profile installs business skills and prompts', () => {
   assert.ok(!fs.existsSync(path.join(project, '.gemini/prompts/product/prd.md')));
 });
 
-test('claude governance profile installs governance skills + prompt/knowhow curation', () => {
+test('claude governance profile installs governance skills + prompt/external document curation', () => {
   const project = tmpProject();
   applyPlan(buildPlan({ target: 'claude', profile: 'governance', projectRoot: project }));
 
@@ -359,7 +359,7 @@ test('claude governance profile installs governance skills + prompt/knowhow cura
   assert.ok(fs.existsSync(path.join(project, '.claude/skills/quarterly-review/SKILL.md')));
   assert.ok(fs.existsSync(path.join(project, '.claude/skills/kpi-report/SKILL.md')));
   assert.ok(fs.existsSync(path.join(project, '.claude/skills/prompt-db-curation/SKILL.md')));
-  assert.ok(fs.existsSync(path.join(project, '.claude/skills/knowhow-asset/SKILL.md')));
+  assert.ok(fs.existsSync(path.join(project, '.claude/skills/external-doc-asset/SKILL.md')));
   // prompt-db-curation depends on prompt-asset, so the capture skill is pulled in too
   assert.ok(fs.existsSync(path.join(project, '.claude/skills/prompt-asset/SKILL.md')));
   // governance is non-developer: no architecture rules
