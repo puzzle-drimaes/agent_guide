@@ -4,7 +4,23 @@
 shell script가 복잡한 QnA를 담당하지 않고, agent가 사용자와 선택지를 확인한 뒤
 결정론적인 `agent-deploy` CLI 명령(`dry-run` → `apply`)을 생성합니다.
 
-## 1. Agent 역할
+## 1. Bundle goal
+
+이 bundle의 목표는 단순히 특정 agent 설정 파일을 생성하는 것이 아닙니다.
+
+```text
+역할, OS, 기존 agent 사용 여부와 무관하게
+회사/프로젝트의 공통 rule, 공유 문서, skill, prompt/template, knowhow를
+Markdown 기반 canonical asset으로 배포하고,
+각 target agent가 자기 방식으로 같은 의미의 자산을 읽게 만든다.
+```
+
+따라서 wizard는 아래 두 사용자를 모두 지원해야 합니다.
+
+- agent 사용이 서툰 사람: 검증된 profile, prompt, template, skill을 선택해 좋은 결과를 얻는다.
+- agent 사용이 익숙한 사람: 자신의 knowhow `*.md`를 배포 가능한 asset으로 정리하고 공유한다.
+
+## 2. Agent 역할
 
 Agent는 아래 원칙을 지킵니다.
 
@@ -13,35 +29,53 @@ Agent는 아래 원칙을 지킵니다.
 - 사용자가 명시하지 않으면 `project` scope를 기본값으로 사용합니다.
 - 복수 target 설치가 필요하면 target별 명령을 나눠서 생성합니다.
 - 설치 파일을 직접 임의 작성하지 않고, 항상 `agent-deploy` CLI를 사용합니다.
+- 사용 목적이 불명확하면 profile 이름부터 묻지 말고, 사용자의 역할/숙련도/목적을 먼저 확인합니다.
+- unsupported capability는 조용히 누락하지 말고 dry-run/install-state의 skip reason으로 확인하게 합니다.
 
-## 2. 사용자에게 확인할 항목
+## 3. 사용자에게 확인할 항목
 
 첫 대화에서 아래 순서로 짧게 확인합니다.
 
 ```text
-1. 설치할 프로젝트 경로는 어디인가?
+1. 무엇을 하려는가?
+   - 회사 공통 agent 규칙 적용
+   - 개발 프로젝트에 developer workflow 적용
+   - product 문서/기획 템플릿 사용
+   - business 문서/응대 템플릿 사용
+   - 다른 사람이 공유한 skill/prompt 적용
+   - 내 knowhow 문서를 배포 가능한 asset으로 만들기
+
+2. agent 사용 숙련도와 역할은 무엇인가?
+   - beginner: 검증된 profile/template 중심으로 추천
+   - experienced: module/profile/target을 직접 조합 가능
+   - contributor: 자신의 *.md knowhow를 공유/승격하려는 사용자
+   - role 예시: developer, product, business, governance
+
+3. 설치할 프로젝트 경로는 어디인가?
    - 기본값: 현재 작업 중인 repository root
 
-2. 어떤 profile을 설치할 것인가?
+4. 어떤 profile을 설치할 것인가?
    - minimal: 회사 공통 원칙/보안/출처/지식 공유
    - developer: 개발 규칙, SDD, architecture, commit convention
    - product: product 문서/기획 프롬프트 중심
    - business: proposal/FAQ/announcement 등 business 프롬프트 중심
+   - governance: KPI/회고/Prompt DB 운영 중심
+   - sdd/full: 내부 검토 또는 명시 요청 시 사용
 
-3. 어떤 target에 설치할 것인가?
+5. 어떤 target에 설치할 것인가?
    - codex
    - claude
    - gemini
    - cursor는 내부 검토 또는 별도 요청 시만 사용
 
-4. 설치 범위는 무엇인가?
+6. 설치 범위는 무엇인가?
    - project: 기본값, repository 내부에 설정 설치
    - home: 선택 옵션, 사용자 전역 설정 설치
 
-5. dry-run 결과를 확인한 뒤 apply를 진행할 것인가?
+7. dry-run 결과를 확인한 뒤 apply를 진행할 것인가?
 ```
 
-## 3. 권장 기본값
+## 4. 권장 기본값
 
 사용자가 잘 모르면 아래 기본값을 제안합니다.
 
@@ -57,9 +91,39 @@ first command: apply --dry-run
 ```text
 product role: product
 business role: business
+governance/operator role: governance
 ```
 
-## 4. 명령 생성 규칙
+초보자에게는 profile 선택과 함께 설치 후 첫 요청 예시를 안내합니다.
+
+```text
+developer:
+- 이 변경의 테스트 계획을 세워줘.
+- 이 diff에서 실제 버그 가능성이 높은 부분만 리뷰해줘.
+
+product:
+- 이 아이디어를 PRD 초안으로 정리해줘.
+- 고객 요청을 user story와 acceptance criteria로 나눠줘.
+
+business:
+- 고객 문의에 대한 답변 초안을 정중하게 작성해줘.
+- 이 제안서의 핵심 메시지를 3개로 줄여줘.
+```
+
+숙련자가 knowhow 공유를 원하면 이번 bundle에서는 바로 설치 명령을 만들기보다,
+먼저 해당 `*.md`를 asset 후보로 정리하도록 안내합니다.
+
+```text
+knowhow asset 후보에 필요한 정보:
+- asset type: prompt, template, skill, knowhow 중 하나
+- audience: developer/product/business/governance 등
+- owner/reviewer
+- 사용 예시
+- 민감정보 포함 여부
+- stable/beta/draft 상태
+```
+
+## 5. 명령 생성 규칙
 
 bundle root가 현재 디렉터리라고 가정하면 다음 형식을 사용합니다.
 
@@ -100,7 +164,7 @@ node src/cli.js apply \
   --dry-run
 ```
 
-## 5. 복수 target 설치
+## 6. 복수 target 설치
 
 현재 wizard는 target별 실행을 기본으로 안내합니다.
 
@@ -112,12 +176,14 @@ node src/cli.js apply --target gemini --profile developer --scope project --proj
 
 dry-run 결과를 각각 확인한 뒤 같은 순서로 `--dry-run`을 제거한 apply 명령을 제안합니다.
 
-## 6. Agent 응답 형식
+## 7. Agent 응답 형식
 
 Agent는 설치 전 최종 확인을 아래 형식으로 요약합니다.
 
 ```text
 선택 요약:
+- purpose: developer workflow 적용
+- user level: beginner
 - project: /path/to/project
 - scope: project
 - profile: developer
@@ -131,7 +197,7 @@ Agent는 설치 전 최종 확인을 아래 형식으로 요약합니다.
 - 승인하면 apply 명령을 이어서 제안하겠습니다.
 ```
 
-## 7. install.sh의 역할
+## 8. install.sh의 역할
 
 `install.sh`는 QnA wizard가 아닙니다. 기본 역할은 다음 안내를 출력하는 bootstrap입니다.
 

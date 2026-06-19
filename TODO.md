@@ -14,7 +14,16 @@
 개발자/비개발자 여부와 관계없이,
 Windows/Linux/macOS 환경에서,
 Claude/Codex/Gemini 등 어떤 AI 도구를 쓰더라도,
-같은 회사 표준 agent 설정과 업무 방식을 사용할 수 있게 한다.
+같은 회사 표준 agent 설정, 업무 방식, Markdown 기반 AI 업무 자산을 사용할 수 있게 한다.
+```
+
+1차 제품 목표는 다음으로 구체화한다.
+
+```text
+회사 구성원은 하네스 엔지니어링으로 관리되는 공통 rule(*.md)을 사용한다.
+다른 사람이 공유한 문서, prompt, skill(*.md)을 자신의 프로젝트에 적용할 수 있다.
+agent 사용이 서툰 사람은 검증된 template(*.md)으로 좋은 결과를 얻는다.
+agent 사용이 익숙한 사람은 자신의 knowhow(*.md)를 배포 가능한 asset으로 정리하고 공유한다.
 ```
 
 현재 결정된 큰 방향:
@@ -45,10 +54,17 @@ Claude/Codex/Gemini 등 어떤 AI 도구를 쓰더라도,
    - architecture rules
    - commit convention rules
    - security/source/knowledge sharing rules
+   - product/business prompt와 template
+   - 개인/팀 knowhow asset 후보
 
 6. 공용 AI 계정 운영의 목적은 비용 절감보다 지식 공유화다.
    - 20명 내외 구성원이 9개 AI 계정을 공유한다.
    - PR 노하우, weekly 회고, Prompt DB, 데모데이, 분기 governance를 운영한다.
+
+7. agent-deploy의 정체성은 설정 설치기에서 Markdown asset 배포기로 확장한다.
+   - rule, skill, prompt, template, knowhow, agent, command의 의미를 구분한다.
+   - target별 파일 구조가 달라도 canonical asset의 의미가 같으면 성공으로 본다.
+   - 숙련자의 knowhow는 바로 배포하지 않고 asset 후보 → 검증 → catalog/profile 반영 흐름을 거친다.
 ```
 
 참고 문서:
@@ -186,6 +202,34 @@ npm --prefix agent-deploy run validate
 
 npm --prefix agent-deploy test
   → 23개 smoke test 전체 통과
+```
+
+### 2.1-A 최우선 전략 문서화
+
+목적:
+
+```text
+agent-deploy를 단순 AI coding config installer가 아니라
+회사 AI Markdown asset 배포/적용 인프라로 정의한다.
+```
+
+해야 할 일:
+
+- [x] `agent-deploy/README.md`에 bundle goal과 Markdown asset taxonomy 반영
+- [x] `agent-deploy/SETUP_WIZARD.md`에 사용 목적/숙련도/knowhow 공유 흐름 반영
+- [x] `docs/plans/codex/company-wide-agent-rollout/02-profiles-and-assets.md`에 asset taxonomy와 profile 구현 상태 반영
+- [ ] `prompts/templates/knowhow` frontmatter schema 설계
+- [ ] asset catalog 초안 설계
+- [ ] 외부/shared asset pack 적용 방식 설계
+- [ ] beginner quickstart/role guide 문서 추가
+
+최우선 구현 후보:
+
+```text
+1. prompt/template/knowhow schema 확장
+2. asset catalog.json 또는 catalog.md 초안
+3. knowhow asset 작성/승격 skill 추가
+4. SETUP_WIZARD.md 기반 초보자 role guide 보강
 ```
 
 ### 2.2 Codex adapter 추가
