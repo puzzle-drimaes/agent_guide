@@ -910,6 +910,83 @@ SDD mode: lite (파일명/문서 의미 정정).
 
 ---
 
+### 4.14 Harness capability matrix 작성
+
+대상 파일:
+
+```text
+docs/harness-capability-matrix.md
+TODO.md
+```
+
+작성 내용:
+
+- [x] Claude/Codex/Gemini/Cursor target별 설치 root와 install-state 위치 정리.
+- [x] rules/skills/agents/commands/prompts/MCP/merge/skip reason capability matrix 작성.
+- [x] profile별 smoke test 직접/간접 검증 범위 정리.
+- [x] Codex command skip, Cursor command skip, Gemini MCP skip 정책과 후속 재검토 조건 정리.
+- [x] Pilot 전 smoke test 보강, state 위치, MCP governance, Cursor Pilot 범위 리스크 정리.
+
+SDD mode: lite (현재 adapter/manifest/test 상태 문서화).
+
+---
+
+### 4.15 P1 운영 결정 확정
+
+대상 파일:
+
+```text
+docs/plans/codex/company-wide-agent-rollout/00-open-decisions.md
+TODO.md
+```
+
+확정 내용:
+
+- [x] D08 1차 profile 범위: Pilot 기본은 minimal/developer/product/business, governance/sdd/full은 optional 또는 내부 검토용.
+- [x] D09 installer 실행 방식: Pilot 1차는 repo checkout 후 node CLI 또는 bundle 내부 install.sh/install.bat, npx/binary/zip/web generator는 후속 옵션.
+- [x] D10 provenance 식별자: actor.track과 actor.aiAccountId 기본, machineLabel과 승인된 pseudonymous userId optional.
+- [x] D11 Prompt DB 승인 방식: DB 등록 → 사용/성공률 태깅 → 데모/분기 리뷰 → owner 지정 → company skill PR → installer 배포.
+- [x] D12 KPI 목표값: PR 노하우 80%, 회고 제출 7/9, Prompt DB 월 10개, 출처 표기 90%, Pilot 설치 성공률 80%.
+
+반영 내용:
+
+- [x] D08~D12 상태를 `Accepted`로 변경하고 결정 블록을 추가.
+- [x] P1 결정 체크리스트를 추가.
+- [x] TODO의 다음 우선순위를 Pilot 대상 smoke test와 install script 검증으로 이동.
+
+SDD mode: lite (결정 레지스터/인수인계 문서 정합성 갱신).
+
+---
+
+### 4.16 Pilot 기본 profile smoke test 보강
+
+대상 파일:
+
+```text
+agent-deploy/test/smoke.test.js
+docs/harness-capability-matrix.md
+TODO.md
+```
+
+구현 내용:
+
+- [x] Claude product profile 직접 smoke test 추가.
+- [x] Codex business profile 직접 smoke test 추가.
+- [x] Gemini product/business profile 직접 smoke test 추가.
+- [x] Pilot 기본 profile(minimal/developer/product/business)을 Codex/Claude/Gemini에서 직접 검증하도록 보강.
+- [x] harness capability matrix의 profile별 검증 범위를 최신화.
+
+검증 결과:
+
+```text
+npm --prefix agent-deploy test
+  → 23개 중 23개 통과
+```
+
+SDD mode: lite (기존 smoke test 보강, adapter 로직 변경 없음).
+
+---
+
 ## 5. 아직 완료가 아닌 것
 
 다음은 아직 완료되지 않았다. 자세한 순서는 `TODO.md` 참고.
@@ -973,7 +1050,7 @@ SDD mode: lite (파일명/문서 의미 정정).
 - 직무별 스타터 프롬프트 추가 (product: prd/user-story/prioritization, business: faq/proposal/announcement)
 ```
 
-아직 남은 핵심은 capability matrix 문서화와 파일럿 운영 수준의 bundle/lifecycle 구현이다.
+아직 남은 핵심은 install script 검증과 파일럿 운영 수준의 bundle/lifecycle 구현이다.
 
 ```text
 agent-deploy를 실제 파일럿 가능한 사내 installer MVP로 계속 확장해야 한다.

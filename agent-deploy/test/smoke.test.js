@@ -287,6 +287,19 @@ test('claude business profile installs non-developer skills, no developer-only a
   assert.ok(!fs.existsSync(path.join(project, '.claude/skills/spec-writing/SKILL.md')));
 });
 
+test('claude product profile installs product skills, no business-only assets', () => {
+  const project = tmpProject();
+  applyPlan(buildPlan({ target: 'claude', profile: 'product', projectRoot: project }));
+
+  assertCommonCoreRules(path.join(project, '.claude'));
+  assert.ok(fs.existsSync(path.join(project, '.claude/skills/product-spec/SKILL.md')));
+  assert.ok(fs.existsSync(path.join(project, '.claude/skills/meeting-summary/SKILL.md')));
+  assert.ok(!fs.existsSync(path.join(project, '.claude/skills/customer-response/SKILL.md')));
+  assert.ok(fs.existsSync(path.join(project, '.claude/prompts/product/prd.md')));
+  assert.ok(!fs.existsSync(path.join(project, '.claude/prompts/business/faq.md')));
+  assert.ok(!fs.existsSync(path.join(project, '.claude/rules/developer/architecture.md')));
+});
+
 test('codex product profile installs product-spec + meeting-summary under shared root', () => {
   const project = tmpProject();
   applyPlan(buildPlan({ target: 'codex', profile: 'product', projectRoot: project }));
@@ -298,6 +311,42 @@ test('codex product profile installs product-spec + meeting-summary under shared
   // product-prompts mirror under the shared .agents/ root
   assert.ok(fs.existsSync(path.join(project, '.agents/prompts/product/prd.md')));
   assert.ok(!fs.existsSync(path.join(project, '.agents/prompts/business/faq.md')));
+});
+
+test('codex business profile installs business skills under shared root', () => {
+  const project = tmpProject();
+  applyPlan(buildPlan({ target: 'codex', profile: 'business', projectRoot: project }));
+
+  assertCommonCoreRules(path.join(project, '.agents'));
+  assert.ok(fs.existsSync(path.join(project, '.agents/skills/meeting-summary/SKILL.md')));
+  assert.ok(fs.existsSync(path.join(project, '.agents/skills/customer-response/SKILL.md')));
+  assert.ok(!fs.existsSync(path.join(project, '.agents/skills/product-spec/SKILL.md')));
+  assert.ok(fs.existsSync(path.join(project, '.agents/prompts/business/faq.md')));
+  assert.ok(!fs.existsSync(path.join(project, '.agents/prompts/product/prd.md')));
+});
+
+test('gemini product profile installs product skills and prompts', () => {
+  const project = tmpProject();
+  applyPlan(buildPlan({ target: 'gemini', profile: 'product', projectRoot: project }));
+
+  assertCommonCoreRules(path.join(project, '.gemini'));
+  assert.ok(fs.existsSync(path.join(project, '.gemini/skills/product-spec/SKILL.md')));
+  assert.ok(fs.existsSync(path.join(project, '.gemini/skills/meeting-summary/SKILL.md')));
+  assert.ok(!fs.existsSync(path.join(project, '.gemini/skills/customer-response/SKILL.md')));
+  assert.ok(fs.existsSync(path.join(project, '.gemini/prompts/product/prd.md')));
+  assert.ok(!fs.existsSync(path.join(project, '.gemini/prompts/business/faq.md')));
+});
+
+test('gemini business profile installs business skills and prompts', () => {
+  const project = tmpProject();
+  applyPlan(buildPlan({ target: 'gemini', profile: 'business', projectRoot: project }));
+
+  assertCommonCoreRules(path.join(project, '.gemini'));
+  assert.ok(fs.existsSync(path.join(project, '.gemini/skills/meeting-summary/SKILL.md')));
+  assert.ok(fs.existsSync(path.join(project, '.gemini/skills/customer-response/SKILL.md')));
+  assert.ok(!fs.existsSync(path.join(project, '.gemini/skills/product-spec/SKILL.md')));
+  assert.ok(fs.existsSync(path.join(project, '.gemini/prompts/business/faq.md')));
+  assert.ok(!fs.existsSync(path.join(project, '.gemini/prompts/product/prd.md')));
 });
 
 test('claude governance profile installs governance skills + prompt-db-curation', () => {

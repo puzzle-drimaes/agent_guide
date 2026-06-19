@@ -676,7 +676,7 @@ developer profile 작성 전
 상태:
 
 ```text
-Proposed
+Accepted
 ```
 
 질문:
@@ -706,7 +706,15 @@ sdd
 
 ```text
 agent-deploy에는 governance profile 1차 초안도 추가됐다.
-다만 Pilot 기본 노출 여부는 아직 이 결정(D08)에서 확정하지 않았다.
+다만 Pilot 기본 노출 범위에서는 제외하고 governance 운영 담당자 검토용으로만 사용한다.
+```
+
+결정:
+
+```text
+Pilot 기본 profile은 minimal, developer, product, business로 확정한다.
+governance는 운영 담당자 검토용 optional profile로 유지한다.
+sdd/full은 일반 Pilot 기본 노출에서 제외하고 장시간 구현 또는 내부 검증 시에만 사용한다.
 ```
 
 ---
@@ -716,7 +724,7 @@ agent-deploy에는 governance profile 1차 초안도 추가됐다.
 상태:
 
 ```text
-Proposed
+Accepted
 ```
 
 질문:
@@ -739,6 +747,14 @@ Pilot 사용자는 어떤 방식으로 installer를 실행할 것인가?
 비개발자 Pilot: zip/web generator가 준비되지 않았다면 가이드 기반 수동 적용
 ```
 
+결정:
+
+```text
+Pilot 1차 실행 방식은 repo checkout 후 node CLI 또는 bundle 내부 install.sh/install.bat 실행으로 한다.
+npx, OS별 binary, zip/web generator는 배포 자동화가 준비된 뒤 후속 옵션으로 전환한다.
+비개발자 Pilot은 product/business profile 안내문과 Prompt DB 템플릿을 우선 제공하고, zip/web generator 전에는 가이드 기반 수동 적용을 허용한다.
+```
+
 ---
 
 ### D10. provenance 식별자
@@ -746,7 +762,7 @@ Pilot 사용자는 어떤 방식으로 installer를 실행할 것인가?
 상태:
 
 ```text
-Proposed
+Accepted
 ```
 
 질문:
@@ -775,6 +791,15 @@ install-state에 누구/어떤 계정/어떤 머신에서 설치했는지 기록
 필요 최소한의 감사/운영 정보만 기록한다.
 ```
 
+결정:
+
+```text
+install-state actor에는 track과 aiAccountId를 기본 기록한다.
+machineLabel은 optional로 둔다.
+userId는 Pilot에서는 선택값으로 두며, 필요한 경우 Slack/직원 식별자 자체보다 별도 label 또는 승인된 pseudonymous id를 우선한다.
+민감정보나 credential은 provenance에 기록하지 않는다.
+```
+
 ---
 
 ### D11. Prompt DB 승인 방식
@@ -782,7 +807,7 @@ install-state에 누구/어떤 계정/어떤 머신에서 설치했는지 기록
 상태:
 
 ```text
-Proposed
+Accepted
 ```
 
 질문:
@@ -802,6 +827,13 @@ Proposed
 6. installer 배포
 ```
 
+결정:
+
+```text
+Prompt DB 등록 → 사용 횟수/성공률 태깅 → 월간 데모 또는 분기 리뷰 검증 → owner 지정 → assets/skills/company-* PR → installer 배포 순서로 승격한다.
+승격된 asset은 source-attribution, security, knowledge-sharing rule을 통과해야 한다.
+```
+
 ---
 
 ### D12. KPI 목표값
@@ -809,7 +841,7 @@ Proposed
 상태:
 
 ```text
-Proposed
+Accepted
 ```
 
 질문:
@@ -828,6 +860,31 @@ Prompt DB 등록: 월 10개 이상
 Pilot 설치 성공률: 80% 이상
 ```
 
+결정:
+
+```text
+초기 KPI는 권장 초기값을 그대로 채택한다.
+Pilot 종료 후 실제 설치 실패 사유, 직무별 사용 편차, Prompt DB 품질을 기준으로 목표값을 재조정한다.
+```
+
+---
+
+## P1 결정 체크리스트
+
+```text
+- [x] D08-A Installer 내부 아키텍처 패턴
+- [x] D08-B 개발 프로젝트 코딩 아키텍처 표준
+- [x] D08-C Git Commit Convention 표준
+- [x] D08-D Spec Driven Development 적용 방식
+- [x] D08 1차 profile 범위
+- [x] D09 installer 실행 방식
+- [x] D10 provenance 식별자
+- [x] D11 Prompt DB 승인 방식
+- [x] D12 KPI 목표값
+```
+
+P1 결정은 모두 Accepted 상태다. Pilot 준비는 target/profile smoke test 보강과 install script 검증으로 이동한다.
+
 ---
 
 ## Adapter 구현 기준과 현재 반영 상태
@@ -842,6 +899,12 @@ D04-B 기본 설치 범위: Accepted
 D08-A Installer 내부 아키텍처 패턴: Accepted
 D08-B 개발 프로젝트 코딩 아키텍처 표준: Accepted
 D08-C Git Commit Convention 표준: Accepted
+D08-D Spec Driven Development 적용 방식: Accepted
+D08 1차 profile 범위: Accepted
+D09 installer 실행 방식: Accepted
+D10 provenance 식별자: Accepted
+D11 Prompt DB 승인 방식: Accepted
+D12 KPI 목표값: Accepted
 ```
 
 Codex adapter의 1차 구현 기준과 반영 상태:

@@ -127,18 +127,17 @@ docs/plans/codex/company-wide-agent-rollout/00-open-decisions.md
   - agent가 SDD-none/lite/full 직접 판단
   - none/lite/full은 같은 A~Z 흐름의 압축률 차이
   - 불필요한 QnA 없이 합리적 가정으로 진행
-- [ ] D08 1차 profile 범위 확정
-  - 구현 초안: minimal, core, developer, product, business, governance, sdd, full
-  - Pilot 권장: minimal, developer, product, business
-- [ ] D09 installer 실행 방식 확정
-  - 개발자: bundle + install.sh/install.bat
-  - Windows: exe
-- [ ] D10 provenance 식별자 확정
-  - actor.track
-  - actor.aiAccountId
-  - optional userId/machineLabel
-- [ ] D11 Prompt DB 승인/승격 방식 확정
-- [ ] D12 KPI 목표값 확정
+- [x] D08 1차 profile 범위 확정
+  - Pilot 기본: minimal, developer, product, business
+  - optional/내부 검토: governance, sdd, full
+- [x] D09 installer 실행 방식 확정
+  - Pilot 1차: repo checkout 후 node CLI 또는 bundle 내부 install.sh/install.bat
+  - npx/OS별 binary/zip/web generator는 후속 배포 옵션
+- [x] D10 provenance 식별자 확정
+  - 기본: actor.track, actor.aiAccountId
+  - optional: machineLabel, 승인된 pseudonymous userId
+- [x] D11 Prompt DB 승인/승격 방식 확정
+- [x] D12 KPI 목표값 확정
 
 ---
 
@@ -169,6 +168,7 @@ docs/plans/codex/company-wide-agent-rollout/00-open-decisions.md
 - [x] Gemini adapter
 - [x] Gemini project scope smoke test
 - [x] Claude/Codex/Gemini/Cursor profile smoke test
+- [x] Pilot 기본 profile(minimal/developer/product/business) Codex/Claude/Gemini 직접 smoke test
 - [x] company core rules/skills asset 승격
 - [x] 직무별 developer/product/business/governance profile 초안
 - [x] rule drift / entry parity / asset schema validation
@@ -180,7 +180,7 @@ npm --prefix agent-deploy run validate
   → manifest/rule-drift/entry-parity/asset-schema validation 통과
 
 npm --prefix agent-deploy test
-  → 19개 smoke test 전체 통과
+  → 23개 smoke test 전체 통과
 ```
 
 ### 2.2 Codex adapter 추가
@@ -277,9 +277,9 @@ docs/plans/codex/company-wide-agent-rollout/02b-harness-engineering-principles.m
 
 해야 할 일:
 
-- [ ] `docs/harness-capability-matrix.md` 작성
-- [ ] Claude/Codex/Gemini/Cursor capability 정리
-- [ ] adapter별 native/fallback/skip 정책 작성
+- [x] `docs/harness-capability-matrix.md` 작성
+- [x] Claude/Codex/Gemini/Cursor capability 정리
+- [x] adapter별 native/fallback/skip 정책 작성
 - [x] harness parity smoke test 보강 (Codex/Claude/Gemini core rules/skills + skip reason)
 - [x] 루트 진입점(AGENTS/CLAUDE/GEMINI) parity 자동 가드 추가 (`check-entry-parity.js`, validate에 통합)
 
@@ -897,17 +897,15 @@ docs/plans/codex/company-wide-agent-rollout/13-governance-and-roadmap.md
 가장 추천하는 실제 순서:
 
 ```text
-1. `docs/harness-capability-matrix.md` 작성
-2. P1 결정사항(D08~D12) 확정
-3. install.sh/install.bat OS별 검증
-4. Linux/macOS zip bundle build script 추가
-5. Windows exe packaging 방식 설계
-6. backup/conflict policy 추가
-7. install-state runtime validation 추가
-8. update/repair/uninstall 설계
-9. Pilot 2주 진행
-10. Prompt DB/Slack/GitHub governance 자동화
-11. 전사 rollout
+1. install.sh/install.bat OS별 검증
+2. Linux/macOS zip bundle build script 추가
+3. Windows exe packaging 방식 설계
+4. backup/conflict policy 추가
+5. install-state runtime validation 추가
+6. update/repair/uninstall 설계
+7. Pilot 2주 진행
+8. Prompt DB/Slack/GitHub governance 자동화
+9. 전사 rollout
 ```
 
 ---
@@ -922,7 +920,7 @@ docs/plans/codex/company-wide-agent-rollout/13-governance-and-roadmap.md
 - user/global scope는 옵션이다.
 - Windows는 exe, Linux/macOS는 zip bundle이 기본 배포 방식이다.
 - sh/bat은 bundle 내부 실행 entrypoint다.
-- P0 결정은 확정됐고, 다음 최우선은 capability matrix와 bundle/lifecycle 보강이다.
+- P0/P1 결정, capability matrix, Pilot 기본 profile smoke test는 완료됐고, 다음 최우선은 install script 검증과 bundle/lifecycle 보강이다.
 - 회사 개발 룰은 agent asset으로 1차 배포됐으며, 이후에는 직무별/운영별 asset을 점진 확장한다.
 - commit convention에는 Jira 링크가 필수다.
 - governance는 agent-deploy만으로 끝나지 않는다.
