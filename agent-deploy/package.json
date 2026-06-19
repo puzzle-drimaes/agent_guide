@@ -10,6 +10,7 @@
     "src",
     "manifests",
     "schemas",
+    "docs",
     "assets",
     "SETUP_WIZARD.md",
     "install.sh",

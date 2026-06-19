@@ -112,6 +112,15 @@ agent-deploy/assets/
 Pilot에서는 `templates/`와 `knowhow/`를 바로 코드로 추가하지 않아도 된다. 다만 prompt와 skill을
 설계할 때 향후 분리될 수 있도록 asset type, audience, owner, stability 정보를 남길 수 있어야 한다.
 
+schema/catalog 초안은 아래 파일에서 관리한다.
+
+```text
+agent-deploy/docs/ASSET_SCHEMA_AND_CATALOG.md
+agent-deploy/schemas/asset-frontmatter.schema.json
+agent-deploy/schemas/asset-catalog.schema.json
+agent-deploy/assets/catalog.draft.json
+```
+
 ## Asset taxonomy
 
 | Type | 의미 | 예시 | 배포 기준 |
@@ -247,3 +256,4 @@ prompt-db-curation-skill
 - asset type별 의미와 배포 기준이 문서화되어 있다.
 - prompt/template/knowhow schema와 catalog 도입 여부가 TODO로 추적된다.
 - 실제 manifest에 없는 후보 profile은 문서에서 예정 상태로 표시된다.
+- catalog 초안이 실제 asset 경로, module, profile 추천을 설명한다.

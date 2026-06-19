@@ -218,18 +218,28 @@ agent-deploy를 단순 AI coding config installer가 아니라
 - [x] `agent-deploy/README.md`에 bundle goal과 Markdown asset taxonomy 반영
 - [x] `agent-deploy/SETUP_WIZARD.md`에 사용 목적/숙련도/knowhow 공유 흐름 반영
 - [x] `docs/plans/codex/company-wide-agent-rollout/02-profiles-and-assets.md`에 asset taxonomy와 profile 구현 상태 반영
-- [ ] `prompts/templates/knowhow` frontmatter schema 설계
-- [ ] asset catalog 초안 설계
+- [x] `prompts/templates/knowhow` frontmatter schema 설계
+- [x] asset catalog 초안 설계
 - [ ] 외부/shared asset pack 적용 방식 설계
 - [ ] beginner quickstart/role guide 문서 추가
+
+산출물:
+
+```text
+agent-deploy/docs/ASSET_SCHEMA_AND_CATALOG.md
+agent-deploy/schemas/asset-frontmatter.schema.json
+agent-deploy/schemas/asset-catalog.schema.json
+agent-deploy/assets/catalog.draft.json
+```
 
 최우선 구현 후보:
 
 ```text
-1. prompt/template/knowhow schema 확장
-2. asset catalog.json 또는 catalog.md 초안
+1. prompt/template/knowhow schema를 non-blocking validation으로 연결
+2. catalog와 실제 파일/frontmatter/module/profile의 parity checker 추가
 3. knowhow asset 작성/승격 skill 추가
-4. SETUP_WIZARD.md 기반 초보자 role guide 보강
+4. 외부/shared asset pack 적용 방식 설계
+5. SETUP_WIZARD.md 기반 초보자 role guide 보강
 ```
 
 ### 2.2 Codex adapter 추가

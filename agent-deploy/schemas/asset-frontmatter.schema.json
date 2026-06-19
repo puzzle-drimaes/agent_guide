@@ -1,0 +1,116 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "agent-deploy markdown asset frontmatter draft",
+  "description": "Schema for parsed YAML frontmatter in Markdown assets. Draft-only until prompt/template/knowhow migration is complete.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["id", "asset_type", "title", "description", "audience", "owner", "stability"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$"
+    },
+    "asset_type": {
+      "enum": ["rule", "skill", "prompt", "template", "knowhow", "agent", "command"]
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "audience": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "enum": ["all", "developer", "product", "business", "governance", "design", "manager", "operator"]
+      }
+    },
+    "owner": {
+      "type": "string",
+      "minLength": 1
+    },
+    "stability": {
+      "enum": ["draft", "beta", "stable", "deprecated"]
+    },
+    "version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "reviewers": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "source": {
+      "type": "string",
+      "minLength": 1
+    },
+    "license": {
+      "type": "string",
+      "minLength": 1
+    },
+    "deprecated_by": {
+      "type": "string",
+      "minLength": 1
+    },
+    "inputs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "outputs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "required_sections": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "output_format": {
+      "enum": ["markdown", "table", "checklist", "json", "text"]
+    },
+    "promotion_status": {
+      "enum": ["candidate", "reviewing", "approved", "rejected", "archived"]
+    },
+    "sensitivity": {
+      "enum": ["public", "internal", "confidential"]
+    },
+    "examples": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "asset_type": { "const": "knowhow" } }
+      },
+      "then": {
+        "required": ["promotion_status", "sensitivity"]
+      }
+    }
+  ]
+}
