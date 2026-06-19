@@ -237,7 +237,7 @@ agent-deploy/assets/catalog.draft.json
 ```text
 1. [x] prompt/template/knowhow schema를 non-blocking validation으로 연결
 2. [x] catalog와 실제 파일/frontmatter/module/profile의 parity checker 추가
-3. knowhow asset 작성/승격 skill 추가
+3. [x] knowhow asset 작성/승격 skill 추가
 4. 외부/shared asset pack 적용 방식 설계
 5. SETUP_WIZARD.md 기반 초보자 role guide 보강
 ```

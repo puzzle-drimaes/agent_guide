@@ -113,6 +113,20 @@
       "owner": "ai-governance",
       "tags": ["prompt-db", "knowledge-sharing", "skill"],
       "reviewStatus": "approved"
+    },
+    {
+      "id": "knowhow-asset-workflow",
+      "assetType": "skill",
+      "title": "Knowhow Asset 작성/승격 스킬",
+      "description": "개인/팀 노하우를 정제된 Markdown asset 후보로 만들고 공유 승격 가능성을 판단합니다.",
+      "path": "skills/knowhow-asset/SKILL.md",
+      "moduleIds": ["knowhow-asset-skill"],
+      "profiles": ["core", "developer", "product", "business", "governance", "full"],
+      "audience": ["all"],
+      "stability": "stable",
+      "owner": "ai-governance",
+      "tags": ["knowhow", "knowledge-sharing", "promotion", "skill"],
+      "reviewStatus": "approved"
     }
   ]
 }

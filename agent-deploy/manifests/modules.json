@@ -290,6 +290,24 @@
       "stability": "stable"
     },
     {
+      "id": "knowhow-asset-skill",
+      "description": "Knowhow capture and promotion skill: turn reusable team practice into a sanitized asset candidate",
+      "paths": [
+        "skills/knowhow-asset"
+      ],
+      "targets": [
+        "claude",
+        "cursor",
+        "codex",
+        "gemini"
+      ],
+      "dependencies": [
+        "prompt-asset-skill"
+      ],
+      "cost": "light",
+      "stability": "stable"
+    },
+    {
       "id": "prompt-library",
       "description": "Starter prompt templates (dev/doc/comparison/research) following the company skeleton",
       "paths": [

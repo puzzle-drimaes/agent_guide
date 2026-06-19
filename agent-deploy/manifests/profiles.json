@@ -8,6 +8,7 @@
       "baseline-rules",
       "review-agent",
       "prompt-asset-skill",
+      "knowhow-asset-skill",
       "prompt-library",
       "mcp-baseline"
     ],
@@ -21,6 +22,7 @@
     "business": [
       "baseline-rules",
       "prompt-asset-skill",
+      "knowhow-asset-skill",
       "prompt-library",
       "business-prompts",
       "meeting-summary-skill",
@@ -29,6 +31,7 @@
     "product": [
       "baseline-rules",
       "prompt-asset-skill",
+      "knowhow-asset-skill",
       "prompt-library",
       "product-prompts",
       "meeting-summary-skill",
@@ -37,6 +40,7 @@
     "governance": [
       "baseline-rules",
       "prompt-asset-skill",
+      "knowhow-asset-skill",
       "prompt-library",
       "kpi-report-skill",
       "quarterly-review-skill",
@@ -59,6 +63,7 @@
       "company-code-review-skill",
       "spec-writing-skill",
       "prompt-asset-skill",
+      "knowhow-asset-skill",
       "prompt-library",
       "planning-command",
       "mcp-baseline"
@@ -80,6 +85,7 @@
       "company-code-review-skill",
       "spec-writing-skill",
       "prompt-asset-skill",
+      "knowhow-asset-skill",
       "prompt-library",
       "product-prompts",
       "business-prompts",
