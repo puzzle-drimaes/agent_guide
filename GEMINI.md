@@ -8,7 +8,7 @@ Gemini는 이 프로젝트에서 `AGENTS.md`와 동일한 방향으로 작업한
 AGENTS.md
 TODO.md
 Finish.md
-docs/report.html
+docs/references_analysis.html  # 참고자료 분석용
 ```
 
 ## Canonical rule source

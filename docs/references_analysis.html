@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>사내 Agent 설치·배포 — 통합 분석 &amp; 추출 로드맵 (ECC + k-sdd)</title>
+<title>참고자료 분석 리포트 — ECC + k-sdd</title>
 <style>
   :root{
     --ink:#1e293b;--muted:#64748b;--line:#e2e8f0;--soft:#f8fafc;
@@ -62,8 +62,8 @@
 <body>
 <header class="hero">
   <div class="wrap">
-    <h1>사내 Agent 설치·배포 — 통합 분석 &amp; 추출 로드맵</h1>
-    <p>ECC + k-sdd 분석을 합본한 단일 리포트 — <b>기법 카탈로그 + 추출 우선순위 + agent-deploy 현황</b></p>
+    <h1>참고자료 분석 리포트 — ECC + k-sdd</h1>
+    <p>references/ECC와 references/k-sdd 분석을 합본한 참고자료 분석 리포트 — <b>기법 카탈로그 + 추출 우선순위 + agent-deploy 현황</b></p>
     <div class="meta">
       <span>대상: <b>ECC/ · k-sdd/</b></span>
       <span>목표: <b>모든 사람 × 모든 OS × 모든 에이전트, 같은 방향성</b></span>
@@ -76,7 +76,7 @@
 <main>
   <section>
     <h2><span class="n">0</span>개요</h2>
-    <p class="sub">두 오픈소스에서 <b>사내 AI 코딩 에이전트 설치·배포 시스템</b>에 재사용할 하네스 엔지니어링 기법을 추출·통합한다. 두 프로젝트는 같은 문제("단일 표준 → 여러 AI 툴 일관 배포")를 다른 깊이로 푼다 — 경쟁이 아니라 상보적.</p>
+    <p class="sub"><b>이 문서는 ECC/k-sdd 참고자료 분석용 리포트다.</b> 두 오픈소스에서 <b>사내 AI 코딩 에이전트 설치·배포 시스템</b>에 재사용할 하네스 엔지니어링 기법을 추출·통합한다.</p>
     <div class="stats">
       <div class="stat"><b>67</b><span>ECC agents</span></div>
       <div class="stat"><b>271</b><span>ECC skills</span></div>
@@ -185,7 +185,7 @@ hooks/ mcp/ commands/       profiles            codex / gemini / …    merge-js
         <tr><td>description 트리거(긍정+부정)</td><td>자동 발동 정확도↑</td><td><span class="src s-ecc">ECC</span></td></tr>
         <tr><td>점진적 공개 skills</td><td>SKILL.md 짧게, 참조 온디맨드</td><td><span class="src s-ecc">ECC</span></td></tr>
         <tr><td>계층형 rules(공통+도메인별)</td><td>glob 스코핑, 도메인이 공통 override</td><td><span class="src s-both">둘다</span></td></tr>
-        <tr><td>커밋/Git 규약</td><td>conventional commit + 명시적 staging + PR 노하우 한 줄</td><td><span class="src s-both">둘다</span></td></tr>
+        <tr><td>커밋/Git 규약</td><td>회사형 commit convention([type] 한글 제목 + Jira) + 명시적 staging + PR 노하우 한 줄</td><td><span class="src s-both">둘다</span></td></tr>
         <tr><td>공유 규칙 단일 소스 주입</td><td>frontmatter 선언으로 다중 스킬 공유</td><td><span class="src s-ksdd">k-sdd</span></td></tr>
         <tr><td>소프트웨어 아키텍처 룰(설치 자산)</td><td>Clean/Feature/MVVM + 아키텍처 리뷰</td><td><span class="src s-impl">구현</span></td></tr>
         <tr><td>컨텍스트 모드 프로파일</td><td>dev/research/review 행동 전환</td><td><span class="src s-ecc">ECC</span></td></tr>
@@ -250,8 +250,8 @@ hooks/ mcp/ commands/       profiles            codex / gemini / …    merge-js
       <thead><tr><th>module</th><th>포함</th><th>프로파일</th><th>비고</th></tr></thead>
       <tbody>
         <tr><td><code>common-rules</code></td><td>Prompt Defense 베이스라인 + 시크릿 금지</td><td>minimal(전원)</td><td><span class="src s-impl">구현</span></td></tr>
-        <tr><td><code>source-citation</code></td><td>외부 자료 출처·라이선스 표기(룰 ⑥)</td><td>minimal</td><td>신규</td></tr>
-        <tr><td><code>commit-convention</code></td><td>conventional commit + 명시 staging + PR 노하우(룰 ①)</td><td>minimal</td><td><span class="src s-both">둘다</span></td></tr>
+        <tr><td><code>source-attribution</code></td><td>외부 자료 출처·라이선스 표기</td><td>minimal(baseline)</td><td><span class="src s-impl">구현</span></td></tr>
+        <tr><td><code>commit-convention</code></td><td>회사형 commit convention([type] 한글 제목, 1/2/3 본문, Jira 필수)</td><td>developer/full</td><td><span class="src s-impl">구현</span></td></tr>
         <tr><td><code>language-rules</code></td><td>TS/Python/Go 등 언어별 스타일</td><td>developer</td><td><span class="src s-impl">구현</span></td></tr>
         <tr><td><code>architecture-rules</code></td><td>Clean/Feature/MVVM + 계층 경계</td><td>developer/sdd</td><td><span class="src s-impl">자산</span></td></tr>
         <tr><td><code>review-agents</code></td><td>code-reviewer · architecture-reviewer(read-only)</td><td>developer</td><td><span class="src s-impl">자산</span></td></tr>
@@ -271,26 +271,28 @@ hooks/ mcp/ commands/       profiles            codex / gemini / …    merge-js
         <h4 style="color:var(--ok)">✅ 구현됨</h4>
         <ul class="tight">
           <li>매니페스트(modules/profiles) + 의존성 해석·순환 검출</li>
-          <li>타깃 어댑터(claude/cursor) + 서브경로·단일파일 스코핑</li>
+          <li>타깃 어댑터(claude/cursor/codex/gemini) + 서브경로·단일파일 스코핑</li>
           <li>install-state provenance + 스키마</li>
           <li>비파괴 deepMerge + path-safety + symlink 가드</li>
           <li>계획/적용 분리 + dry-run + <code>--json</code></li>
           <li>scope: project 기본 + <code>--global</code>(home)</li>
           <li>skip+reason 연산, op에 scope/reason 기록</li>
-          <li>아키텍처 룰 + architecture-review <b>자산(프롬프트 .md) 추가·developer 스코핑·설치</b> <span style="color:var(--muted)">(리뷰 동작 자체는 에이전트가 읽는 지침이며 기능 검증은 별도)</span></li>
-          <li>번들 스크립트 install.sh/install.bat + CI 불변식 검증</li>
+          <li>아키텍처/SDD/commit convention/core common 룰 + developer workflow skill 자산 설치</li>
+          <li>product/business/governance profile과 직무별 skill·prompt 스타터 자산</li>
+          <li>Codex TOML add-only merge + AGENTS/GEMINI managed block append-markdown</li>
+          <li>번들 스크립트 install.sh/install.bat + CI 불변식 검증(validate 4종 가드, smoke test 19개)</li>
         </ul>
       </div>
       <div class="box" style="border-top:3px solid var(--bad)">
         <h4 style="color:var(--bad)">⬜ 남은 것</h4>
         <ul class="tight">
-          <li>Codex / Gemini 어댑터</li>
-          <li>공급망 스캔(IOC/유니코드) + 아티팩트 서명</li>
+          <li>P1/P2 운영 결정 구체화(D08~D16)</li>
+          <li><code>docs/harness-capability-matrix.md</code> 문서화</li>
+          <li>install.sh/install.bat OS별 검증 + Linux/macOS zip bundle build</li>
+          <li>공급망 스캔(IOC/유니코드/secret) + 아티팩트 서명·checksum</li>
           <li>uninstall(provenance 역재생) / update-diff / drift repair</li>
-          <li>merge-toml(Codex 설정) / append-markdown</li>
           <li>MCP DISABLED 필터 + 승인 카탈로그 거버넌스</li>
-          <li>harness parity test / capability matrix 문서</li>
-          <li>SDD-lite·impl/review/debug 자율 루프 자산</li>
+          <li>Prompt DB/Slack/GitHub governance 자동화</li>
           <li>Windows .exe / 웹 설정 생성기(비개발자)</li>
         </ul>
       </div>
@@ -318,12 +320,12 @@ hooks/ mcp/ commands/       profiles            codex / gemini / …    merge-js
   ├─ 자산·패턴·보안 라이브러리 ← <span class="a">ECC</span> (어댑터, provenance, 공급망 스캔, 룰/스킬/에이전트)
   ├─ 자율 구현 방법론       ← <span class="b">k-sdd</span> (게이트, 경계우선, 핸드오프, 적대적 리뷰)
   └─ 거버넌스(6룰/KPI)      ← 사내 (PR노하우·회고·프롬프트DB↔스킬 승격)</div>
-    <div class="callout"><b>한 줄</b>: ECC의 넓은 배포 인프라 + k-sdd의 선명한 설치 엔진·자율 구현 루프를, <b>project 기본 / 전역 옵션의 번들</b>로 사내 2~3개 툴에 축소 이식한다. 골격(<code>agent-deploy</code>)은 이미 동작하며, 남은 것은 어댑터 확장·보안·생애주기다.</div>
+    <div class="callout"><b>한 줄</b>: ECC의 넓은 배포 인프라 + k-sdd의 선명한 설치 엔진·자율 구현 루프를, <b>project 기본 / 전역 옵션의 번들</b>로 사내 2~3개 툴에 축소 이식한다. 골격(<code>agent-deploy</code>)과 1차 Codex/Gemini 어댑터·직무별 자산은 이미 동작하며, 남은 것은 capability matrix·번들 배포·보안·생애주기와 Pilot 운영 준비다.</div>
   </section>
 </main>
 
 <footer>
-  통합 분석 리포트 · 작성 Claude · 2026-06-17 · 세부: <code>[claude]report_ecc.html</code> · <code>[claude]report_k-sdd.html</code> · 비교: <code>[codex]report_*.html</code>
+  참고자료 분석 리포트 · 작성 Claude · 2026-06-17 · 세부: <code>[claude]report_ecc.html</code> · <code>[claude]report_k-sdd.html</code> · 비교: <code>[codex]report_*.html</code>
 </footer>
 </body>
 </html>

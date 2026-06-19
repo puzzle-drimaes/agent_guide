@@ -36,7 +36,7 @@ P3: 운영 고도화 단계에서 결정
 상태:
 
 ```text
-Proposed
+Accepted
 ```
 
 질문:
@@ -55,6 +55,13 @@ Proposed
 
 ```text
 별도 private repo `company-agent-kit`
+```
+
+결정:
+
+```text
+회사 표준 rules/skills/agents/prompts/manifests의 정규 소스는 별도 private repo `company-agent-kit`에 둔다.
+현재 `agent_guide` repo와 `agent-deploy/`는 dogfooding/reference 구현으로 유지하고, Phase 1에서 정규 repo로 승격/분리한다.
 ```
 
 이유:
@@ -281,7 +288,7 @@ Installer MVP 구현 전
 상태:
 
 ```text
-Proposed
+Accepted
 ```
 
 질문:
@@ -305,6 +312,13 @@ GitHub: installer assets, audit 가능한 변경 이력
 Slack: 알림과 회고 수집 입구
 ```
 
+결정:
+
+```text
+지식 DB는 Notion + GitHub + Slack 조합으로 운영한다.
+Notion은 Prompt DB/회고/노하우의 운영 DB, GitHub는 agent asset과 변경 이력, Slack은 수집/알림/회고 진입점으로 사용한다.
+```
+
 결정 시점:
 
 ```text
@@ -318,7 +332,7 @@ Slack: 알림과 회고 수집 입구
 상태:
 
 ```text
-Proposed
+Accepted
 ```
 
 질문:
@@ -340,6 +354,13 @@ Proposed
 업무 유형별 계정 배정 + 계정별 초기 담당자 1명 + 공동 사용자 N명
 ```
 
+결정:
+
+```text
+9개 공용 AI 계정은 업무 유형별로 배정하고, 각 계정마다 초기 담당자 1명과 공동 사용자 N명을 둔다.
+계정의 목적은 비용 절감보다 지식 공유화이며, 사용 후 재사용 가능한 노하우를 Prompt DB/회고로 남긴다.
+```
+
 필수 기록:
 
 ```text
@@ -359,7 +380,7 @@ Pilot 대상 선정 전
 상태:
 
 ```text
-Proposed
+Accepted
 ```
 
 질문:
@@ -377,6 +398,13 @@ Proposed
 - 민감한 재무 정보
 - 법무 검토 전 외부 공개 불가 자료
 - 사내 계정 credential
+```
+
+결정:
+
+```text
+위 초기 금지 범위를 P0 보안 기준으로 채택한다.
+AI 도구 입력 전 민감정보는 placeholder로 치환하고, 판단이 어려운 자료는 담당자/보안 검토 후 사용한다.
 ```
 
 결정 시점:
@@ -672,7 +700,13 @@ business
 design
 manager
 sdd
-governance
+```
+
+구현 메모:
+
+```text
+agent-deploy에는 governance profile 1차 초안도 추가됐다.
+다만 Pilot 기본 노출 여부는 아직 이 결정(D08)에서 확정하지 않았다.
 ```
 
 ---
@@ -796,9 +830,9 @@ Pilot 설치 성공률: 80% 이상
 
 ---
 
-## Codex adapter 착수 기준
+## Adapter 구현 기준과 현재 반영 상태
 
-Codex adapter 구현 전 준비 작업은 이 문서의 `P0/P1` 결정 중 아래 항목을 기준으로 시작한다.
+Codex/Gemini adapter 1차 구현은 아래 `P0/P1` 결정 중 Accepted 항목을 기준으로 진행했고, 현재 smoke test 수준에서 동작을 확인했다. 이 절은 과거 착수 기준을 보존하되 현재 상태를 함께 기록한다.
 
 ```text
 D02 1차 지원 대상 AI 도구: Accepted
@@ -810,7 +844,7 @@ D08-B 개발 프로젝트 코딩 아키텍처 표준: Accepted
 D08-C Git Commit Convention 표준: Accepted
 ```
 
-Codex adapter의 1차 구현 기준:
+Codex adapter의 1차 구현 기준과 반영 상태:
 
 ```text
 기본 scope:
@@ -832,6 +866,28 @@ install state:
   .agent-deploy/install-state.json
 ```
 
+Gemini adapter의 1차 구현 기준과 반영 상태:
+
+```text
+기본 scope:
+  project
+
+root instruction:
+  GEMINI.md
+
+canonical rule source:
+  .gemini/rules/
+
+commands/agents/skills/prompts:
+  .gemini/ 하위 mirror + instruction-backed fallback
+
+MCP config:
+  현재는 skip-with-reason 정책(docs/specs/gemini-adapter/mcp-policy.md)
+
+install state:
+  .agent-deploy/install-state.json
+```
+
 하네스 엔지니어링 기준:
 
 ```text
@@ -840,7 +896,7 @@ Codex가 native로 지원하지 않는 capability는 instruction-backed fallback
 target별 차이는 core가 아니라 target adapter가 흡수한다.
 ```
 
-다음 구현 문서:
+다음 구현/검증 문서:
 
 ```text
 docs/plans/codex/company-wide-agent-rollout/02b-harness-engineering-principles.md
@@ -1032,14 +1088,14 @@ Cursor, OpenCode, Copilot, Windsurf를 언제 추가할 것인가?
 ## P0 결정 체크리스트
 
 ```text
-- [ ] D01 정규 소스 저장 위치
-- [ ] D02 1차 지원 대상 AI 도구
-- [ ] D03 개발자/비개발자 전달 방식
-- [ ] D04 배포 채널
-- [ ] D04-B 기본 설치 범위
-- [ ] D05 지식 DB 위치
-- [ ] D06 공용 계정 매핑 방식
-- [ ] D07 민감정보 입력 금지 범위
+- [x] D01 정규 소스 저장 위치
+- [x] D02 1차 지원 대상 AI 도구
+- [x] D03 개발자/비개발자 전달 방식
+- [x] D04 배포 채널
+- [x] D04-B 기본 설치 범위
+- [x] D05 지식 DB 위치
+- [x] D06 공용 계정 매핑 방식
+- [x] D07 민감정보 입력 금지 범위
 ```
 
-P0가 완료되어야 installer MVP와 Pilot 준비를 안정적으로 시작할 수 있다.
+P0 결정은 모두 Accepted 상태다. Pilot 준비는 P1 결정과 bundle/lifecycle 검증으로 이동한다.

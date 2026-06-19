@@ -71,6 +71,6 @@ evidence-first verification
 AGENTS.md
 TODO.md
 Finish.md
-docs/report.html
+docs/references_analysis.html  # ECC/k-sdd 참고자료 분석용
 docs/plans/codex/company-wide-agent-rollout/
 ```

@@ -35,10 +35,10 @@ references/ECC/
 report 정리:
 
 ```text
-docs/report.html
+docs/references_analysis.html
 ```
 
-개별 ECC report는 현재 통합 report로 정리됐다.
+개별 ECC report는 현재 `docs/references_analysis.html` 참고자료 분석 리포트로 정리됐다.
 
 ---
 
@@ -72,19 +72,19 @@ references/k-sdd/
 report 정리:
 
 ```text
-docs/report.html
+docs/references_analysis.html
 ```
 
-개별 k-sdd report는 현재 통합 report로 정리됐다.
+개별 k-sdd report는 현재 `docs/references_analysis.html` 참고자료 분석 리포트로 정리됐다.
 
 ---
 
-### 1.3 통합 report 작성
+### 1.3 참고자료 분석 리포트 작성
 
 생성/검토된 파일:
 
 ```text
-docs/report.html
+docs/references_analysis.html
 ```
 
 포함된 내용:
@@ -99,7 +99,7 @@ docs/report.html
 
 검토 결과:
 
-- [x] 통합 report의 구조는 적절하다고 판단.
+- [x] 참고자료 분석 리포트의 구조는 적절하다고 판단.
 - [x] 이전 지적 사항 일부 반영됨.
   - ECC adapter 수 표현 정리.
   - project 기본/global option 반영.
@@ -118,14 +118,14 @@ docs/report.html
 ```text
 references/ECC/
 references/k-sdd/
-docs/report.html
+docs/references_analysis.html
 ```
 
 내용:
 
 - [x] ECC 원본 참고 자료를 `references/ECC/` 아래로 이동.
 - [x] k-sdd 원본 참고 자료를 `references/k-sdd/` 아래로 이동.
-- [x] 개별 report 파일을 정리하고 `docs/report.html`을 통합 리포트 기준 파일로 사용.
+- [x] 개별 report 파일을 정리하고 `docs/references_analysis.html`을 ECC/k-sdd 참고자료 분석용 리포트로 사용.
 
 ---
 
@@ -856,11 +856,65 @@ SDD mode: lite (가드 스크립트 1개 + 테스트 2개 + validate 연결, 기
 
 ---
 
+### 4.12 P0 운영 결정 확정
+
+대상 파일:
+
+```text
+docs/plans/codex/company-wide-agent-rollout/00-open-decisions.md
+TODO.md
+docs/references_analysis.html
+```
+
+확정 내용:
+
+- [x] D01 정규 소스 저장 위치: 별도 private repo `company-agent-kit`
+- [x] D05 지식 DB 위치: Notion + GitHub + Slack
+- [x] D06 공용 계정 매핑 방식: 업무 유형별 계정 배정 + 계정별 초기 담당자 1명 + 공동 사용자 N명
+- [x] D07 민감정보 입력 금지 범위: 고객 개인정보, credential, 미공개 계약 조건, 민감 재무 정보, 법무 검토 전 외부 공개 불가 자료, 사내 계정 credential 입력 금지
+
+반영 내용:
+
+- [x] `00-open-decisions.md`에서 D01/D05/D06/D07 상태를 `Accepted`로 변경하고 결정 블록을 추가.
+- [x] P0 체크리스트를 모두 완료 상태로 갱신.
+- [x] `TODO.md`의 다음 작업 순서를 capability matrix와 bundle/lifecycle 중심으로 재정렬.
+- [x] `docs/references_analysis.html`의 남은 작업 설명에서 P0 승인 항목을 제거하고 P1/P2 운영 결정 구체화로 갱신.
+
+SDD mode: lite (결정 레지스터/인수인계 문서 정합성 갱신).
+
+---
+
+### 4.13 참고자료 분석 리포트 파일명 정정
+
+대상 파일:
+
+```text
+docs/references_analysis.html
+AGENTS.md
+CLAUDE.md
+GEMINI.md
+TODO.md
+README.md
+.agents/rules/common/source-attribution.md
+agent-deploy/assets/rules/common/source-attribution.md
+```
+
+정리 내용:
+
+- [x] `docs/report.html`을 `docs/references_analysis.html`로 rename.
+- [x] HTML 제목/개요/footer에 참고자료 분석용 리포트임을 명시.
+- [x] AGENTS/TODO/README 계열 문서에 참고자료 분석용 리포트임을 반영.
+- [x] source-attribution rule의 참고 소스 경로를 새 파일명으로 갱신.
+
+SDD mode: lite (파일명/문서 의미 정정).
+
+---
+
 ## 5. 아직 완료가 아닌 것
 
 다음은 아직 완료되지 않았다. 자세한 순서는 `TODO.md` 참고.
 
-- [ ] P0 결정사항 실제 승인.
+- [x] P0 결정사항 실제 승인.
 - [x] Codex adapter 구현.
 - [x] Gemini adapter 구현.
 - [x] commit convention asset 실제 추가.
@@ -883,7 +937,7 @@ SDD mode: lite (가드 스크립트 1개 + 테스트 2개 + validate 연결, 기
 
 ```text
 1. TODO.md
-2. docs/report.html
+2. docs/references_analysis.html
 3. docs/plans/codex/company-wide-agent-rollout/00-open-decisions.md
 4. docs/plans/codex/company-wide-agent-rollout/README.md
 5. docs/plans/codex/company-wide-agent-rollout/03b-project-bundle-install-strategy.md
@@ -910,7 +964,7 @@ SDD mode: lite (가드 스크립트 1개 + 테스트 2개 + validate 연결, 기
 - Gemini adapter 1차 구현
 - project scope 기본 전략 확정
 - architecture/commit convention 계획 추가
-- report.html 통합 리포트 작성
+- references_analysis.html 참고자료 분석 리포트 작성
 - developer 직무 workflow skill 추가 (company-plan / company-code-review / spec-writing)
 - prompt-asset 지식 캡처 skill 추가 (전 직무 공통, Prompt DB 13필드 + 승격 루프)
 - 범용 프롬프트 템플릿 + 스타터 라이브러리(dev/doc/comparison/research) 추가, 4개 adapter에 prompts category 설치 경로 추가
@@ -919,7 +973,7 @@ SDD mode: lite (가드 스크립트 1개 + 테스트 2개 + validate 연결, 기
 - 직무별 스타터 프롬프트 추가 (product: prd/user-story/prioritization, business: faq/proposal/announcement)
 ```
 
-아직 남은 핵심은 회사 표준 asset 보강과 파일럿 운영 수준의 lifecycle 구현이다.
+아직 남은 핵심은 capability matrix 문서화와 파일럿 운영 수준의 bundle/lifecycle 구현이다.
 
 ```text
 agent-deploy를 실제 파일럿 가능한 사내 installer MVP로 계속 확장해야 한다.

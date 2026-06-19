@@ -55,7 +55,7 @@ Claude/Codex/Gemini 등 어떤 AI 도구를 쓰더라도,
 docs/plans/codex/company-wide-agent-installer-rollout-plan.md
 docs/plans/codex/company-wide-agent-rollout/README.md
 docs/plans/codex/company-wide-agent-rollout/00-open-decisions.md
-docs/report.html
+docs/references_analysis.html
 Finish.md
 references/ECC/
 references/k-sdd/
@@ -65,7 +65,7 @@ references/k-sdd/
 
 ```text
 - 완료 이력 파일: Finish.md
-- 통합 리포트 기준 파일: docs/report.html
+- 참고자료 분석 리포트: docs/references_analysis.html
 - ECC 참고 소스: references/ECC/
 - k-sdd 참고 소스: references/k-sdd/
 - installer skeleton: agent-deploy/
@@ -87,8 +87,8 @@ docs/plans/codex/company-wide-agent-rollout/00-open-decisions.md
 
 해야 할 일:
 
-- [ ] D01 정규 소스 저장 위치 확정
-  - 권장: 별도 private repo `company-agent-kit`
+- [x] D01 정규 소스 저장 위치 확정
+  - 결정: 별도 private repo `company-agent-kit`
 - [x] D02 1차 지원 AI 도구 확정
   - 권장: Codex + Claude 먼저, Gemini는 Pilot 중 추가
 - [x] D03 개발자/비개발자 전달 방식 확정
@@ -100,11 +100,12 @@ docs/plans/codex/company-wide-agent-rollout/00-open-decisions.md
   - 내부 파일 서버 또는 GitHub Releases
 - [x] D04-B 기본 설치 범위 확정
   - 결정 방향: project scope 기본, user/global scope 옵션
-- [ ] D05 지식 DB 위치 확정
-  - 권장: Notion + GitHub + Slack
-- [ ] D06 공용 계정 매핑 방식 확정
-  - 업무 유형별 계정 배정 + 초기 담당자 1명 + 공동 사용자 N명
-- [ ] D07 민감정보 입력 금지 범위 확정
+- [x] D05 지식 DB 위치 확정
+  - 결정: Notion + GitHub + Slack
+- [x] D06 공용 계정 매핑 방식 확정
+  - 결정: 업무 유형별 계정 배정 + 초기 담당자 1명 + 공동 사용자 N명
+- [x] D07 민감정보 입력 금지 범위 확정
+  - 결정: 고객 개인정보, credential, 미공개 계약/민감 재무/법무 검토 전 자료 입력 금지
 
 ### 1.2 P1 결정사항 확정
 
@@ -127,7 +128,8 @@ docs/plans/codex/company-wide-agent-rollout/00-open-decisions.md
   - none/lite/full은 같은 A~Z 흐름의 압축률 차이
   - 불필요한 QnA 없이 합리적 가정으로 진행
 - [ ] D08 1차 profile 범위 확정
-  - 권장: minimal, developer, product, business
+  - 구현 초안: minimal, core, developer, product, business, governance, sdd, full
+  - Pilot 권장: minimal, developer, product, business
 - [ ] D09 installer 실행 방식 확정
   - 개발자: bundle + install.sh/install.bat
   - Windows: exe
@@ -164,12 +166,21 @@ docs/plans/codex/company-wide-agent-rollout/00-open-decisions.md
 - [x] Codex adapter
 - [x] Codex project scope smoke test
 - [x] TOML add-only merge for Codex MCP config
+- [x] Gemini adapter
+- [x] Gemini project scope smoke test
+- [x] Claude/Codex/Gemini/Cursor profile smoke test
+- [x] company core rules/skills asset 승격
+- [x] 직무별 developer/product/business/governance profile 초안
+- [x] rule drift / entry parity / asset schema validation
 
 검증:
 
 ```text
+npm --prefix agent-deploy run validate
+  → manifest/rule-drift/entry-parity/asset-schema validation 통과
+
 npm --prefix agent-deploy test
-  → 전체 테스트 통과
+  → 19개 smoke test 전체 통과
 ```
 
 ### 2.2 Codex adapter 추가
@@ -475,7 +486,7 @@ governance
 - [x] `assets/skills/quarterly-review/` `kpi-report/` `prompt-db-curation/` (governance)
 - [x] `assets/prompts/product/` (prd / user-story / prioritization, `product-prompts` 모듈; product/full)
 - [x] `assets/prompts/business/` (faq / proposal / announcement, `business-prompts` 모듈; business/full)
-- [ ] `assets/prompts/governance/` (skill로 충분 — 보류)
+- [ ] `assets/prompts/governance/` (현재는 governance skill 3종으로 충분하다고 판단하여 보류)
 
 ---
 
@@ -504,6 +515,7 @@ agent-deploy/manifests/profiles.json
 - [x] `governance-skills` (quarterly-review, kpi-report, prompt-db-curation)
 - [x] `spec-driven-development-rules` / `spec-mode-selector-skill`
 - [ ] `mcp-baseline`은 default 제외 또는 profile별 선택
+  - 현재 core/developer/full에는 포함되어 있으므로, Pilot 전 MCP governance 결정(D16/7.2)에 맞춰 재검토
 
 ### 4.2 profiles 재구성
 
@@ -546,6 +558,7 @@ agent-deploy/manifests/profiles.json
 해야 할 일:
 
 - [ ] 기존 `core/full` 유지 여부 결정
+  - 현재 구현은 minimal/core/developer/product/business/governance/sdd/full을 유지한다. Pilot 노출 범위는 D08에서 별도 결정한다.
 - [x] `business` / `product` / `governance` 비개발 profile 신설 (baseline + prompt 자산 + 직무 skill)
 - [x] profile별 module dependencies 정리
 - [x] manifest validation 통과
@@ -776,11 +789,11 @@ docs/plans/codex/company-wide-agent-rollout/10-pilot.md
 
 ### 9.2 Pilot 전 완료 조건
 
-- [ ] P0 결정사항 확정
+- [x] P0 결정사항 확정
 - [x] Codex adapter 동작
-- [ ] Claude adapter 동작
-- [ ] minimal/developer/product/business profile 초안
-- [ ] install.sh/install.bat 동작
+- [x] Claude adapter 동작
+- [x] minimal/developer/product/business profile 초안
+- [ ] install.sh/install.bat OS별 동작 검증
 - [ ] Windows 사용자는 임시로 bat 또는 node 실행 가능
 - [ ] Prompt DB 초안
 - [ ] 계정 9개 매핑표 초안
@@ -828,7 +841,7 @@ docs/plans/codex/company-wide-agent-rollout/10-pilot.md
 최근 정리된 기준:
 
 ```text
-docs/report.html
+docs/references_analysis.html
 references/ECC/
 references/k-sdd/
 Finish.md
@@ -836,11 +849,12 @@ Finish.md
 
 해야 할 일:
 
-- [ ] 새 분석 내용은 개별 report 파일을 다시 늘리기보다 `docs/report.html`에 통합.
+- [ ] 새 ECC/k-sdd 참고자료 분석 내용은 개별 report 파일을 다시 늘리기보다 `docs/references_analysis.html`에 통합.
 - [ ] ECC/k-sdd 원본 참고는 root가 아니라 `references/` 하위 경로 기준으로 링크.
 - [ ] 완료된 작업은 `Finish.md`에 추가.
 - [ ] 남은 작업 순서는 이 `TODO.md`에 반영.
 - [ ] 문서에 남아 있는 이전 경로가 생기면 즉시 정정.
+- [x] `docs/report.html`을 `docs/references_analysis.html`로 rename하고 참고자료 분석용임을 명시.
 
 ### 11.1 plans 문서 정리
 
@@ -864,17 +878,17 @@ docs/plans/codex/company-wide-agent-rollout/13-governance-and-roadmap.md
 
 - [ ] 결정된 사항은 `00-open-decisions.md`에 `Accepted`로 반영
 - [ ] 더 이상 맞지 않는 내용은 삭제하지 말고 “변경됨”으로 표시
-- [ ] report.html의 내용과 plans 문서가 충돌하지 않게 유지
+- [ ] `docs/references_analysis.html`이 ECC/k-sdd 참고자료 분석용 리포트임을 유지한다.
 
-### 11.2 report.html 보강
+### 11.2 references_analysis.html 보강
 
 최근 검토 결과 기준 남은 수정:
 
-- [ ] `conventional commit` 표현을 회사형 commit convention으로 수정
-- [ ] Jira 필수 규칙을 report에 추가
-- [ ] 출처 문장 정리
-- [ ] Linux/macOS zip bundle 남은 작업 명시
-- [ ] 테스트 상태 문장을 더 정확히 수정
+- [x] `conventional commit` 표현을 회사형 commit convention으로 수정
+- [x] Jira 필수 규칙을 report에 추가
+- [x] 출처 문장 정리
+- [x] Linux/macOS zip bundle 남은 작업 명시
+- [x] 테스트 상태 문장을 더 정확히 수정
 
 ---
 
@@ -883,19 +897,17 @@ docs/plans/codex/company-wide-agent-rollout/13-governance-and-roadmap.md
 가장 추천하는 실제 순서:
 
 ```text
-1. P0 결정사항 확정
-2. company core rules 추가
-3. commit convention rule 추가
-4. architecture rule 보강
-5. profiles/modules 재구성
-6. install.sh/install.bat 검증
-7. Linux/macOS zip bundle build
-8. Windows exe packaging 설계
-9. backup/conflict policy 추가
-10. update/repair/uninstall 설계
-11. Pilot 2주 진행
-12. Prompt DB/Slack/GitHub governance 자동화
-13. 전사 rollout
+1. `docs/harness-capability-matrix.md` 작성
+2. P1 결정사항(D08~D12) 확정
+3. install.sh/install.bat OS별 검증
+4. Linux/macOS zip bundle build script 추가
+5. Windows exe packaging 방식 설계
+6. backup/conflict policy 추가
+7. install-state runtime validation 추가
+8. update/repair/uninstall 설계
+9. Pilot 2주 진행
+10. Prompt DB/Slack/GitHub governance 자동화
+11. 전사 rollout
 ```
 
 ---
@@ -910,8 +922,8 @@ docs/plans/codex/company-wide-agent-rollout/13-governance-and-roadmap.md
 - user/global scope는 옵션이다.
 - Windows는 exe, Linux/macOS는 zip bundle이 기본 배포 방식이다.
 - sh/bat은 bundle 내부 실행 entrypoint다.
-- Codex/Gemini adapter가 최우선이다.
-- 회사 개발 룰도 agent asset으로 배포해야 한다.
+- P0 결정은 확정됐고, 다음 최우선은 capability matrix와 bundle/lifecycle 보강이다.
+- 회사 개발 룰은 agent asset으로 1차 배포됐으며, 이후에는 직무별/운영별 asset을 점진 확장한다.
 - commit convention에는 Jira 링크가 필수다.
 - governance는 agent-deploy만으로 끝나지 않는다.
 - Prompt DB → skill 승격 루프가 지식 공유화의 핵심이다.

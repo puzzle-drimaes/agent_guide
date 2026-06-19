@@ -16,7 +16,9 @@
 ```text
 references/ECC/
 references/k-sdd/
-docs/report.html
+docs/references_analysis.html
 ```
+
+docs/references_analysis.html은 ECC/k-sdd 참고자료 분석용 리포트다.
 
 ECC/k-sdd에서 추출한 아이디어는 그대로 복제하기보다 회사 상황에 맞게 재구성한다.
