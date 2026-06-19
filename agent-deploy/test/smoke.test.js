@@ -401,3 +401,20 @@ test('asset schema guard catches malformed frontmatter', () => {
   // the plain frontmatter-less rule must NOT produce an error
   assert.ok(!/plain\.md/.test(joined), `plain rule should pass:\n${joined}`);
 });
+
+test('asset schema guard reports draft metadata schema warnings without blocking', () => {
+  const root = tmpProject();
+  fs.mkdirSync(path.join(root, 'prompts/product'), { recursive: true });
+  fs.writeFileSync(path.join(root, 'prompts/product/no-frontmatter.md'), '# prompt without metadata\n');
+  fs.writeFileSync(
+    path.join(root, 'prompts/product/partial.md'),
+    '---\nid: Bad ID\nasset_type: template\ntitle: Partial\ndescription: Partial prompt\naudience: ["product"]\nowner: product-team\nstability: stable\n---\n\n# prompt\n'
+  );
+
+  const { errors, warnings } = checkAssetSchemas(root);
+  const joined = warnings.join('\n');
+  assert.deepEqual(errors, []);
+  assert.match(joined, /no-frontmatter\.md: missing draft asset metadata frontmatter/);
+  assert.match(joined, /partial\.md: 'id' must match pattern/);
+  assert.match(joined, /partial\.md: asset_type 'template' should match 'prompt'/);
+});
