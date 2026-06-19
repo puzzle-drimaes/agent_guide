@@ -8,7 +8,7 @@
       "title": "범용 프롬프트 템플릿",
       "description": "재사용 가능한 prompt asset을 작성할 때 사용하는 공통 골격입니다.",
       "path": "prompts/_universal-template.md",
-      "moduleIds": ["prompt-asset-skill", "prompt-library"],
+      "moduleIds": ["prompt-asset-skill"],
       "profiles": ["core", "developer", "product", "business", "governance", "full"],
       "audience": ["all"],
       "stability": "stable",

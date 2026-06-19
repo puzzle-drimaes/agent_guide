@@ -10,6 +10,7 @@ import { fileURLToPath } from 'node:url';
 import { buildPlan } from '../src/planner.js';
 import { applyPlan } from '../src/apply.js';
 import { checkAssetSchemas } from '../scripts/check-asset-schema.js';
+import { checkCatalogParity } from '../scripts/check-catalog-parity.js';
 
 const CLI = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../src/cli.js');
 
@@ -417,4 +418,87 @@ test('asset schema guard reports draft metadata schema warnings without blocking
   assert.match(joined, /no-frontmatter\.md: missing draft asset metadata frontmatter/);
   assert.match(joined, /partial\.md: 'id' must match pattern/);
   assert.match(joined, /partial\.md: asset_type 'template' should match 'prompt'/);
+});
+
+test('catalog parity guard accepts matching file, frontmatter, module, and profile data', () => {
+  const root = tmpProject();
+  fs.mkdirSync(path.join(root, 'assets/prompts'), { recursive: true });
+  fs.mkdirSync(path.join(root, 'manifests'), { recursive: true });
+  fs.writeFileSync(
+    path.join(root, 'assets/prompts/a.md'),
+    '---\nid: prompt-a\nasset_type: prompt\ntitle: Prompt A\ndescription: Example prompt\naudience: ["product"]\nowner: product-team\nstability: stable\n---\n\n# Prompt A\n'
+  );
+  fs.writeFileSync(
+    path.join(root, 'assets/catalog.draft.json'),
+    JSON.stringify({
+      schemaVersion: 'agentdeploy.assetCatalog.v1',
+      generatedAt: null,
+      assets: [
+        {
+          id: 'prompt-a',
+          assetType: 'prompt',
+          title: 'Prompt A',
+          description: 'Example prompt',
+          path: 'prompts/a.md',
+          moduleIds: ['prompt-module'],
+          profiles: ['product'],
+          audience: ['product'],
+          stability: 'stable',
+          owner: 'product-team',
+          tags: ['example'],
+          reviewStatus: 'approved',
+        },
+      ],
+    })
+  );
+  fs.writeFileSync(
+    path.join(root, 'manifests/modules.json'),
+    JSON.stringify({ version: 1, modules: [{ id: 'prompt-module', paths: ['prompts/a.md'], dependencies: [] }] })
+  );
+  fs.writeFileSync(path.join(root, 'manifests/profiles.json'), JSON.stringify({ version: 1, profiles: { product: ['prompt-module'] } }));
+
+  const { errors, warnings, checked } = checkCatalogParity(root);
+  assert.deepEqual(errors, []);
+  assert.deepEqual(warnings, []);
+  assert.equal(checked, 1);
+});
+
+test('catalog parity guard catches catalog/module/profile drift', () => {
+  const root = tmpProject();
+  fs.mkdirSync(path.join(root, 'assets/prompts'), { recursive: true });
+  fs.mkdirSync(path.join(root, 'manifests'), { recursive: true });
+  fs.writeFileSync(path.join(root, 'assets/prompts/a.md'), '# prompt without metadata\n');
+  fs.writeFileSync(
+    path.join(root, 'assets/catalog.draft.json'),
+    JSON.stringify({
+      schemaVersion: 'agentdeploy.assetCatalog.v1',
+      generatedAt: null,
+      assets: [
+        {
+          id: 'prompt-a',
+          assetType: 'prompt',
+          title: 'Prompt A',
+          description: 'Example prompt',
+          path: 'prompts/a.md',
+          moduleIds: ['wrong-module'],
+          profiles: ['ghost'],
+          audience: ['product'],
+          stability: 'stable',
+          owner: 'product-team',
+          reviewStatus: 'approved',
+        },
+      ],
+    })
+  );
+  fs.writeFileSync(
+    path.join(root, 'manifests/modules.json'),
+    JSON.stringify({ version: 1, modules: [{ id: 'prompt-module', paths: ['prompts/a.md'], dependencies: [] }] })
+  );
+  fs.writeFileSync(path.join(root, 'manifests/profiles.json'), JSON.stringify({ version: 1, profiles: { product: ['prompt-module'] } }));
+
+  const { errors, warnings } = checkCatalogParity(root);
+  const errorText = errors.join('\n');
+  assert.match(errorText, /unknown module 'wrong-module'/);
+  assert.match(errorText, /unknown profile 'ghost'/);
+  assert.match(warnings.join('\n'), /has no draft frontmatter to compare/);
 });

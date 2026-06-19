@@ -192,16 +192,16 @@ docs/plans/codex/company-wide-agent-rollout/00-open-decisions.md
 - [x] Pilot 기본 profile(minimal/developer/product/business) Codex/Claude/Gemini 직접 smoke test
 - [x] company core rules/skills asset 승격
 - [x] 직무별 developer/product/business/governance profile 초안
-- [x] rule drift / entry parity / asset schema validation
+- [x] rule drift / entry parity / asset schema / catalog parity validation
 
 검증:
 
 ```text
 npm --prefix agent-deploy run validate
-  → manifest/rule-drift/entry-parity/asset-schema validation 통과
+  → manifest/rule-drift/entry-parity/asset-schema/catalog-parity validation 통과
 
 npm --prefix agent-deploy test
-  → 23개 smoke test 전체 통과
+  → 26개 smoke test 전체 통과
 ```
 
 ### 2.1-A 최우선 전략 문서화
@@ -235,8 +235,8 @@ agent-deploy/assets/catalog.draft.json
 최우선 구현 후보:
 
 ```text
-1. prompt/template/knowhow schema를 non-blocking validation으로 연결
-2. catalog와 실제 파일/frontmatter/module/profile의 parity checker 추가
+1. [x] prompt/template/knowhow schema를 non-blocking validation으로 연결
+2. [x] catalog와 실제 파일/frontmatter/module/profile의 parity checker 추가
 3. knowhow asset 작성/승격 skill 추가
 4. 외부/shared asset pack 적용 방식 설계
 5. SETUP_WIZARD.md 기반 초보자 role guide 보강
@@ -761,6 +761,7 @@ agent-deploy/install.bat
 - [x] rule drift check
 - [x] entry parity check
 - [x] asset frontmatter schema validation (`scripts/check-asset-schema.js`, validate에 통합)
+- [x] asset catalog parity validation (`scripts/check-catalog-parity.js`, validate에 통합)
 - [x] skill schema validation (위 가드에 포함: name/description/allowed-tools/argument-hint)
 - [x] agent schema validation (위 가드에 포함: name=파일명/description/tools/model)
 - [x] rule schema validation (위 가드에 포함: frontmatter optional, present 시 paths만 허용)
@@ -778,8 +779,9 @@ agent-deploy/install.bat
 check-asset-schema.js는 closed schema(unknown key error) + 타입 검사 + name 일치(agent=파일명, skill=디렉터리명)를 검증한다.
 frontmatter 파서는 zero-dependency(라이브러리 없음)로 `key: scalar`와 `key: ["a","b"]` 형태만 지원한다.
 rule은 frontmatter가 optional이며 present 시 paths(string[])만 허용한다.
-npm run validate가 4종 가드(manifest/rule-drift/entry-parity/asset-schema)로 확장됐고, smoke test는 14 → 16으로 증가했다.
+npm run validate가 5종 가드(manifest/rule-drift/entry-parity/asset-schema/catalog-parity)로 확장됐고, smoke test는 26개다.
 새 frontmatter 키를 추가하려면 SCHEMAS를 함께 갱신해야 한다(의도된 리뷰 포인트).
+catalog parity는 catalog entry의 실제 파일 존재 여부, module/profile 참조, module path 포함 관계, frontmatter 일치 여부를 검증한다.
 ```
 
 ### 7.2 MCP governance

@@ -1,3 +1,17 @@
+---
+id: business-proposal
+asset_type: template
+title: 제안서 템플릿
+description: 고객/파트너 제안서 초안을 목적, 핵심 메시지, 근거, 다음 단계로 정리합니다.
+audience: ["business"]
+owner: business-team
+stability: stable
+version: "0.1.0"
+tags: ["proposal", "business"]
+required_sections: ["고객 문제 / 배경", "제안 개요", "기대 효과", "범위 / 일정", "비용 / 조건", "다음 단계"]
+output_format: markdown
+---
+
 # 제안서 초안 프롬프트
 
 영업/사업 제안서 초안 스타터. 발송 전 사람 검토가 필요한 초안이다.

@@ -1,3 +1,17 @@
+---
+id: product-prioritization
+asset_type: prompt
+title: 우선순위 정리 프롬프트
+description: 요구사항이나 backlog를 기준과 trade-off 중심으로 우선순위화합니다.
+audience: ["product"]
+owner: product-team
+stability: stable
+version: "0.1.0"
+tags: ["prioritization", "backlog", "product"]
+inputs: ["후보 목록", "목표/맥락"]
+outputs: ["우선순위 표", "Top 3 추천", "보류 항목"]
+---
+
 # 우선순위 결정 프롬프트
 
 여러 후보를 같은 기준으로 비교해 우선순위를 매기는 스타터.

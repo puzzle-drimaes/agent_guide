@@ -1,3 +1,17 @@
+---
+id: product-user-story
+asset_type: template
+title: 사용자 스토리 템플릿
+description: 요구사항을 user story와 acceptance criteria로 구조화합니다.
+audience: ["product", "developer"]
+owner: product-team
+stability: stable
+version: "0.1.0"
+tags: ["user-story", "acceptance-criteria", "product"]
+required_sections: ["User Story", "Acceptance Criteria", "Priority"]
+output_format: markdown
+---
+
 # 유저 스토리 프롬프트
 
 요구사항을 사용자 관점의 스토리 + 수용 기준으로 쪼개는 스타터.

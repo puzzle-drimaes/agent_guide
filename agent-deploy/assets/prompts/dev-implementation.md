@@ -1,3 +1,17 @@
+---
+id: dev-implementation
+asset_type: prompt
+title: 개발 구현 프롬프트
+description: 구현 요구사항을 설계, 코드, 설명, 개선점으로 정리합니다.
+audience: ["developer"]
+owner: ai-governance
+stability: stable
+version: "0.1.0"
+tags: ["development", "implementation", "code"]
+inputs: ["요구사항", "개발환경", "조건"]
+outputs: ["설계", "코드", "설명", "개선점"]
+---
+
 # 개발용 프롬프트 (구현)
 
 구현 작업에 거의 만능으로 쓰는 골격. 민감정보는 [placeholder]로 치환한다.

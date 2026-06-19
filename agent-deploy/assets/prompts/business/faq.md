@@ -1,3 +1,17 @@
+---
+id: business-faq
+asset_type: template
+title: FAQ 템플릿
+description: 반복 문의를 FAQ 형식으로 정리합니다.
+audience: ["business"]
+owner: business-team
+stability: stable
+version: "0.1.0"
+tags: ["faq", "customer-response", "business"]
+required_sections: ["질문", "답변", "확인 필요 항목"]
+output_format: markdown
+---
+
 # FAQ 작성 프롬프트
 
 반복 문의를 FAQ 항목으로 정리하는 스타터. 고객/개인정보는 [placeholder]로 치환한다.

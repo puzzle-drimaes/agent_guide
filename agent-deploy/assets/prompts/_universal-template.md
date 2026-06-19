@@ -1,3 +1,17 @@
+---
+id: universal-prompt-template
+asset_type: template
+title: 범용 프롬프트 템플릿
+description: 재사용 가능한 prompt asset을 작성할 때 사용하는 공통 골격입니다.
+audience: ["all"]
+owner: ai-governance
+stability: stable
+version: "0.1.0"
+tags: ["prompt", "template", "asset"]
+required_sections: ["역할", "목적", "대상", "배경", "제약조건", "출력 형식"]
+output_format: markdown
+---
+
 # 범용 프롬프트 템플릿
 
 재사용 프롬프트 본문을 작성할 때의 회사 표준 골격이다. 작업에 맞게 채우고,

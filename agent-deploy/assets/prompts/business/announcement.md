@@ -1,3 +1,17 @@
+---
+id: business-announcement
+asset_type: prompt
+title: 공지문 작성 프롬프트
+description: 내부/외부 공지문을 대상, 핵심 메시지, 액션 아이템 중심으로 작성합니다.
+audience: ["business"]
+owner: business-team
+stability: stable
+version: "0.1.0"
+tags: ["announcement", "communication", "business"]
+inputs: ["알릴 내용", "대상", "채널"]
+outputs: ["제목", "핵심 요약", "상세 내용", "영향 / 일정", "문의처 / 다음 단계"]
+---
+
 # 공지/안내문 프롬프트
 
 사내외 공지·안내문 초안 스타터. 대상에 맞는 톤으로 작성한다.

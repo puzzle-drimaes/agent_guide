@@ -23,6 +23,7 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..'); // agent-deploy/
 const DEFAULT_ASSET_ROOT = path.join(ROOT, 'assets');
 const DEFAULT_FRONTMATTER_SCHEMA = path.join(ROOT, 'schemas', 'asset-frontmatter.schema.json');
+const DEFAULT_CATALOG_FILE = 'catalog.draft.json';
 
 const SCHEMAS = {
   agent: {
@@ -220,6 +221,21 @@ function validateDraftAssetMetadata(kind, label, text, draftSchema) {
 }
 
 const read = (p) => fs.readFileSync(p, 'utf8');
+const toPosix = (p) => p.split(path.sep).join('/');
+
+function loadCatalogAssetTypes(assetRoot) {
+  const catalogPath = path.join(assetRoot, DEFAULT_CATALOG_FILE);
+  const assetTypes = new Map();
+  if (!fs.existsSync(catalogPath)) return assetTypes;
+
+  const catalog = JSON.parse(read(catalogPath));
+  for (const entry of catalog.assets || []) {
+    if (typeof entry.path === 'string' && typeof entry.assetType === 'string') {
+      assetTypes.set(entry.path, entry.assetType);
+    }
+  }
+  return assetTypes;
+}
 
 function listMd(dir) {
   if (!fs.existsSync(dir)) return [];
@@ -246,6 +262,7 @@ export function checkAssetSchemas(assetRoot = DEFAULT_ASSET_ROOT) {
   let checked = 0;
   const label = (p) => `assets/${path.relative(assetRoot, p)}`;
   const draftSchema = loadJsonSchema();
+  const catalogAssetTypes = loadCatalogAssetTypes(assetRoot);
 
   for (const f of listMd(path.join(assetRoot, 'agents'))) {
     checked++;
@@ -284,7 +301,10 @@ export function checkAssetSchemas(assetRoot = DEFAULT_ASSET_ROOT) {
     ['knowhow', 'knowhow'],
   ]) {
     for (const f of walkMd(path.join(assetRoot, dirName))) {
-      warnings.push(...validateDraftAssetMetadata(assetType, label(f), read(f), draftSchema));
+      const rel = toPosix(path.relative(assetRoot, f));
+      warnings.push(
+        ...validateDraftAssetMetadata(catalogAssetTypes.get(rel) || assetType, label(f), read(f), draftSchema)
+      );
     }
   }
 

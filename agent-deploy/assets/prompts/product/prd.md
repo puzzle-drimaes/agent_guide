@@ -1,3 +1,17 @@
+---
+id: product-prd
+asset_type: prompt
+title: PRD 작성 프롬프트
+description: 제품 아이디어를 문제, 요구사항, 비범위, acceptance criteria 중심의 PRD 초안으로 정리합니다.
+audience: ["product"]
+owner: product-team
+stability: stable
+version: "0.1.0"
+tags: ["prd", "requirements", "product"]
+inputs: ["제품/기능", "대상 사용자"]
+outputs: ["문제 정의", "목표 / 성공 지표", "요구사항", "Non-goals", "수용 기준", "리스크 / 미결"]
+---
+
 # PRD (제품 요구사항 문서) 프롬프트
 
 기획 산출물을 PRD로 정리하는 스타터. 깊은 작업은 product-spec skill을 쓴다.
