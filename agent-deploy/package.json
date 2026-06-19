@@ -11,6 +11,7 @@
     "manifests",
     "schemas",
     "assets",
+    "SETUP_WIZARD.md",
     "install.sh",
     "install.bat"
   ],

@@ -193,25 +193,28 @@ agent installer를 어떻게 배포할 것인가?
 2. GitHub Releases
 3. 내부 파일 서버
 4. npm + GitHub Releases 병행
-5. Windows installer exe + Linux/macOS zip bundle
-6. 선택적 shell script/bootstrap
+5. OS 공통 zip bundle
+6. shell script/bootstrap
 
 권장:
 
 ```text
-Windows: installer exe
-Linux/macOS: zip bundle
-프로젝트 설치: shell script 또는 batch file
+OS 공통: zip bundle
+프로젝트 설정 유도: SETUP_WIZARD.md 기반 첫 agent 대화
 선택 옵션: 전역 설정 설치
 배포 위치: GitHub Releases 또는 내부 파일 서버
+제외: Windows installer exe packaging
 ```
 
 결정 반영:
 
 ```text
-exe/zip은 기본 배포 방식이다.
-프로젝트별 bundle 설치를 기본으로 한다.
-sh/bat은 bundle 내부 실행 entrypoint로 제공한다.
+zip bundle을 유일한 기본 배포 방식으로 한다.
+Windows installer exe packaging은 현재 배포 범위에서 제외한다.
+사용자는 bundle을 복사/압축 해제한 뒤 첫 agent 대화에서 SETUP_WIZARD.md를 읽게 하고, agent와 project path/profile/target/scope를 QnA로 정한다.
+install.sh는 복잡한 QnA를 하지 않고 bootstrap, bundle 검증, wizard 안내, 고급 사용자용 direct wrapper만 담당한다.
+실제 설치는 agent가 생성한 agent-deploy dry-run/apply 명령으로 수행한다.
+install.bat은 필요 시 호환 wrapper로만 둔다.
 ```
 
 결정 시점:
@@ -750,9 +753,12 @@ Pilot 사용자는 어떤 방식으로 installer를 실행할 것인가?
 결정:
 
 ```text
-Pilot 1차 실행 방식은 repo checkout 후 node CLI 또는 bundle 내부 install.sh/install.bat 실행으로 한다.
-npx, OS별 binary, zip/web generator는 배포 자동화가 준비된 뒤 후속 옵션으로 전환한다.
-비개발자 Pilot은 product/business profile 안내문과 Prompt DB 템플릿을 우선 제공하고, zip/web generator 전에는 가이드 기반 수동 적용을 허용한다.
+Pilot 1차 실행 방식은 zip bundle 복사/압축 해제 후 첫 agent 대화에서 SETUP_WIZARD.md를 사용하는 방식으로 한다.
+SETUP_WIZARD.md는 project path, profile, target, scope를 agent가 질문하도록 안내하고, dry-run 명령을 먼저 생성하게 한다.
+install.sh는 bootstrap/wizard 안내/다음 단계 안내와 고급 사용자용 direct wrapper만 담당하며 설정 QnA는 하지 않는다.
+repo checkout 후 node CLI는 개발/디버깅용 fallback으로만 둔다.
+npx, OS별 binary, Windows exe, zip/web generator는 현재 배포 범위에서 제외한다.
+비개발자 Pilot도 product/business profile 안내문과 SETUP_WIZARD.md를 사용해 agent 대화로 설정을 진행한다.
 ```
 
 ---
@@ -883,7 +889,7 @@ Pilot 종료 후 실제 설치 실패 사유, 직무별 사용 편차, Prompt DB
 - [x] D12 KPI 목표값
 ```
 
-P1 결정은 모두 Accepted 상태다. Pilot 준비는 target/profile smoke test 보강과 install script 검증으로 이동한다.
+P1 결정은 모두 Accepted 상태다. Pilot 준비는 target/profile smoke test 보강 이후 SETUP_WIZARD.md 기반 flow 검증과 bundle/lifecycle 보강으로 이동한다.
 
 ---
 
@@ -997,20 +1003,20 @@ installer release 전에 어떤 보안 검사를 필수화할 것인가?
 질문:
 
 ```text
-OS별 binary와 release artifact에 서명할 것인가?
+zip bundle release artifact에 서명 또는 checksum을 제공할 것인가?
 ```
 
 권장:
 
 ```text
-Pilot에서는 선택, 전사 rollout 전에는 도입
+Pilot에서는 zip checksum을 우선 제공하고, 전사 rollout 전에는 release manifest와 서명 정책을 검토
 ```
 
 결정 이유:
 
-- Windows SmartScreen/Gatekeeper 차단 가능성 감소
 - 배포물 변조 방지
 - 사내 신뢰 체계 확보
+- Windows exe packaging은 제외됐으므로 SmartScreen 대응은 현재 범위에서 제외
 
 ---
 

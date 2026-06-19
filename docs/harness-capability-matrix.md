@@ -319,13 +319,14 @@ npm --prefix agent-deploy test
 - target별 install-state 위치 차이
 - Gemini MCP skip 정책의 재검토 시점
 - Cursor를 Pilot 대상에 포함할지 여부
-- OS별 install.sh/install.bat 검증 부족
+- SETUP_WIZARD.md 기반 agent setup flow 검증 부족
 ```
 
 따라서 다음 작업 우선순위는 다음이다.
 
 ```text
-1. install.sh/install.bat OS별 검증
-2. Linux/macOS zip bundle build script 추가
-3. backup/conflict policy와 lifecycle(update/repair/uninstall) 설계
+1. SETUP_WIZARD.md 기반 agent setup flow 검증
+2. install.sh bootstrap/direct wrapper 검증
+3. OS 공통 zip bundle build script 추가
+4. backup/conflict policy와 lifecycle(update/repair/uninstall) 설계
 ```

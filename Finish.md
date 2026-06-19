@@ -331,7 +331,7 @@ docs/plans/codex/company-wide-agent-rollout/03-installer-mvp.md
 - [x] dry-run.
 - [x] install-state.
 - [x] path-safety.
-- [x] Windows exe / Linux macOS zip bundle 방향.
+- [x] OS 공통 zip bundle + SETUP_WIZARD.md 기반 agent setup flow 방향.
 
 ---
 
@@ -347,8 +347,8 @@ docs/plans/codex/company-wide-agent-rollout/03b-project-bundle-install-strategy.
 
 - [x] project scope 기본 결정.
 - [x] user scope는 옵션.
-- [x] Windows exe + install.bat.
-- [x] Linux/macOS zip bundle + install.sh.
+- [x] OS 공통 zip bundle.
+- [x] SETUP_WIZARD.md 기반 agent setup flow를 기본 entrypoint로 결정.
 - [x] project/user scope install-state 구분.
 - [x] 설정 우선순위.
 
@@ -550,19 +550,26 @@ user/global scope 옵션
 
 ### 4.2 배포 형태 결정
 
-정리된 방향:
+정리된 방향(최신 변경 반영):
 
 ```text
-Windows:
-  installer exe
-  install.bat
-
-Linux/macOS:
+OS 공통:
   zip bundle
-  install.sh
+  SETUP_WIZARD.md 기반 agent setup flow
+
+제외:
+  Windows installer exe packaging
 
 선택:
   user/global scope
+```
+
+변경 메모:
+
+```text
+초기에는 Windows exe + install.bat, Linux/macOS zip + install.sh로 정리했으나,
+최신 결정은 OS 공통 zip bundle + SETUP_WIZARD.md 기반 agent setup flow다.
+install.sh는 bootstrap/안내 역할만 담당하고, install.bat은 optional wrapper 여부만 검토한다.
 ```
 
 ### 4.3 하네스 엔지니어링 방향 결정
@@ -943,7 +950,7 @@ TODO.md
 확정 내용:
 
 - [x] D08 1차 profile 범위: Pilot 기본은 minimal/developer/product/business, governance/sdd/full은 optional 또는 내부 검토용.
-- [x] D09 installer 실행 방식: Pilot 1차는 repo checkout 후 node CLI 또는 bundle 내부 install.sh/install.bat, npx/binary/zip/web generator는 후속 옵션.
+- [x] D09 installer 실행 방식: 최신 결정은 zip bundle 복사/압축 해제 후 SETUP_WIZARD.md 기반 첫 agent 대화, repo checkout/node CLI는 개발 fallback.
 - [x] D10 provenance 식별자: actor.track과 actor.aiAccountId 기본, machineLabel과 승인된 pseudonymous userId optional.
 - [x] D11 Prompt DB 승인 방식: DB 등록 → 사용/성공률 태깅 → 데모/분기 리뷰 → owner 지정 → company skill PR → installer 배포.
 - [x] D12 KPI 목표값: PR 노하우 80%, 회고 제출 7/9, Prompt DB 월 10개, 출처 표기 90%, Pilot 설치 성공률 80%.
@@ -987,6 +994,90 @@ SDD mode: lite (기존 smoke test 보강, adapter 로직 변경 없음).
 
 ---
 
+### 4.17 배포 전략 변경: Windows exe 제외, zip bundle + agent setup wizard
+
+대상 파일:
+
+```text
+docs/plans/codex/company-wide-agent-rollout/00-open-decisions.md
+docs/plans/codex/company-wide-agent-rollout/03-installer-mvp.md
+docs/plans/codex/company-wide-agent-rollout/03b-project-bundle-install-strategy.md
+docs/plans/codex/company-wide-agent-rollout/02c-installer-architecture.md
+TODO.md
+docs/harness-capability-matrix.md
+```
+
+결정 내용:
+
+- [x] Windows installer exe packaging은 현재 배포 범위에서 제외.
+- [x] OS 공통 zip bundle을 기본 배포물로 사용.
+- [x] 사용자는 bundle 압축 해제 후 첫 agent 대화에서 `SETUP_WIZARD.md`를 읽힌다.
+- [x] `install.sh`는 QnA wizard가 아니라 bootstrap/안내 및 direct wrapper 역할만 담당한다.
+- [x] `install.bat`은 필요 시 optional wrapper로만 검토.
+
+SDD mode: lite (배포 전략 문서 정합성 갱신, 이후 4.18에서 shell QnA 제외를 명확화).
+
+---
+
+### 4.18 설정 방식 변경: shell QnA에서 agent setup wizard로 전환
+
+대상 파일:
+
+```text
+docs/plans/codex/company-wide-agent-rollout/00-open-decisions.md
+docs/plans/codex/company-wide-agent-rollout/03-installer-mvp.md
+docs/plans/codex/company-wide-agent-rollout/03b-project-bundle-install-strategy.md
+docs/plans/codex/company-wide-agent-rollout/02c-installer-architecture.md
+TODO.md
+docs/harness-capability-matrix.md
+```
+
+결정 내용:
+
+- [x] shell script가 복잡한 QnA를 담당하지 않는다.
+- [x] `SETUP_WIZARD.md`를 첫 agent 대화에서 읽게 하고 agent와 QnA한다.
+- [x] agent는 선택/설명/dry-run 명령 생성을 돕고, 실제 설치는 `agent-deploy` CLI가 수행한다.
+- [x] `install.sh`는 bundle 검증, wizard 안내, fallback 안내, 고급 사용자용 direct wrapper만 담당한다.
+
+SDD mode: lite (배포/설정 flow 문서 정합성 갱신).
+
+---
+
+### 4.19 SETUP_WIZARD.md 추가 및 install.sh bootstrap 정리
+
+대상 파일:
+
+```text
+agent-deploy/SETUP_WIZARD.md
+agent-deploy/README.md
+agent-deploy/install.sh
+agent-deploy/package.json
+TODO.md
+docs/references_analysis.html
+```
+
+구현 내용:
+
+- [x] 첫 agent 대화에서 읽힐 `SETUP_WIZARD.md`를 추가.
+- [x] wizard가 project path/profile/target/scope를 확인하고 `dry-run` → `apply` 명령을 생성하도록 절차화.
+- [x] `install.sh` 무인자 실행은 bundle 검증과 wizard 안내를 출력하는 bootstrap으로 변경.
+- [x] `install.sh` 인자 실행은 기존 direct apply wrapper로 유지.
+- [x] package files에 `SETUP_WIZARD.md`를 포함.
+- [x] README quick start를 zip bundle + agent setup wizard 중심으로 수정.
+
+검증 결과:
+
+```text
+sh agent-deploy/install.sh
+sh agent-deploy/install.sh --target codex --profile developer --dry-run
+npm --prefix agent-deploy run validate
+npm --prefix agent-deploy test
+```
+
+SDD mode: lite (기존 installer core 변경 없이 bundle entrypoint와 문서 정합성 보강).
+
+---
+
 ## 5. 아직 완료가 아닌 것
 
 다음은 아직 완료되지 않았다. 자세한 순서는 `TODO.md` 참고.
@@ -998,8 +1089,8 @@ SDD mode: lite (기존 smoke test 보강, adapter 로직 변경 없음).
 - [x] source attribution / knowledge sharing rules 실제 추가.
 - [x] profiles/modules 재구성.
 - [x] `.agents/rules`와 deploy assets drift check.
-- [ ] Windows exe packaging.
-- [ ] Linux/macOS zip bundle build.
+- [x] Windows exe packaging 제외 결정.
+- [ ] OS 공통 zip bundle build.
 - [ ] update/repair/uninstall.
 - [ ] backup/conflict policy.
 - [ ] Prompt DB/Slack/GitHub governance automation.
@@ -1050,7 +1141,7 @@ SDD mode: lite (기존 smoke test 보강, adapter 로직 변경 없음).
 - 직무별 스타터 프롬프트 추가 (product: prd/user-story/prioritization, business: faq/proposal/announcement)
 ```
 
-아직 남은 핵심은 install script 검증과 파일럿 운영 수준의 bundle/lifecycle 구현이다.
+아직 남은 핵심은 SETUP_WIZARD.md 기반 flow 검증과 파일럿 운영 수준의 bundle/lifecycle 구현이다.
 
 ```text
 agent-deploy를 실제 파일럿 가능한 사내 installer MVP로 계속 확장해야 한다.

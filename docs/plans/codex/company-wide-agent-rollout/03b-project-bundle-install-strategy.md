@@ -8,7 +8,7 @@
 
 ```text
 기본값:
-  bundle을 프로젝트에 풀고 install.sh 또는 install.bat으로 프로젝트별 설정을 설치한다.
+  zip bundle을 프로젝트 또는 임시 위치에 풀고 SETUP_WIZARD.md 기반 첫 agent 대화로 프로젝트별 설정을 유도한다.
 
 선택값:
   --scope user 옵션으로 사용자 전역 설정에도 설치한다.
@@ -66,44 +66,20 @@ Cursor:
 
 ## 2. 배포 방식
 
-## 2.1 Windows
+## 2.1 OS 공통 zip bundle
 
 기본 배포:
+
+```text
+company-agent-kit.zip
+또는 company-agent-kit-<platform>.zip
+```
+
+제외:
 
 ```text
 CompanyAgentKitSetup.exe
-```
-
-역할:
-
-```text
-- bundle 압축 해제
-- 프로젝트 경로 선택
-- profile 선택
-- target 선택
-- install.bat 또는 내부 installer 실행
-- doctor 실행
-```
-
-보조 entrypoint:
-
-```bat
-install.bat
-```
-
-사용 예:
-
-```bat
-install.bat --scope project --target codex --profile developer --project .
-```
-
-## 2.2 Linux/macOS
-
-기본 배포:
-
-```text
-company-agent-kit-linux-x64.zip
-company-agent-kit-macos-arm64.zip
+Windows installer exe packaging
 ```
 
 bundle 구성:
@@ -115,8 +91,9 @@ company-agent-kit/
   ├─ assets/
   ├─ manifests/
   ├─ docs/
+  ├─ SETUP_WIZARD.md
   ├─ install.sh
-  ├─ install.bat
+  ├─ install.bat  # optional wrapper
   └─ README.md
 ```
 
@@ -125,27 +102,29 @@ company-agent-kit/
 ```bash
 unzip company-agent-kit-macos-arm64.zip
 cd company-agent-kit
-sh install.sh --scope project --target codex --profile developer --project /path/to/project
+sh install.sh
 ```
 
-## 2.3 sh/bat의 역할
+## 2.2 SETUP_WIZARD.md 기반 agent setup flow의 역할
 
-`sh` 또는 `bat`은 여러 방법 중 하나다.
+`SETUP_WIZARD.md`가 기본 설정 entrypoint다.
 
 역할:
 
 ```text
-- bundle 내부 installer를 쉽게 실행한다.
-- 사용자의 OS별 명령 차이를 숨긴다.
-- project path/profile/target 선택을 도와준다.
+- 첫 agent 대화에서 project path/profile/target/scope를 선택하게 한다.
+- agent가 dry-run 명령을 먼저 생성하게 한다.
+- dry-run 결과 확인 후 apply 명령을 생성하게 한다.
+- 실패 시 doctor 또는 CLI fallback 안내를 제공한다.
 ```
 
 주의:
 
 ```text
-- sh/bat 자체가 유일한 설치 방법은 아니다.
 - 내부적으로는 같은 planner/apply 로직을 호출해야 한다.
-- dry-run과 doctor를 지원해야 한다.
+- install.sh는 bootstrap 안내와 고급 사용자용 direct wrapper만 담당한다.
+- install.bat은 필요 시 optional wrapper로만 유지한다.
+- Windows installer exe는 현재 배포 범위에서 제외한다.
 ```
 
 ---
@@ -247,15 +226,16 @@ project scope가 있으면 project scope가 더 구체적인 문맥이다.
 
 ```text
 1. bundle 다운로드
-2. bundle 압축 해제 또는 exe 실행
-3. 프로젝트 경로 선택
-4. profile 선택
-5. target 선택
-6. dry-run 표시
-7. 사용자 확인
-8. project scope로 파일 설치
-9. doctor 실행
-10. 완료 메시지 출력
+2. bundle 압축 해제
+3. 첫 agent 대화에서 SETUP_WIZARD.md 읽기
+4. agent가 프로젝트 경로 질문
+5. agent가 profile 질문
+6. agent가 target 질문
+7. agent가 dry-run 명령 생성
+8. 사용자가 dry-run 결과 확인
+9. 사용자 승인 후 apply 명령 실행
+10. doctor 안내
+11. 완료 메시지 확인
 ```
 
 ### 5.2 전역 설정 옵션 흐름
@@ -312,10 +292,10 @@ Linux: ~/.config/company-agent-kit/install-state.json
 ```text
 - [ ] --scope project 기본값 적용
 - [ ] --scope user 선택 옵션 구현
-- [ ] Windows installer exe flow 정의
-- [ ] Linux/macOS zip bundle 구조 정의
-- [ ] install.sh 작성
-- [ ] install.bat 작성
+- [x] Windows installer exe 제외 결정
+- [ ] OS 공통 zip bundle 구조 정의
+- [x] SETUP_WIZARD.md 기반 agent setup flow 작성
+- [ ] install.bat optional wrapper 여부 결정
 - [ ] project scope install-state 경로 확정
 - [ ] user scope install-state 경로 확정
 - [ ] dry-run 후 apply flow 구현
@@ -328,9 +308,9 @@ Linux: ~/.config/company-agent-kit/install-state.json
 ## 완료 기준
 
 ```text
-- Windows에서 exe로 프로젝트별 agent 설정을 설치할 수 있다.
-- Linux/macOS에서 zip bundle + install.sh로 프로젝트별 설정을 설치할 수 있다.
-- install.bat으로 Windows 프로젝트 설치가 가능하다.
+- OS 공통 zip bundle + SETUP_WIZARD.md 기반 agent setup flow로 프로젝트별 agent 설정을 설치할 수 있다.
+- Windows installer exe 없이도 Windows/macOS/Linux 사용자에게 동일한 bundle 설치 절차를 안내할 수 있다.
+- install.bat은 optional wrapper로 유지할지 결정되어 있다.
 - 사용자 전역 설정은 선택 옵션으로 제공된다.
 - project scope와 user scope의 install-state가 구분된다.
 - 어떤 IDE/CLI를 쓰더라도 프로젝트 폴더 안의 표준 설정을 우선 사용한다.

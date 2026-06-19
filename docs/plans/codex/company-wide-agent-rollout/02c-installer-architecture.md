@@ -41,9 +41,10 @@ core는 다음 실행 표면을 몰라야 한다.
 
 ```text
 - CLI
-- Windows installer exe UI
-- install.sh
-- install.bat
+- SETUP_WIZARD.md agent conversation flow
+- install.sh bootstrap
+- install.bat optional wrapper
+- Windows installer exe UI (현재 배포 범위 제외)
 - web generator
 - CI
 ```
@@ -356,14 +357,17 @@ preflight
 CLI adapter:
   node/bin 실행, 개발자/CI 친화
 
-Windows installer adapter:
-  exe, GUI 또는 console wizard
+Setup wizard adapter:
+  SETUP_WIZARD.md, agent conversation flow
 
 Shell adapter:
-  install.sh
+  install.sh bootstrap
 
 Batch adapter:
-  install.bat
+  install.bat optional wrapper
+
+Windows installer adapter:
+  현재 배포 범위 제외
 
 Web generator adapter:
   비개발자용 bundle/config 생성
@@ -394,8 +398,8 @@ canonical asset
 MVVM은 다음에만 적용한다.
 
 ```text
-Windows installer GUI
 Web 설정 생성기
+Windows installer GUI(현재 배포 범위 제외)
 ```
 
 예:
@@ -485,10 +489,10 @@ usecase가 port interface를 통해 filesystem/state/target adapter 사용
 ```text
 - project scope install
 - user scope install
-- install.sh
-- install.bat
-- Windows exe smoke
-- Linux/macOS bundle smoke
+- SETUP_WIZARD.md agent conversation flow
+- install.sh bootstrap
+- install.bat optional wrapper
+- OS 공통 zip bundle smoke
 ```
 
 ---
@@ -530,6 +534,6 @@ UI가 직접 파일 write
 - target adapter 추가 시 domain/usecase 수정이 거의 없다.
 - dry-run과 apply가 같은 plan model을 사용한다.
 - file write는 FileSystemPort를 통해서만 수행된다.
-- Windows GUI 또는 웹 생성기가 생겨도 core를 재사용한다.
+- 웹 생성기나 별도 UI가 생겨도 core를 재사용한다. Windows exe UI는 현재 배포 범위에서 제외한다.
 - test에서 domain/usecase를 filesystem 없이 검증할 수 있다.
 ```

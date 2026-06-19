@@ -9,22 +9,49 @@ ECC( `manifests/` + `install-targets/` 어댑터 + `install-state` provenance +
 
 ## 빠른 시작
 
-### 번들 스크립트 (배포 형태) — 기본 프로젝트, `--global`로 전역
+### zip bundle + agent setup wizard (권장 배포 형태)
+
 ```bash
-./install.sh --target codex --profile developer             # 프로젝트(AGENTS.md, .agents/, .codex/ …) — 기본
-./install.sh --target gemini --profile developer            # 프로젝트(GEMINI.md, .gemini/ …)
-./install.sh --target claude --profile developer --global   # 전역(~/.claude/, ~/.claude.json)
-install.bat  --target codex --profile developer              # Windows (동일)
+./install.sh
+```
+
+`install.sh`는 복잡한 QnA를 수행하지 않고 bundle 상태와 다음 단계를 안내합니다.
+첫 agent 대화에서 `SETUP_WIZARD.md`를 읽히고, agent가 project path/profile/target/scope를
+확인한 뒤 `dry-run` → `apply` 명령을 생성하게 합니다.
+
+권장 기본 흐름:
+
+```text
+1. zip bundle 압축 해제
+2. ./install.sh 로 bootstrap 안내 확인
+3. 첫 agent 대화에 SETUP_WIZARD.md 제공
+4. agent가 생성한 dry-run 명령 실행
+5. dry-run 결과 확인 후 apply 명령 실행
 ```
 
 ### 직접 CLI
+
 ```bash
 node src/cli.js list                                   # 타깃/프로파일/모듈 목록
-node src/cli.js plan  --target cursor --profile core --project /path/to/repo
-node src/cli.js apply --target claude --profile developer --project /path/to/repo
-node src/cli.js apply --target claude --profile developer --scope home --home /tmp/fakehome  # 전역(테스트는 가짜 home)
-node src/cli.js apply --target claude --profile developer --project /path/to/repo --dry-run
+node src/cli.js apply --target codex --profile developer --project /path/to/repo --dry-run
+node src/cli.js apply --target codex --profile developer --project /path/to/repo
+```
 
+### 고급 사용자용 wrapper
+
+`install.sh`에 인자를 넘기면 기존 direct apply wrapper처럼 사용할 수 있습니다.
+
+```bash
+./install.sh --target codex --profile developer --dry-run    # 현재 디렉터리를 project로 preview
+./install.sh --target codex --profile developer              # 현재 디렉터리에 apply
+./install.sh --target claude --profile developer --global    # home scope apply
+```
+
+### 개발/검증
+
+```bash
+node src/cli.js plan  --target cursor --profile core --project /path/to/repo
+node src/cli.js apply --target claude --profile developer --scope home --home /tmp/fakehome
 node scripts/validate-manifests.js                     # CI 불변식 검증
 node --test                                            # plan→apply 라운드트립 테스트
 ```
