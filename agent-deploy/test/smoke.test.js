@@ -9,6 +9,7 @@ import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { buildPlan } from '../src/planner.js';
 import { applyPlan } from '../src/apply.js';
+import { applyUpdate } from '../src/update.js';
 import { validateInstallState } from '../src/state.js';
 import { checkAssetSchemas } from '../scripts/check-asset-schema.js';
 import { checkCatalogParity } from '../scripts/check-catalog-parity.js';
@@ -389,7 +390,7 @@ test('update --dry-run --json reads install-state and reports possible user modi
   assert.match(fs.readFileSync(path.join(project, '.agents/rules/common/security.md'), 'utf8'), /User local security note/);
 });
 
-test('update rejects missing state and non-dry-run execution', () => {
+test('update rejects missing state', () => {
   const project = tmpProject();
 
   assert.throws(
@@ -400,13 +401,119 @@ test('update rejects missing state and non-dry-run execution', () => {
     /install-state not found/,
   );
 
-  applyPlan(buildPlan({ target: 'codex', profile: 'minimal', projectRoot: project }));
   assert.throws(
     () => execFileSync('node', [
       CLI, 'update',
       '--target', 'codex', '--profile', 'minimal', '--project', project,
     ], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }),
-    /update currently supports --dry-run only/,
+    /install-state not found/,
+  );
+});
+
+test('update refreshes managed files from install-state and rewrites provenance', () => {
+  const project = tmpProject();
+  applyPlan(buildPlan({ target: 'codex', profile: 'minimal', projectRoot: project }), {
+    installedAt: '2026-01-01T00:00:00Z',
+  });
+
+  const result = applyUpdate({ target: 'codex', projectRoot: project }, {
+    installedAt: '2026-02-01T00:00:00Z',
+  });
+
+  assert.equal(result.updated, true);
+  assert.equal(result.userModified.length, 0);
+  assert.ok(fs.existsSync(path.join(project, 'AGENTS.md')));
+  assert.ok(fs.existsSync(path.join(project, '.agents/rules/common/security.md')));
+
+  const state = JSON.parse(fs.readFileSync(path.join(project, '.agent-deploy/install-state.json'), 'utf8'));
+  assert.equal(state.installedAt, '2026-02-01T00:00:00Z');
+  assert.equal(state.request.profile, 'minimal');
+  assert.deepEqual(validateInstallState(state), []);
+});
+
+test('update is fail-closed on user-modified managed files by default', () => {
+  const project = tmpProject();
+  applyPlan(buildPlan({ target: 'codex', profile: 'minimal', projectRoot: project }), {
+    installedAt: '2026-01-01T00:00:00Z',
+  });
+  const securityPath = path.join(project, '.agents/rules/common/security.md');
+  fs.appendFileSync(securityPath, '\nUser local security note.\n');
+
+  assert.throws(
+    () => applyUpdate({ target: 'codex', projectRoot: project }, { installedAt: '2026-02-01T00:00:00Z' }),
+    /update refused: .* look user-modified/,
+  );
+  assert.match(fs.readFileSync(securityPath, 'utf8'), /User local security note/);
+  const state = JSON.parse(fs.readFileSync(path.join(project, '.agent-deploy/install-state.json'), 'utf8'));
+  assert.equal(state.installedAt, '2026-01-01T00:00:00Z', 'state must not be rewritten on fail-closed');
+});
+
+test('update --on-user-modified skip preserves the edit and records a skip op', () => {
+  const project = tmpProject();
+  applyPlan(buildPlan({ target: 'codex', profile: 'minimal', projectRoot: project }), {
+    installedAt: '2026-01-01T00:00:00Z',
+  });
+  const securityPath = path.join(project, '.agents/rules/common/security.md');
+  fs.appendFileSync(securityPath, '\nUser local security note.\n');
+
+  const result = applyUpdate({ target: 'codex', projectRoot: project }, {
+    installedAt: '2026-02-01T00:00:00Z',
+    onUserModified: 'skip',
+  });
+
+  assert.match(fs.readFileSync(securityPath, 'utf8'), /User local security note/);
+  assert.equal(result.userModified.length, 1);
+  assert.ok(result.state.operations.some((op) => (
+    op.kind === 'skip'
+      && op.strategy.endsWith('+update-skip')
+      && /looks user-modified/.test(op.reason)
+  )));
+  assert.deepEqual(validateInstallState(result.state), []);
+});
+
+test('update --on-user-modified overwrite restores canonical content and backs up the edit', () => {
+  const project = tmpProject();
+  applyPlan(buildPlan({ target: 'codex', profile: 'minimal', projectRoot: project }), {
+    installedAt: '2026-01-01T00:00:00Z',
+  });
+  const securityPath = path.join(project, '.agents/rules/common/security.md');
+  const canonical = fs.readFileSync(securityPath, 'utf8');
+  fs.appendFileSync(securityPath, '\nUser local security note.\n');
+
+  const result = applyUpdate({ target: 'codex', projectRoot: project }, {
+    installedAt: '2026-02-01T00:00:00Z',
+    onUserModified: 'overwrite',
+    backup: true,
+  });
+
+  assert.equal(fs.readFileSync(securityPath, 'utf8'), canonical, 'canonical content restored');
+  assert.equal(result.backup.enabled, true);
+  const securityBackup = path.join(result.backup.root, '.agents/rules/common/security.md');
+  assert.ok(fs.existsSync(securityBackup), 'edited file backed up before overwrite');
+  assert.match(fs.readFileSync(securityBackup, 'utf8'), /User local security note/);
+  assert.deepEqual(validateInstallState(result.state), []);
+});
+
+test('update --json emits a valid result and rejects unknown --on-user-modified', () => {
+  const project = tmpProject();
+  applyPlan(buildPlan({ target: 'codex', profile: 'minimal', projectRoot: project }), {
+    installedAt: '2026-01-01T00:00:00Z',
+  });
+
+  const out = execFileSync('node', [
+    CLI, 'update', '--json',
+    '--target', 'codex', '--project', project,
+  ], { encoding: 'utf8' });
+  const parsed = JSON.parse(out);
+  assert.equal(parsed.updated, true);
+  assert.ok(parsed.operations >= 1);
+
+  assert.throws(
+    () => execFileSync('node', [
+      CLI, 'update', '--on-user-modified', 'bogus',
+      '--target', 'codex', '--project', project,
+    ], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }),
+    /--on-user-modified must be one of/,
   );
 });
 

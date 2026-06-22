@@ -28,5 +28,16 @@ git diff --check: pass
 
 ## Notes and follow-ups
 
-- Non-dry-run managed file updates remain a follow-up.
-- Historical hash storage should be added before strong user-modified detection is treated as authoritative.
+- Non-dry-run managed file updates are now implemented: `agent-deploy update`
+  reuses the dry-run analysis (`analyzeUpdate`) to build the next plan, then
+  delegates writes/backup/install-state rewrite to `applyPlan`. Only next-plan
+  operations are touched — user-created and `removed-from-plan` files are never
+  modified. `--backup` and `--conflict-policy` are honored as in `apply`.
+- User-modified drift is fail-closed by default. `--on-user-modified` controls
+  it: `fail` (default, refuse with the drifted file list), `skip` (preserve the
+  edit and record a `+update-skip` skip op in install-state), `overwrite`
+  (restore canonical content; pair with `--backup`).
+- Historical hash storage should still be added before the conservative
+  `possible-user-modified` signal is treated as authoritative — a legitimate
+  bundled asset change to a copy-file currently reads as user-modified and must
+  be resolved with `--on-user-modified overwrite`.

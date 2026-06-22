@@ -1,13 +1,19 @@
-// Update dry-run usecase.
-// This first lifecycle slice reads trusted install-state, builds the next plan,
-// and reports what would happen without mutating files.
+// Update usecase.
+// Reads trusted install-state, builds the next plan, and either reports what
+// would happen (--dry-run) or applies the managed-file refresh. Drift against
+// the previous install-state is surfaced as `possible-user-modified`; applying
+// over those files is fail-closed unless an explicit --on-user-modified policy
+// is given. All real writes/backup/state-rewrite delegate to applyPlan.
 import fs from 'node:fs';
 import { buildPlan } from './planner.js';
+import { applyPlan } from './apply.js';
 import { getAdapter } from './targets/registry.js';
 import { ASSET_ROOT } from './manifest.js';
 import { readState } from './state.js';
 import { deepMergeJson } from './json-merge.js';
 import { mergeTomlAddOnly } from './toml-merge.js';
+
+export const USER_MODIFIED_POLICIES = ['fail', 'skip', 'overwrite'];
 
 function inputForRequest(request) {
   return {
@@ -164,7 +170,10 @@ function deriveRequestFromState(request, state) {
   };
 }
 
-export function buildUpdateDryRun(request) {
+// Shared analysis for dry-run reporting and apply gating: read the trusted
+// install-state, derive the next request, build the next plan, and classify
+// every next/previous operation. Pure (no writes) so apply can reuse it.
+export function analyzeUpdate(request) {
   const statePath = locateStatePath(request);
   const currentState = readState(statePath);
   if (request.target && currentState.target.target !== request.target) {
@@ -191,6 +200,12 @@ export function buildUpdateDryRun(request) {
     }
   }
 
+  return { statePath, currentState, nextRequest, nextPlan, items };
+}
+
+export function buildUpdateDryRun(request) {
+  const { statePath, currentState, nextRequest, nextPlan, items } = analyzeUpdate(request);
+
   return {
     dryRun: true,
     statePath,
@@ -202,5 +217,60 @@ export function buildUpdateDryRun(request) {
     },
     summary: summarize(items),
     items,
+  };
+}
+
+function userModifiedSkipOp(op) {
+  return {
+    ...op,
+    kind: 'skip',
+    dest: null,
+    strategy: `${op.strategy}+update-skip`,
+    reason: `Skipped by update --on-user-modified skip: destination looks user-modified (${op.dest})`,
+  };
+}
+
+// Apply a managed-file update: refresh only the operations in the next plan
+// (so user-created files and removed-from-plan files are never touched), gate
+// on user-modified drift, then delegate writes/backup/state-rewrite to apply.
+export function applyUpdate(
+  request,
+  { backup = false, conflictPolicy = 'managed-overwrite', onUserModified = 'fail', installedAt } = {},
+) {
+  if (!USER_MODIFIED_POLICIES.includes(onUserModified)) {
+    throw new Error(`--on-user-modified must be one of ${USER_MODIFIED_POLICIES.join(', ')} (got ${onUserModified})`);
+  }
+
+  const { nextPlan, items } = analyzeUpdate(request);
+  const modifiedItems = items.filter((item) => item.status === 'possible-user-modified');
+
+  if (modifiedItems.length && onUserModified === 'fail') {
+    const list = modifiedItems.map((item) => item.dest).join(', ');
+    throw new Error(
+      `update refused: ${modifiedItems.length} managed file(s) look user-modified (${list}). `
+      + 'Re-run with --on-user-modified skip (keep your edits) or overwrite (restore canonical content, ideally with --backup).',
+    );
+  }
+
+  let { operations } = nextPlan;
+  if (modifiedItems.length && onUserModified === 'skip') {
+    const modifiedDests = new Set(modifiedItems.map((item) => item.dest));
+    operations = operations.map((op) => (
+      op.kind !== 'skip' && op.dest && modifiedDests.has(op.dest)
+        ? userModifiedSkipOp(op)
+        : op
+    ));
+  }
+
+  const applyOptions = { backup, conflictPolicy };
+  if (installedAt !== undefined) applyOptions.installedAt = installedAt;
+  const result = applyPlan({ ...nextPlan, operations }, applyOptions);
+
+  return {
+    updated: true,
+    onUserModified,
+    userModified: modifiedItems,
+    baseRoot: nextPlan.baseRoot,
+    ...result,
   };
 }

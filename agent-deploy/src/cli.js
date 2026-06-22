@@ -13,7 +13,7 @@ import { buildPlan } from './planner.js';
 import { applyPlan } from './apply.js';
 import { readConflictResolutionsFile } from './packs/conflict-resolutions.js';
 import { resolveConflictPolicy } from './conflict-policy.js';
-import { buildUpdateDryRun } from './update.js';
+import { buildUpdateDryRun, applyUpdate } from './update.js';
 
 function parseArgs(argv) {
   const args = { _: [] };
@@ -123,6 +123,39 @@ function printUpdateReport(report, asJson) {
   }
 }
 
+function printUpdateResult(result, asJson) {
+  if (asJson) {
+    process.stdout.write(`${JSON.stringify({
+      updated: true,
+      operations: result.operations,
+      statePath: result.statePath,
+      onUserModified: result.onUserModified,
+      userModified: result.userModified.map((item) => item.dest),
+      backup: {
+        enabled: result.backup.enabled,
+        root: result.backup.root,
+        entries: result.backup.entries.length,
+      },
+      conflictPolicy: {
+        policy: result.conflictPolicy.policy,
+        decisions: result.conflictPolicy.decisions.length,
+      },
+    }, null, 2)}\n`);
+    return;
+  }
+
+  const root = result.baseRoot;
+  console.log(`updated ${result.operations} operation(s) (scope: ${result.state.target.scope}).`);
+  console.log(`state:  ${path.relative(root, result.statePath)}`);
+  console.log(`conflict policy: ${result.conflictPolicy.policy} (${result.conflictPolicy.decisions.length} decision(s))`);
+  if (result.userModified.length) {
+    console.log(`user-modified (${result.onUserModified}): ${result.userModified.length} file(s)`);
+  }
+  if (result.backup.enabled) {
+    console.log(`backup: ${path.relative(root, result.backup.root)} (${result.backup.entries.length} file(s))`);
+  }
+}
+
 function main() {
   const [, , cmd, ...rest] = process.argv;
   const args = parseArgs(rest);
@@ -140,7 +173,9 @@ function main() {
         + '  --conflict-resolution: JSON file of reviewed conflict decisions to record in install-state\n'
         + '  --backup: copy existing write targets into a timestamped backup directory before apply\n'
         + '  --conflict-policy: managed-overwrite (default), skip, append, merge-json, merge-toml, conflict-error\n'
-        + '  update: currently supports --dry-run only; reads install-state and prints a managed-file diff');
+        + '  --on-user-modified: fail (default), skip, overwrite — how update treats drifted managed files\n'
+        + '  update --dry-run: reads install-state and prints a managed-file diff (no writes)\n'
+        + '  update: refreshes managed files from install-state; fail-closed on user-modified drift');
       return;
     }
     if (cmd === 'list') return cmdList();
@@ -192,11 +227,17 @@ function main() {
     }
 
     if (cmd === 'update') {
-      if (!args['dry-run']) {
-        throw new Error('update currently supports --dry-run only');
+      if (args['dry-run']) {
+        const report = buildUpdateDryRun(buildRequest(args));
+        printUpdateReport(report, Boolean(args.json));
+        return;
       }
-      const report = buildUpdateDryRun(buildRequest(args));
-      printUpdateReport(report, Boolean(args.json));
+      const result = applyUpdate(buildRequest(args), {
+        backup: Boolean(args.backup),
+        conflictPolicy: args['conflict-policy'] || 'managed-overwrite',
+        onUserModified: args['on-user-modified'] || 'fail',
+      });
+      printUpdateResult(result, Boolean(args.json));
       return;
     }
 
