@@ -808,6 +808,60 @@ test('add-namespaced decision installs colliding pack assets under shared namesp
   assert.equal(state.source.conflictResolutions[0].decision, 'add-namespaced');
 });
 
+test('keep-existing decision skips colliding pack operations and records the reason', () => {
+  const project = tmpProject();
+  const packRoot = path.join(FIXTURES, 'packs/destination-collision');
+  const packDigest = calculatePackDigest(packRoot).digest;
+  const keepExistingReason = 'The company dev implementation prompt remains canonical for this project.';
+  const plan = buildPlan({
+    target: 'codex',
+    profile: 'developer',
+    moduleIds: ['team-conflict-pack-dev-prompt-module'],
+    packPaths: [packRoot],
+    conflictResolutions: ['claude', 'cursor', 'codex', 'gemini'].map((target) => ({
+      proposed: `${target}:team-conflict-pack-dev-prompt-module`,
+      conflictsWith: `${target}:prompt-library`,
+      decision: 'keep-existing',
+      decidedBy: 'platform-team',
+      decidedAt: '2026-06-22',
+      reason: keepExistingReason,
+      packId: 'team-conflict-pack',
+      packDigest,
+    })),
+    projectRoot: project,
+  });
+
+  const skipOp = plan.operations.find((op) => (
+    op.kind === 'skip'
+      && op.moduleId === 'team-conflict-pack-dev-prompt-module'
+      && op.strategy === 'skip+keep-existing'
+  ));
+  assert.ok(skipOp, 'colliding pack operation should become a skip op');
+  assert.match(skipOp.reason, /Skipped by keep-existing conflict decision/);
+  assert.match(skipOp.reason, new RegExp(keepExistingReason));
+  assert.ok(!plan.operations.some((op) => (
+    op.moduleId === 'team-conflict-pack-dev-prompt-module'
+      && op.kind === 'copy-file'
+      && op.dest?.endsWith('.agents/prompts/dev-implementation.md')
+  )));
+
+  applyPlan(plan, { installedAt: '2026-01-01T00:00:00Z' });
+  assert.ok(fs.existsSync(path.join(project, '.agents/prompts/dev-implementation.md')));
+  assert.ok(!fs.existsSync(path.join(project, '.agents/shared/team-conflict-pack/prompts/dev-implementation.md')));
+
+  const state = JSON.parse(fs.readFileSync(path.join(project, '.agent-deploy/install-state.json'), 'utf8'));
+  const stateSkip = state.operations.find((op) => (
+    op.kind === 'skip'
+      && op.moduleId === 'team-conflict-pack-dev-prompt-module'
+      && op.strategy === 'skip+keep-existing'
+  ));
+  assert.ok(stateSkip, 'install-state should record the keep-existing skip');
+  assert.match(stateSkip.reason, /Skipped by keep-existing conflict decision/);
+  assert.match(stateSkip.reason, new RegExp(keepExistingReason));
+  assert.equal(state.source.conflictResolutions[0].decision, 'keep-existing');
+  assert.equal(state.source.conflictResolutions[0].reason, keepExistingReason);
+});
+
 test('CLI dry-run applies shared-approved extensions only with explicit opt-in', () => {
   const project = tmpProject();
   const packRoot = path.join(FIXTURES, 'packs/shared-approved-extension');

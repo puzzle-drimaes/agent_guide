@@ -112,6 +112,10 @@ export function detectPackConflicts(packRoot, options = {}) {
           type: 'target-destination',
           proposed: `${proposed.target}:${proposed.moduleId}`,
           conflictsWith: `${existing.target}:${existing.moduleId}`,
+          target: proposed.target,
+          proposedModuleId: proposed.moduleId,
+          conflictsWithModuleId: existing.moduleId,
+          destRel: normalizeRel(path.relative('/tmp/agent-deploy-pack-conflict', proposed.dest)),
           message: `target '${proposed.target}' destination collision at ${normalizeRel(path.relative('/tmp/agent-deploy-pack-conflict', proposed.dest))}`,
         }));
       }

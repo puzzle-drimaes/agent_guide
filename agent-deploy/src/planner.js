@@ -35,6 +35,9 @@ export function buildPlan(request) {
   if (issues.length) throw new Error(issues.map((i) => i.message).join('; '));
 
   const resolution = resolveRequest(request, manifests, adapter);
+  if (manifests.skippedPackModules?.length) {
+    resolution.skipped.push(...manifests.skippedPackModules);
+  }
   const operations = adapter.planOperations({ ...input, modules: resolution.selected });
 
   return {

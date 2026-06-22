@@ -54,6 +54,28 @@ export function skipOp({ moduleId, sourceRel, reason }) {
   return fileOp({ kind: 'skip', moduleId, sourceRel, dest: null, strategy: 'skip', reason });
 }
 
+function keepExistingSkipReason({ module, op, input, adapter }) {
+  for (const skip of module?.keepExistingSkips || []) {
+    if (skip.target && skip.target !== adapter.target) continue;
+    if (skip.moduleId && skip.moduleId !== op.moduleId) continue;
+    if (skip.sourceRel && normalizeRel(skip.sourceRel) !== normalizeRel(op.sourceRel)) continue;
+    if (skip.destRel && normalizeRel(path.relative(adapter.baseRoot(input), op.dest)) !== skip.destRel) continue;
+    return skip.reason;
+  }
+  return null;
+}
+
+function keepExistingSkipOp(op, reason) {
+  return fileOp({
+    kind: 'skip',
+    moduleId: op.moduleId,
+    sourceRel: op.sourceRel,
+    dest: null,
+    strategy: 'skip+keep-existing',
+    reason,
+  });
+}
+
 // Recursively list files under a directory, returning POSIX-style relative paths.
 export function walkFiles(absDir, prefix = '') {
   if (!fs.existsSync(absDir)) return [];
@@ -185,7 +207,13 @@ export function createAdapter(config) {
       const sharedRoot = typeof config.sharedRoot === 'function'
         ? config.sharedRoot(input, adapter)
         : path.join(adapter.resolveRoot(input), 'shared');
-      const ops = config.planOperations(input, adapter).map((op) => {
+      const transformedOps = config.planOperations(input, adapter).map((op) => {
+        if (!op || op.kind === 'skip' || !op.dest) return op;
+        const module = moduleById.get(op.moduleId);
+        const reason = keepExistingSkipReason({ module, op, input, adapter });
+        return reason ? keepExistingSkipOp(op, reason) : op;
+      });
+      const ops = transformedOps.map((op) => {
         if (!op || op.kind !== 'copy-file' || !op.dest || !op.sourceRel) return op;
         const module = moduleById.get(op.moduleId);
         if (!module?.installNamespace) return op;

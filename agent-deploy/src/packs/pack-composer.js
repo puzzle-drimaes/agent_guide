@@ -57,19 +57,54 @@ function isAddNamespacedResolutionForPack(resolution, pack) {
   return resolution.packId === pack.packJson.id;
 }
 
+function validateResolutionPackDigest(resolution, pack) {
+  if (resolution.packDigest && resolution.packDigest !== pack.digest) {
+    throw new Error(`pack ${pack.packJson.id}: conflict resolution packDigest does not match current pack digest`);
+  }
+}
+
+function resolutionMatchesConflict(resolution, conflict, pack) {
+  if (resolution.packId && resolution.packId !== pack.packJson.id) return false;
+  validateResolutionPackDigest(resolution, pack);
+  return resolution.proposed === conflict.proposed && resolution.conflictsWith === conflict.conflictsWith;
+}
+
 function isAddNamespacedResolvableConflict(conflict) {
   return ['target-destination', 'asset-path'].includes(conflict.type);
 }
 
+function isKeepExistingResolvableConflict(conflict) {
+  return ['module-id', 'profile-id', 'asset-id', 'asset-path', 'target-destination'].includes(conflict.type);
+}
+
 function resolvePackConflicts(pack, conflicts, conflictResolutions) {
-  if (!conflicts.length) return { unresolved: [], installNamespace: null };
+  if (!conflicts.length) return { unresolved: [], installNamespace: null, keepExistingConflicts: [] };
   const hasAddNamespaced = conflictResolutions.some((resolution) => isAddNamespacedResolutionForPack(resolution, pack));
+  const keepExistingConflicts = [];
+  const keepExistingKeys = new Set();
+  for (const conflict of conflicts) {
+    if (!isKeepExistingResolvableConflict(conflict)) continue;
+    const resolution = conflictResolutions.find((item) => (
+      item.decision === 'keep-existing' && resolutionMatchesConflict(item, conflict, pack)
+    ));
+    if (!resolution) continue;
+    keepExistingConflicts.push({
+      ...conflict,
+      decisionReason: resolution.reason,
+    });
+    keepExistingKeys.add(`${conflict.type}:${conflict.proposed}:${conflict.conflictsWith}`);
+  }
   const unresolved = conflicts.filter((conflict) => {
-    return !(hasAddNamespaced && isAddNamespacedResolvableConflict(conflict));
+    const key = `${conflict.type}:${conflict.proposed}:${conflict.conflictsWith}`;
+    return !(
+      keepExistingKeys.has(key)
+      || (hasAddNamespaced && isAddNamespacedResolvableConflict(conflict))
+    );
   });
   return {
     unresolved,
     installNamespace: hasAddNamespaced ? pack.packJson.id : null,
+    keepExistingConflicts,
   };
 }
 
@@ -95,6 +130,7 @@ function loadPack(packRoot, options = {}) {
   return {
     ...pack,
     installNamespace: conflictResult.installNamespace,
+    keepExistingConflicts: conflictResult.keepExistingConflicts,
     modulesDoc,
     profilesDoc,
   };
@@ -135,6 +171,45 @@ function assertNoDestinationCollisions(modules) {
       seen.set(key, op.moduleId);
     }
   }
+}
+
+function keepExistingReason(conflict) {
+  return `Skipped by keep-existing conflict decision: ${conflict.decisionReason} (${conflict.message})`;
+}
+
+function moduleKeepExistingConflict(module, pack) {
+  return (pack.keepExistingConflicts || []).find((conflict) => (
+    conflict.type === 'module-id' && conflict.proposed === module.id
+  ));
+}
+
+function profileHasKeepExistingConflict(profileId, pack) {
+  return (pack.keepExistingConflicts || []).some((conflict) => (
+    conflict.type === 'profile-id' && conflict.proposed === profileId
+  ));
+}
+
+function keepExistingSkipsForModule(module, pack) {
+  const skips = [];
+  for (const conflict of pack.keepExistingConflicts || []) {
+    if (conflict.type === 'asset-path') {
+      skips.push({
+        type: conflict.type,
+        sourceRel: conflict.proposed,
+        reason: keepExistingReason(conflict),
+      });
+    }
+    if (conflict.type === 'target-destination' && conflict.proposedModuleId === module.id) {
+      skips.push({
+        type: conflict.type,
+        target: conflict.target,
+        moduleId: module.id,
+        destRel: conflict.destRel,
+        reason: keepExistingReason(conflict),
+      });
+    }
+  }
+  return skips;
 }
 
 function applyDefaultProfileExtensions({ pack, profiles, baseProfileIds, moduleOwners }) {
@@ -188,6 +263,7 @@ export function loadComposedManifests({
   })));
   const modules = base.modulesDoc.modules.map((module) => annotateBaseModule(module, baseAssetRoot));
   const profiles = cloneJson(base.profilesDoc.profiles);
+  const skippedPackModules = [];
   const baseProfileIds = new Set(Object.keys(base.profilesDoc.profiles));
   const moduleOwners = new Map(modules.map((module) => [module.id, 'base bundle']));
   const profileOwners = new Map(Object.keys(profiles).map((profileId) => [profileId, 'base bundle']));
@@ -195,10 +271,18 @@ export function loadComposedManifests({
   for (const pack of loadedPacks) {
     const owner = `pack ${pack.packJson.id}`;
     for (const module of pack.modulesDoc.modules || []) {
+      const moduleConflict = moduleKeepExistingConflict(module, pack);
+      if (moduleConflict) {
+        skippedPackModules.push({ id: module.id, reason: keepExistingReason(moduleConflict) });
+        continue;
+      }
       assertUniqueId(module.id, moduleOwners, 'module', owner);
-      modules.push(annotatePackModule(module, pack));
+      const annotatedModule = annotatePackModule(module, pack);
+      const keepExistingSkips = keepExistingSkipsForModule(module, pack);
+      modules.push(keepExistingSkips.length ? { ...annotatedModule, keepExistingSkips } : annotatedModule);
     }
     for (const [profileId, moduleIds] of Object.entries(pack.profilesDoc.profiles || {})) {
+      if (profileHasKeepExistingConflict(profileId, pack)) continue;
       assertUniqueId(profileId, profileOwners, 'profile', owner);
       profiles[profileId] = moduleIds;
     }
@@ -230,5 +314,6 @@ export function loadComposedManifests({
     },
     byId,
     packs,
+    skippedPackModules,
   };
 }

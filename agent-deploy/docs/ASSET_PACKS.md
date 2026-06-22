@@ -122,9 +122,11 @@ node src/cli.js apply \
   --conflict-resolution ./conflicts.reviewed.json
 ```
 
-Runtime behavior: `add-namespaced` can resolve target-destination/asset-path collisions by installing the selected
-pack copy-file operations under `shared/<pack-id>/...`. Other decisions are still provenance-only in v1 and require
-the pack contents to already reflect the chosen resolution before planning. Unresolved physical conflicts still fail closed.
+Runtime behavior: `keep-existing` resolves the matched pack conflict by keeping the base asset and transforming the
+matched pack module/file operation into a visible `skip` operation with a reason in install-state. `add-namespaced`
+can resolve target-destination/asset-path collisions by installing the selected pack copy-file operations under
+`shared/<pack-id>/...`. Other decisions are still provenance-only in v1 and require the pack contents to already
+reflect the chosen resolution before planning. Unresolved physical conflicts still fail closed.
 
 ## Trust levels
 
@@ -409,4 +411,6 @@ node src/cli.js apply --target codex --profile developer --pack ./packs/frontend
 ```
 
 Invalid decision values are rejected before apply. Valid records are written to `source.conflictResolutions[]` in
-install-state. `add-namespaced` records also transform colliding copy-file destinations to `shared/<pack-id>/...`.
+install-state. `keep-existing` records transform matched colliding pack operations into `skip+keep-existing` skip
+ops with explicit reasons, while `add-namespaced` records transform colliding copy-file destinations to
+`shared/<pack-id>/...`.
