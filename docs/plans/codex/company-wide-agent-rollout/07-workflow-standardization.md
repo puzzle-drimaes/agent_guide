@@ -73,7 +73,7 @@ SDD mode 판단
   → test
   → review
   → PR
-  → 1 PR = 1 knowhow
+  → 1 PR = 1 공유 문서
 ```
 
 필수 산출물:

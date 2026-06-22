@@ -124,6 +124,51 @@ schemas/asset-catalog.schema.json
 assets/catalog.draft.json
 ```
 
+
+## Markdown asset lifecycle
+
+외부에서 가져온 Markdown과 내부에서 관리하는 canonical asset은 같은 파일처럼 보이더라도 lifecycle이 다릅니다.
+기본 원칙은 **외부 제안은 격리하고, 검증 후 공유 영역에 적용하며, 충분히 검증된 것만 canonical asset으로 승격**하는 것입니다.
+
+```text
+1. Import
+   외부에서 받은 *.md를 <repo>/.agent-packs/externals/ 아래에 둔다.
+
+2. Inspect / classify
+   agent가 prompt/template/skill/doc 중 asset type을 제안하고 frontmatter 초안을 만든다.
+
+3. Validate
+   민감정보, 출처/license, frontmatter schema, catalog/module/profile 정합성을 확인한다.
+
+4. Resolve conflicts
+   기존 문서/룰과 충돌하면 사용자에게 선택지를 제시한다.
+   - keep-existing
+   - add-namespaced
+   - rename-proposed
+   - replace-existing (canonical rule은 별도 승인 없이는 금지)
+
+5. Apply as shared asset
+   승인된 파일은 target별 shared 영역에 적용한다.
+   - .agents/shared/<pack-id>/...
+   - .claude/shared/<pack-id>/...
+   - .gemini/shared/<pack-id>/...
+   - .cursor/shared/<pack-id>/...
+
+6. Promote
+   반복 사용, owner/reviewer 승인, 안정성 확인 후 assets/ + manifests/ + catalog에 반영한다.
+```
+
+Lifecycle별 책임:
+
+| 단계 | 관리 위치 | 의미 | 기존 rule/doc 영향 |
+|---|---|---|---|
+| 제안 | `.agent-packs/externals/` | 외부에서 가져온 모든 Markdown 후보 | 없음 |
+| 적용 | `<target>/shared/<pack-id>/` | 프로젝트에서 agent가 참고하는 shared asset | 직접 덮어쓰기 없음 |
+| 승격 | `agent-deploy/assets/` + `manifests/` + `catalog` | 회사/팀이 승인한 canonical asset | 리뷰 후 반영 |
+
+`externals`는 다운로드 폴더가 아니라 **프로젝트에 적용하려는 외부 Markdown의 검역/검토 구역**입니다.
+사용자는 여기에 파일을 넣고, agent는 검증·충돌 해결·dry-run을 거쳐 적용 여부를 결정해야 합니다.
+
 ## 4-레이어 파이프라인
 
 ```
@@ -180,7 +225,7 @@ project-local pack을 read-only overlay로 합성합니다. 충돌은 자동 병
 
 ## 프로덕션 전 보강 포인트 (의도적으로 생략한 것)
 
-- 스키마 검증을 런타임에 강제(현재 `schemas/`는 문서용) — AJV 또는 무의존 폴백 검증기.
+- schema/catalog 검증을 더 엄격한 blocking 정책으로 승격 — 현재는 무의존 검증기와 non-blocking warning을 병행.
 - `prompts/templates/docs` frontmatter schema와 asset catalog를 blocking validation으로 승격.
 - 외부 asset pack 적용(`--pack`, `pack validate`) 구현과 개인/팀 공유 문서 승격 workflow 운영 자동화.
 - `--backup` / uninstall(=provenance 역재생) / 카테고리별 덮어쓰기 정책(k-sdd `policies.ts`).

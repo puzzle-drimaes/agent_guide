@@ -64,7 +64,7 @@
 ### Quality
 
 ```text
-- PR knowhow 작성률
+- PR 공유 문서 작성률
 - prompt 재사용률
 - 실패 사례 등록 수
 - 출처 표기율
@@ -98,7 +98,7 @@
 - Gemini target 추가
 - 비개발자 설치 가이드 완성
 - Prompt DB 운영 시작
-- PR knowhow template 적용
+- PR 공유 문서 template 적용
 - 첫 데모데이 진행
 ```
 

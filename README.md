@@ -20,6 +20,55 @@ references/     ECC, k-sdd 참고 소스
 .agents/        현재 프로젝트에 먼저 적용한 agent 사용 룰
 ```
 
+## Agent Deploy / Markdown asset 흐름
+
+`agent-deploy/`는 단순 설정 파일 설치기가 아니라, 회사 표준 rule, skill, prompt/template,
+공유 문서(`doc`)를 target agent별 네이티브 구조로 적용하는 Markdown asset 배포 엔진입니다.
+
+외부에서 가져와 현재 프로젝트에 적용하려는 모든 Markdown 파일은 기존 rule/doc에 바로 섞지 않고
+아래 격리 폴더에서 관리합니다.
+
+```text
+<repo>/.agent-packs/externals/
+  skills/
+  docs/
+  prompts/
+```
+
+외부 Markdown 적용 lifecycle:
+
+```text
+1. Import
+   → 외부에서 받은 *.md를 .agent-packs/externals/ 아래에 둔다.
+
+2. Inspect / classify
+   → agent가 prompt/template/skill/doc 중 asset type을 제안한다.
+
+3. Validate
+   → 민감정보, 출처/license, frontmatter, catalog/module/profile 정합성을 확인한다.
+
+4. Resolve conflicts
+   → 기존 문서/룰과 충돌하면 사용자 선택에 따라 처리한다.
+   → keep-existing / add-namespaced / rename-proposed / replace-existing
+
+5. Apply as shared asset
+   → 승인된 파일은 target별 shared 영역에 적용한다.
+   → .agents/shared/<pack-id>/, .claude/shared/<pack-id>/ 등
+
+6. Promote
+   → 반복 사용과 owner/reviewer 승인 후 canonical assets/manifests/catalog로 승격한다.
+```
+
+관련 문서:
+
+```text
+agent-deploy/README.md
+agent-deploy/SETUP_WIZARD.md
+agent-deploy/docs/ASSET_SCHEMA_AND_CATALOG.md
+agent-deploy/docs/ASSET_PACKS.md
+docs/specs/external-shared-asset-packs/
+```
+
 ## 에이전트 사용 라이프사이클
 
 이 저장소에서 정의하는 agent 사용은 단순히 AI 도구를 실행하는 것이 아니라, 설치 → 작업 → 검증 → 공유 → 개선으로 이어지는 반복 운영 흐름입니다.

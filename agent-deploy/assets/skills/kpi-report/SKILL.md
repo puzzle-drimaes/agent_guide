@@ -36,7 +36,7 @@ Report only values that were actually provided. For any missing metric, write
 - 계정별 active usage / 회고 제출률 / 데모데이 발표 수 / prompt 등록 수
 
 ## Quality
-- PR knowhow 작성률 / prompt 재사용률 / 실패 사례 수 / 출처 표기율 / 보안 위반 건수
+- PR 공유 문서 작성률 / prompt 재사용률 / 실패 사례 수 / 출처 표기율 / 보안 위반 건수
 
 ## Business Impact
 - 반복 업무 시간 절감 / PR cycle time / 문서 리드타임 / CS 응답 작성 시간

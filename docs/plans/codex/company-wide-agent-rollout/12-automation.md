@@ -8,7 +8,7 @@
 
 | 자동화 | 설명 |
 |---|---|
-| PR knowhow bot | PR merge 시 AI 노하우 작성 reminder |
+| PR 공유 문서 bot | PR merge 시 AI 노하우 작성 reminder |
 | Weekly Slack form | 매주 금 16:00 회고 폼 발송 |
 | Prompt DB sync | Slack/Notion에서 prompt 자산화 |
 | Installer update check | profile/rule 업데이트 알림 |
@@ -19,7 +19,7 @@
 
 ```text
 1. Weekly Slack form
-2. PR knowhow reminder
+2. PR 공유 문서 reminder
 3. Prompt DB template
 4. Installer update notification
 5. Governance dashboard
@@ -46,7 +46,7 @@
 - 다음 주 실험 제안
 ```
 
-## 2. PR knowhow reminder
+## 2. PR 공유 문서 reminder
 
 동작:
 
@@ -103,7 +103,7 @@ agent-deploy apply --target codex --profile developer
 - OS별 설치 성공률
 - 계정별 회고 제출률
 - Prompt DB 등록 수
-- PR knowhow 작성률
+- PR 공유 문서 작성률
 - 출처 누락 건수
 ```
 

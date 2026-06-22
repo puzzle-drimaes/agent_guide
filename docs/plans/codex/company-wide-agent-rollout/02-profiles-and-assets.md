@@ -8,7 +8,7 @@
 `*.md` 기반 AI 업무 자산 전체를 뜻한다.
 
 ```text
-rules + skills + prompts/templates + shared documents + personal/team knowhow
+rules + skills + prompts/templates + external/shared docs
 ```
 
 목표는 모든 target의 파일 구조를 같게 만드는 것이 아니라, Codex/Claude/Gemini 등 각 harness가
@@ -22,7 +22,7 @@ rules + skills + prompts/templates + shared documents + personal/team knowhow
 |---|---|---|
 | 회사 구성원 공통 | 하네스 엔지니어링으로 관리되는 회사 rule `*.md` | project scope에 공통 rule과 entrypoint 설치 |
 | agent 초보자 | 검증된 템플릿/프롬프트/스킬 `*.md` | role profile과 첫 사용 예시 제공 |
-| agent 숙련자 | 개인/팀 knowhow `*.md` 공유와 승격 | asset 후보 작성, 검증, catalog 등록, profile 반영 흐름 제공 |
+| agent 숙련자 | 외부/팀 공유 문서 `*.md` 적용과 승격 | asset 후보 작성, 검증, catalog 등록, profile 반영 흐름 제공 |
 
 ## Profile 원칙
 
@@ -99,7 +99,7 @@ agent-deploy/assets/
   │   ├─ product/
   │   └─ business/
   │
-  ├─ knowhow/            # 향후 추가 후보: 개인/팀 공유 문서 asset
+  ├─ docs/               # 향후 추가 후보: 외부/팀 공유 문서 asset
   │   ├─ developer/
   │   ├─ product/
   │   ├─ business/
@@ -109,7 +109,7 @@ agent-deploy/assets/
       └─ servers.json
 ```
 
-Pilot에서는 `templates/`와 `knowhow/`를 바로 코드로 추가하지 않아도 된다. 다만 prompt와 skill을
+Pilot에서는 `templates/`와 `docs/`를 바로 코드로 추가하지 않아도 된다. 다만 prompt와 skill을
 설계할 때 향후 분리될 수 있도록 asset type, audience, owner, stability 정보를 남길 수 있어야 한다.
 
 schema/catalog 초안은 아래 파일에서 관리한다.
@@ -129,7 +129,7 @@ agent-deploy/assets/catalog.draft.json
 | `skill` | agent가 수행할 절차/전문성 | product-spec, meeting-summary | task trigger와 output 형식이 명확해야 함 |
 | `prompt` | 특정 결과물을 만들기 위한 재사용 요청문 | PRD 작성, 고객 답변, 비교 분석 | 초보자가 그대로 사용할 수 있어야 함 |
 | `template` | 사용자가 채워 넣는 문서 골격 | PRD, user story, proposal | 입력 항목과 결과 품질 기준이 있어야 함 |
-| `knowhow` | 숙련자/팀이 축적한 노하우 | 팀별 리뷰 방식, 도메인별 체크리스트 | owner/reviewer와 승격 상태가 있어야 함 |
+| `doc` | 외부/팀 공유 문서 | 팀별 리뷰 방식, 도메인별 체크리스트 | owner/reviewer와 승격 상태가 있어야 함 |
 | `agent` | 전문 subagent 정의 | reviewer, architecture-reviewer | target 지원 여부와 fallback이 명확해야 함 |
 | `command` | slash command 또는 instruction fallback | plan | unsupported target은 skip reason 기록 |
 
@@ -188,7 +188,7 @@ prompt-db-curation-skill
 ...
 ```
 
-향후 `templates/`, `knowhow/`, 외부 asset pack을 추가할 때도 같은 module/profile 구조를 유지한다.
+향후 `templates/`, `docs/`, 외부 asset pack을 추가할 때도 같은 module/profile 구조를 유지한다.
 
 ## Profile manifest 예시
 
@@ -254,6 +254,6 @@ prompt-db-curation-skill
 - 비개발자가 profile 설명만 보고 선택할 수 있다.
 - 각 profile에 첫 사용 예시가 3개 이상 있다.
 - asset type별 의미와 배포 기준이 문서화되어 있다.
-- prompt/template/knowhow schema와 catalog 도입 여부가 TODO로 추적된다.
+- prompt/template/doc schema와 catalog 도입 여부가 TODO로 추적된다.
 - 실제 manifest에 없는 후보 profile은 문서에서 예정 상태로 표시된다.
 - catalog 초안이 실제 asset 경로, module, profile 추천을 설명한다.

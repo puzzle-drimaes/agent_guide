@@ -75,6 +75,49 @@ Agent는 아래 원칙을 지킵니다.
 7. dry-run 결과를 확인한 뒤 apply를 진행할 것인가?
 ```
 
+
+## 4. Role guide for beginners
+
+초보자에게는 profile 이름을 먼저 고르게 하지 말고, 아래 decision guide로 추천합니다.
+
+| 사용자가 하고 싶은 일 | 추천 profile | 추천 target | 첫 요청 예시 |
+|---|---|---|---|
+| 회사 공통 AI 사용 규칙만 적용 | `minimal` | 현재 쓰는 agent | "이 프로젝트에서 지켜야 할 AI 사용 규칙을 요약해줘." |
+| 개발 프로젝트에서 구현/리뷰/커밋 도움 받기 | `developer` | `codex` 우선 | "이 이슈를 SDD-lite로 진행하고 테스트 계획까지 세워줘." |
+| 제품 기획/요구사항/PRD 작성 | `product` | `codex` 또는 `claude` | "이 아이디어를 PRD 초안으로 정리해줘." |
+| 고객 응대/공지/제안서 작성 | `business` | `claude` 또는 `gemini` | "이 고객 문의에 대한 답변 초안을 작성해줘." |
+| Prompt DB, KPI, 분기 회고 운영 | `governance` | `claude` 우선 | "이번 달 Prompt DB 정리 후보를 뽑아줘." |
+| 여러 역할을 모두 검토 | `full` | 내부 검토 시만 | "설치될 asset 목록과 중복 위험을 검토해줘." |
+
+초보자 기본값은 다음처럼 추천합니다.
+
+```text
+개발자:   project scope + developer profile + codex target + dry-run first
+기획자:   project scope + product profile + codex/claude target + dry-run first
+비즈니스: project scope + business profile + claude/gemini target + dry-run first
+운영자:   project scope + governance profile + claude target + dry-run first
+```
+
+초보자가 "다른 사람이 준 md 파일을 적용하고 싶다"고 말하면, 바로 기존 rule/doc에 복사하지 말고
+아래 폴더에 넣도록 안내합니다.
+
+```text
+<repo>/.agent-packs/externals/
+  skills/
+  docs/
+  prompts/
+```
+
+그 다음 agent는 다음 순서로 안내합니다.
+
+```text
+1. externals에 넣은 파일 목록을 확인한다.
+2. 민감정보/credential/customer data 포함 여부를 확인한다.
+3. prompt/template/skill/doc 중 어떤 asset type인지 제안한다.
+4. 기존 문서/룰과 충돌하면 keep-existing/add-namespaced/rename-proposed/replace-existing 선택지를 설명한다.
+5. 기본 추천은 add-namespaced이며, canonical rule 교체는 별도 승인 없이는 금지한다.
+```
+
 ## 4. 권장 기본값
 
 사용자가 잘 모르면 아래 기본값을 제안합니다.
@@ -123,7 +166,7 @@ shared document asset 후보에 필요한 정보:
 - stable/beta/draft 상태
 ```
 
-## 5. 명령 생성 규칙
+## 6. 명령 생성 규칙
 
 bundle root가 현재 디렉터리라고 가정하면 다음 형식을 사용합니다.
 
@@ -164,7 +207,7 @@ node src/cli.js apply \
   --dry-run
 ```
 
-## 6. 복수 target 설치
+## 7. 복수 target 설치
 
 현재 wizard는 target별 실행을 기본으로 안내합니다.
 
@@ -176,7 +219,7 @@ node src/cli.js apply --target gemini --profile developer --scope project --proj
 
 dry-run 결과를 각각 확인한 뒤 같은 순서로 `--dry-run`을 제거한 apply 명령을 제안합니다.
 
-## 7. Agent 응답 형식
+## 8. Agent 응답 형식
 
 Agent는 설치 전 최종 확인을 아래 형식으로 요약합니다.
 
@@ -197,7 +240,7 @@ Agent는 설치 전 최종 확인을 아래 형식으로 요약합니다.
 - 승인하면 apply 명령을 이어서 제안하겠습니다.
 ```
 
-## 8. install.sh의 역할
+## 9. install.sh의 역할
 
 `install.sh`는 QnA wizard가 아닙니다. 기본 역할은 다음 안내를 출력하는 bootstrap입니다.
 

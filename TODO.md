@@ -221,7 +221,7 @@ agent-deploy를 단순 AI coding config installer가 아니라
 - [x] `prompts/templates/docs` frontmatter schema 설계
 - [x] asset catalog 초안 설계
 - [x] 외부/shared asset pack 적용 방식 설계
-- [ ] beginner quickstart/role guide 문서 추가
+- [x] beginner quickstart/role guide 문서 추가
 
 산출물:
 
@@ -241,7 +241,7 @@ docs/specs/external-shared-asset-packs/
 2. [x] catalog와 실제 파일/frontmatter/module/profile의 parity checker 추가
 3. [x] shared document asset 작성/승격 skill 추가
 4. [x] 외부/shared asset pack 적용 방식 설계
-5. SETUP_WIZARD.md 기반 초보자 role guide 보강
+5. [x] SETUP_WIZARD.md 기반 초보자 role guide 보강
 ```
 
 ### 2.2 Codex adapter 추가

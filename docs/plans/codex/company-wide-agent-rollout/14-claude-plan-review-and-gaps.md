@@ -249,7 +249,7 @@ Codex 문서에는 별도 보안/생애주기 문서가 필요하다.
 
 ```text
 - 6룰을 governance-as-code로 구현한다는 원칙
-- GitHub Action으로 PR knowhow 자동 수집
+- GitHub Action으로 PR 공유 문서 자동 수집
 - Slack schedule로 weekly form 자동 발송
 - Prompt DB → assets/skills 승격 루프
 - KPI 목표값
