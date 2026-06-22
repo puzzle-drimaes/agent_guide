@@ -196,6 +196,10 @@ Resolution provenance:
 }
 ```
 
+Until interactive conflict-resolution apply support exists, these records live in the pack PR/review issue or
+governance registry. Future install-state support should use the same fields and include `decidedAt`, `packId`, and
+`packDigest`.
+
 ## 5. CLI shape
 
 ### 5.1 v1 commands
@@ -274,6 +278,34 @@ confidential shared documents in default profiles
 ```
 
 If a pack contains executable helper files, they are treated as inert documentation unless a future explicit policy allows them.
+
+## 7.1 Shared-approved governance
+
+`shared-approved` means a pack is safe for broad internal reuse, not merely that it validates technically.
+
+Approval criteria:
+
+- `pack.json` includes stable id/version, owner, source, license, `reviewStatus=approved`, and `packType=shared-approved`.
+- Pack validation, catalog parity, path safety, symlink guard, and destination conflict checks pass.
+- Source attribution and license are acceptable for internal reuse.
+- Assets have owner/audience/stability/review metadata and no unresolved catalog/module/profile drift.
+- Security review finds no secrets, credentials, customer-private data, hidden install behavior, escaping links, or unsafe MCP defaults.
+- Any `defaultProfileExtensions` are reviewed separately and include only non-confidential assets.
+- Conflict resolution decisions are recorded with reviewer, date, rationale, pack id, and digest.
+
+Candidate promotion flow:
+
+```text
+externals / candidate
+  → validate and normalize metadata
+  → resolve conflicts explicitly
+  → dry-run affected targets/profiles
+  → approve pack.json + catalog reviewStatus
+  → record digest and approval evidence
+  → publish as shared-approved
+```
+
+Project-local packs can inspire shared assets, but they do not become shared defaults automatically.
 
 ## 8. Install-state provenance
 

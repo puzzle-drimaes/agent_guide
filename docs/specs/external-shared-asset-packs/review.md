@@ -52,7 +52,6 @@ pack provenance/install-state.
 - Whether pack profiles should be addressed as `<pack-id>:<profile>` or plain profile ids in the CLI.
 - Whether `templates/` should become a first-class target path or remain under `prompts/` for v1.
 - Whether conflict resolution records should live only in install-state or also in a pack-side decision log.
-- Whether `shared-approved` pack approval lives in GitHub review, Notion registry, or both.
 
 ## Review conclusion
 
@@ -96,5 +95,11 @@ Remaining risk: conflict resolution is still fail-closed only. Interactive `keep
 - Non-`shared-approved` packs cannot declare `defaultProfileExtensions`; validator tests cover `project-local` and `candidate`.
 - Smoke tests cover opt-in behavior, no-extension default behavior, and CLI dry-run output.
 
-Remaining Phase 3 risk: governance approval workflow is still documented at a high level only. The next task should
-define shared-approved approval criteria, candidate promotion, and conflict-resolution decision records.
+## Phase 3 governance documentation review
+
+- Shared-approved approval criteria now require source/license, owner, approved review status, validation pass, metadata parity, security checks, conflict decisions, and approval evidence.
+- Candidate to shared-approved promotion is documented from externals/candidate scan through validation, conflict resolution, dry-run, approval, digest recording, and publish.
+- Conflict-resolution record policy defines required fields and decision constraints for `keep-existing`, `add-namespaced`, `rename-proposed`, and `replace-existing`.
+- Until runtime conflict decision capture is implemented, decisions are recorded in the pack PR/review issue or governance registry; future install-state support should mirror the same fields.
+
+Remaining Phase 3 risk: governance policy is documented, but conflict-resolution decision capture is not yet implemented in the CLI/apply flow.

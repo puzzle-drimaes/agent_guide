@@ -49,7 +49,7 @@ Implementation notes:
 - [x] Compute deterministic pack digest.
 - [x] Record pack id/version/source/digest/root in install-state.
 - [x] Add `shared-approved` profile extension opt-in.
-- [ ] Document approval workflow for shared packs.
+- [x] Document approval workflow for shared packs.
 
 Implementation notes:
 
@@ -59,6 +59,8 @@ Implementation notes:
 - `source.packs[]` now records `id`, `version`, `packType`, `digest`, `source`, and `root`.
 - CLI `--enable-pack-extensions` applies `defaultProfileExtensions` only from `shared-approved` packs.
 - Extension targets must be bundled base profiles; `project-local` and `candidate` packs cannot mutate builtin profiles.
+- Shared-approved approval criteria now cover source/license, validation, metadata, security, conflict decisions, reviewers, and pack digest.
+- Candidate promotion and conflict-resolution record policies are documented; runtime conflict-decision capture remains a Phase 2 follow-up.
 
 ## Phase 4 — Production hardening
 

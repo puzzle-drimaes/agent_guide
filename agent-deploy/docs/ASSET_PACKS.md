@@ -113,6 +113,80 @@ The decision should be written to pack provenance, for example:
 | `project-local` | project/team-specific assets | no |
 | `candidate` | shared document review/promotion candidates | no |
 
+## Governance workflow
+
+Asset packs move through explicit trust states. A pack must not become `shared-approved` only because it installs
+successfully; it needs content, provenance, security, and conflict review.
+
+### Shared-approved approval criteria
+
+A pack can be marked `packType: "shared-approved"` only when all criteria below are met:
+
+- `pack.json` has a stable `id`, semantic `version`, `owner`, `source`, `license`, `reviewStatus: "approved"`, and `packType: "shared-approved"`.
+- `node scripts/check-pack.js --pack <pack-root>` passes without blocking errors.
+- Source attribution and license are clear enough for internal reuse.
+- All shipped assets have suitable frontmatter/catalog metadata: owner, audience, stability, review status, and module/profile references.
+- No secrets, credentials, customer-private data, hidden executable install behavior, path escape, or symlink escape are present.
+- Any `defaultProfileExtensions` are limited to non-confidential assets and existing bundled base profiles.
+- Conflict decisions are reviewed and recorded; unresolved collisions fail closed.
+- Approval is recorded in the pack PR/review issue or governance registry with reviewer, date, pack digest, and rationale.
+
+Recommended approvers:
+
+```text
+content owner/team lead
+platform or agent-deploy maintainer
+security/governance reviewer when the pack affects shared profiles, MCP, rules, or confidential domains
+```
+
+### Candidate to shared-approved promotion flow
+
+```text
+externals or candidate pack
+  → scan/validate candidate metadata
+  → normalize frontmatter/catalog/module ids
+  → run conflict detection and choose explicit resolutions
+  → dry-run target installs for affected profiles/tools
+  → update pack.json to shared-approved + reviewStatus approved
+  → record pack digest, reviewer, approval date, source/license, and conflict decisions
+  → publish or include the approved pack
+```
+
+Promotion rules:
+
+- Candidate content is never added to builtin profiles directly.
+- Project-local learnings can be copied into a new candidate pack, but project-local packs themselves do not become shared defaults automatically.
+- Version must be bumped when approved content, profile extensions, or conflict decisions change.
+- `defaultProfileExtensions` should be added only after the pack is approved and the target profile impact is reviewed.
+
+### Conflict resolution record policy
+
+Every non-trivial conflict decision should be recorded with enough context to reproduce the review. Until runtime
+conflict-resolution provenance is implemented, record the decision in the pack PR/review issue or governance registry;
+future apply/install-state support should mirror the same fields.
+
+Required fields:
+
+```json
+{
+  "proposed": ".agent-packs/externals/docs/onboarding-checklist.md",
+  "conflictsWith": ".agents/shared/team/onboarding-checklist.md",
+  "decision": "add-namespaced",
+  "decidedBy": "platform-team",
+  "decidedAt": "2026-06-22",
+  "reason": "Keep existing onboarding guide and add team-specific variant",
+  "packId": "team-onboarding-pack",
+  "packDigest": "sha256:<64-hex>"
+}
+```
+
+Decision constraints:
+
+- `keep-existing`: default for canonical rule conflicts and unclear ownership.
+- `add-namespaced`: default for useful team-specific skills/docs/prompts.
+- `rename-proposed`: use for id/path/title collisions when both assets should remain discoverable.
+- `replace-existing`: requires explicit governance approval; forbidden for canonical company rules outside the canonical rule-change workflow.
+
 ## Application flow
 
 ```text

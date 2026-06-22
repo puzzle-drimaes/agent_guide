@@ -263,7 +263,7 @@ docs/specs/external-shared-asset-packs/
    - `--enable-pack-extensions` 옵션 추가
    - `shared-approved` pack만 builtin profile 확장 허용
    - `candidate`/`project-local` builtin profile 확장 금지
-10. [ ] asset pack governance 문서 보강
+10. [x] asset pack governance 문서 보강
    - shared-approved pack 승인 기준
    - candidate → shared-approved 승격 흐름
    - conflict resolution 기록 정책
