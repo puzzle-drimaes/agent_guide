@@ -38,7 +38,7 @@
     "source": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["repoVersion", "repoCommit", "manifestVersion", "packs"],
+      "required": ["repoVersion", "repoCommit", "manifestVersion", "packs", "conflictResolutions"],
       "properties": {
         "repoVersion": { "type": ["string", "null"] },
         "repoCommit": { "type": ["string", "null"] },
@@ -59,6 +59,29 @@
               },
               "source": { "type": ["string", "null"] },
               "root": { "type": "string", "minLength": 1 }
+            }
+          }
+        },
+        "conflictResolutions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["proposed", "conflictsWith", "decision", "decidedBy", "reason"],
+            "properties": {
+              "proposed": { "type": "string", "minLength": 1 },
+              "conflictsWith": { "type": "string", "minLength": 1 },
+              "decision": {
+                "enum": ["keep-existing", "add-namespaced", "rename-proposed", "replace-existing"]
+              },
+              "decidedBy": { "type": "string", "minLength": 1 },
+              "decidedAt": { "type": "string", "minLength": 1 },
+              "reason": { "type": "string", "minLength": 1 },
+              "packId": { "type": "string", "minLength": 1 },
+              "packDigest": {
+                "type": "string",
+                "pattern": "^sha256:[a-f0-9]{64}$"
+              }
             }
           }
         }

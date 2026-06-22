@@ -51,7 +51,6 @@ pack provenance/install-state.
 
 - Whether pack profiles should be addressed as `<pack-id>:<profile>` or plain profile ids in the CLI.
 - Whether `templates/` should become a first-class target path or remain under `prompts/` for v1.
-- Whether conflict resolution records should live only in install-state or also in a pack-side decision log.
 
 ## Review conclusion
 
@@ -76,8 +75,8 @@ Remaining Phase 2 risk: planner integration must keep pack logic out of target a
 - Applied pack plans write `source.packs` provenance to install-state.
 - Smoke tests cover explicit pack module planning, pack-local profile apply, install-state pack provenance, and CLI dry-run output.
 
-Remaining risk: conflict resolution is still fail-closed only. Interactive `keep-existing` / `add-namespaced` /
-`rename-proposed` / `replace-existing` provenance remains a follow-up task.
+Conflict resolution remains fail-closed for unresolved physical conflicts, but reviewed decisions can now be captured
+from a JSON file and written to install-state provenance.
 
 ## Phase 3 provenance implementation review
 
@@ -100,6 +99,16 @@ Remaining risk: conflict resolution is still fail-closed only. Interactive `keep
 - Shared-approved approval criteria now require source/license, owner, approved review status, validation pass, metadata parity, security checks, conflict decisions, and approval evidence.
 - Candidate to shared-approved promotion is documented from externals/candidate scan through validation, conflict resolution, dry-run, approval, digest recording, and publish.
 - Conflict-resolution record policy defines required fields and decision constraints for `keep-existing`, `add-namespaced`, `rename-proposed`, and `replace-existing`.
-- Until runtime conflict decision capture is implemented, decisions are recorded in the pack PR/review issue or governance registry; future install-state support should mirror the same fields.
+- Runtime conflict decision capture now mirrors the documented fields into install-state when `--conflict-resolution` is provided.
 
-Remaining Phase 3 risk: governance policy is documented, but conflict-resolution decision capture is not yet implemented in the CLI/apply flow.
+Remaining Phase 3 risk: governance policy is documented and decisions can be captured, but automatic plan transformation for those decisions is not implemented.
+
+
+## Phase 2 conflict-resolution capture review
+
+- CLI `plan`/`apply` accepts `--conflict-resolution <json-file>` and validates decision records before planning.
+- Decision records are written to `source.conflictResolutions[]` in install-state.
+- Invalid decision values are rejected with a clear error before any write.
+- The feature is provenance-only in v1: it records reviewed decisions but does not automatically rename, namespace, skip, or replace conflicting pack files.
+
+Remaining risk: applying conflict decisions to transform plans is still a follow-up task; unresolved pack conflicts continue to fail closed.

@@ -664,6 +664,91 @@ test('planner composes pack-local profiles and apply records pack provenance', (
   assert.equal(state.source.packs[0].source, null);
 });
 
+test('conflict resolution file is recorded in install-state provenance', () => {
+  const project = tmpProject();
+  const packRoot = path.join(FIXTURES, 'packs/valid-pack');
+  const packDigest = calculatePackDigest(packRoot).digest;
+  const resolutionFile = path.join(tmpProject(), 'conflicts.reviewed.json');
+  fs.writeFileSync(
+    resolutionFile,
+    JSON.stringify({
+      conflictResolutions: [
+        {
+          proposed: '.agent-packs/externals/docs/onboarding-checklist.md',
+          conflictsWith: '.agents/shared/team/onboarding-checklist.md',
+          decision: 'add-namespaced',
+          decidedBy: 'platform-team',
+          decidedAt: '2026-06-22',
+          reason: 'Keep the existing guide and add a team-specific variant.',
+          packId: 'team-valid-pack',
+          packDigest,
+        },
+      ],
+    }),
+  );
+
+  const out = execFileSync('node', [
+    CLI, 'apply',
+    '--target', 'claude',
+    '--profile', 'team-valid',
+    '--pack', packRoot,
+    '--conflict-resolution', resolutionFile,
+    '--project', project,
+  ], { encoding: 'utf8' });
+  assert.match(out, /applied/);
+
+  const state = JSON.parse(fs.readFileSync(path.join(project, '.claude/agent-install-state.json'), 'utf8'));
+  assert.deepEqual(state.source.conflictResolutions, [
+    {
+      proposed: '.agent-packs/externals/docs/onboarding-checklist.md',
+      conflictsWith: '.agents/shared/team/onboarding-checklist.md',
+      decision: 'add-namespaced',
+      decidedBy: 'platform-team',
+      decidedAt: '2026-06-22',
+      reason: 'Keep the existing guide and add a team-specific variant.',
+      packId: 'team-valid-pack',
+      packDigest,
+    },
+  ]);
+});
+
+test('conflict resolution file rejects invalid decisions before apply', () => {
+  const project = tmpProject();
+  const packRoot = path.join(FIXTURES, 'packs/valid-pack');
+  const resolutionFile = path.join(tmpProject(), 'conflicts.invalid.json');
+  fs.writeFileSync(
+    resolutionFile,
+    JSON.stringify({
+      conflictResolutions: [
+        {
+          proposed: 'a',
+          conflictsWith: 'b',
+          decision: 'silently-overwrite',
+          decidedBy: 'platform-team',
+          reason: 'Invalid decision should fail validation.',
+        },
+      ],
+    }),
+  );
+
+  let error = null;
+  try {
+    execFileSync('node', [
+      CLI, 'apply',
+      '--target', 'claude',
+      '--profile', 'team-valid',
+      '--pack', packRoot,
+      '--conflict-resolution', resolutionFile,
+      '--project', project,
+    ], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+  } catch (caught) {
+    error = caught;
+  }
+  assert.ok(error, 'invalid conflict resolution should fail');
+  assert.match(error.stderr, /decision must be one of keep-existing, add-namespaced, rename-proposed, replace-existing/);
+  assert.ok(!fs.existsSync(path.join(project, '.claude/agent-install-state.json')));
+});
+
 test('CLI dry-run applies shared-approved extensions only with explicit opt-in', () => {
   const project = tmpProject();
   const packRoot = path.join(FIXTURES, 'packs/shared-approved-extension');

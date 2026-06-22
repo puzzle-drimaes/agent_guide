@@ -31,7 +31,7 @@ Implementation notes:
 - [x] Add `--pack <path>` parsing to CLI.
 - [x] Refactor manifest loading so planner can receive composed manifests.
 - [x] Add pack manifest composition with collision detection.
-- [ ] Add conflict resolution provenance for `keep-existing`, `add-namespaced`, `rename-proposed`, and `replace-existing`.
+- [x] Add conflict resolution provenance for `keep-existing`, `add-namespaced`, `rename-proposed`, and `replace-existing`.
 - [x] Add explicit pack module/profile selection to plan/apply.
 - [x] Extend smoke tests for pack dry-run and apply.
 
@@ -41,7 +41,7 @@ Implementation notes:
 - Pack manifests are composed after validation; base bundle remains the base layer.
 - Pack modules retain their own `assetRoot`, so target adapters can copy from pack assets without mixing files into bundled `assets/`.
 - `source.packs` is recorded in install-state for applied pack plans.
-- Conflict resolution decisions are not interactive yet; unresolved conflicts still fail closed.
+- `--conflict-resolution <json-file>` records reviewed decisions in install-state; unresolved conflicts still fail closed and records are provenance-only in v1.
 
 ## Phase 3 — Provenance and governance
 
@@ -60,7 +60,7 @@ Implementation notes:
 - CLI `--enable-pack-extensions` applies `defaultProfileExtensions` only from `shared-approved` packs.
 - Extension targets must be bundled base profiles; `project-local` and `candidate` packs cannot mutate builtin profiles.
 - Shared-approved approval criteria now cover source/license, validation, metadata, security, conflict decisions, reviewers, and pack digest.
-- Candidate promotion and conflict-resolution record policies are documented; runtime conflict-decision capture remains a Phase 2 follow-up.
+- Candidate promotion and conflict-resolution record policies are documented; runtime conflict-decision capture now records reviewed decisions in install-state, while automatic conflict transformation remains a follow-up.
 
 ## Phase 4 — Production hardening
 

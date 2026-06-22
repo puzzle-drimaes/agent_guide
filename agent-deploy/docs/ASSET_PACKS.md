@@ -108,6 +108,24 @@ The decision should be written to pack provenance, for example:
 }
 ```
 
+Runtime capture is available with `--conflict-resolution <json-file>`. The JSON file may be either an array of
+decision records or an object with a `conflictResolutions` array. These records are written to
+`install-state` under `source.conflictResolutions[]`.
+
+Example:
+
+```text
+node src/cli.js apply \
+  --target codex \
+  --profile team-valid \
+  --pack ./packs/team \
+  --conflict-resolution ./conflicts.reviewed.json
+```
+
+Important v1 limitation: conflict-resolution records are provenance-only. They do not automatically rename, namespace,
+skip, or replace conflicting files. Pack contents must already reflect the chosen resolution before planning; unresolved
+physical conflicts still fail closed.
+
 ## Trust levels
 
 | Pack type | Purpose | Default profile extension |
@@ -226,9 +244,9 @@ Promotion rules:
 
 ### Conflict resolution record policy
 
-Every non-trivial conflict decision should be recorded with enough context to reproduce the review. Until runtime
-conflict-resolution provenance is implemented, record the decision in the pack PR/review issue or governance registry;
-future apply/install-state support should mirror the same fields.
+Every non-trivial conflict decision should be recorded with enough context to reproduce the review. Record the decision
+in the pack PR/review issue or governance registry, and pass the same record to `--conflict-resolution` when applying
+so install-state can mirror the approved provenance.
 
 Required fields:
 
@@ -242,6 +260,25 @@ Required fields:
   "reason": "Keep existing onboarding guide and add team-specific variant",
   "packId": "team-onboarding-pack",
   "packDigest": "sha256:<64-hex>"
+}
+```
+
+The same record shape can be passed to `--conflict-resolution` after review:
+
+```json
+{
+  "conflictResolutions": [
+    {
+      "proposed": ".agent-packs/externals/docs/onboarding-checklist.md",
+      "conflictsWith": ".agents/shared/team/onboarding-checklist.md",
+      "decision": "add-namespaced",
+      "decidedBy": "platform-team",
+      "decidedAt": "2026-06-22",
+      "reason": "Keep existing onboarding guide and add team-specific variant",
+      "packId": "team-onboarding-pack",
+      "packDigest": "sha256:<64-hex>"
+    }
+  ]
 }
 ```
 
@@ -324,6 +361,7 @@ agent-deploy pack inspect --externals ./.agent-packs/externals
 agent-deploy plan  --target codex --profile developer --pack ./packs/frontend --modules frontend-team-pack-review-checklist
 agent-deploy apply --target codex --profile developer --pack ./packs/frontend --dry-run
 agent-deploy plan  --target codex --profile developer --pack ./packs/frontend --enable-pack-extensions
+agent-deploy apply --target codex --profile developer --pack ./packs/frontend --conflict-resolution ./conflicts.reviewed.json
 ```
 
 ## Phase 1 validation entry point
@@ -363,3 +401,12 @@ node src/cli.js apply --target codex --profile developer --pack ./packs/frontend
 
 Only `shared-approved` pack extensions are applied. Candidate and project-local packs can still be used explicitly,
 but they cannot mutate builtin profile defaults.
+
+Implemented runtime conflict-resolution capture:
+
+```text
+node src/cli.js apply --target codex --profile developer --pack ./packs/frontend --conflict-resolution ./conflicts.reviewed.json
+```
+
+Invalid decision values are rejected before apply. Valid records are written to `source.conflictResolutions[]` in
+install-state.

@@ -196,9 +196,11 @@ Resolution provenance:
 }
 ```
 
-Until interactive conflict-resolution apply support exists, these records live in the pack PR/review issue or
-governance registry. Future install-state support should use the same fields and include `decidedAt`, `packId`, and
-`packDigest`.
+Runtime capture supports a `--conflict-resolution <json-file>` option that records externally reviewed decisions in
+install-state under `source.conflictResolutions[]`. The records are provenance-only in v1: unresolved pack conflicts
+still fail closed, and any path/id renames must be reflected in the pack files before planning. The JSON file may be
+either an array of decision records or an object with a `conflictResolutions` array. Each record uses the same fields
+and may include `decidedAt`, `packId`, and `packDigest`.
 
 ## 5. CLI shape
 
@@ -210,6 +212,7 @@ agent-deploy pack validate --pack ./packs/frontend
 agent-deploy pack inspect --externals ./.agent-packs/externals
 agent-deploy plan  --target codex --profile developer --pack ./packs/frontend --modules frontend-team-pack-review-checklist
 agent-deploy apply --target codex --profile developer --pack ./packs/frontend --dry-run
+agent-deploy apply --target codex --profile developer --pack ./packs/frontend --conflict-resolution ./conflicts.reviewed.json
 ```
 
 ### 5.2 Later convenience

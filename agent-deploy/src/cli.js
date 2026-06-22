@@ -11,6 +11,7 @@ import { listTargets } from './targets/registry.js';
 import { loadManifests } from './manifest.js';
 import { buildPlan } from './planner.js';
 import { applyPlan } from './apply.js';
+import { readConflictResolutionsFile } from './packs/conflict-resolutions.js';
 
 function parseArgs(argv) {
   const args = { _: [] };
@@ -42,6 +43,9 @@ function buildRequest(args) {
     moduleIds: args.modules ? String(args.modules).split(',').map((s) => s.trim()).filter(Boolean) : [],
     packPaths: args.pack ? String(args.pack).split(',').map((s) => path.resolve(s.trim())).filter(Boolean) : [],
     enablePackExtensions: Boolean(args['enable-pack-extensions']),
+    conflictResolutions: args['conflict-resolution']
+      ? readConflictResolutionsFile(args['conflict-resolution'])
+      : [],
     scope,
     projectRoot: path.resolve(args.project || process.cwd()),
     homeDir: args.home ? path.resolve(args.home) : undefined,
@@ -59,6 +63,9 @@ function printPlan(plan, asJson) {
   if (plan.packs.length) {
     console.log(`packs:    ${plan.packs.map((p) => `${p.id}@${p.version}`).join(', ')}`);
     if (plan.request.enablePackExtensions) console.log('pack extensions: enabled');
+  }
+  if (plan.conflictResolutions.length) {
+    console.log(`conflict resolutions: ${plan.conflictResolutions.length} recorded`);
   }
   console.log(`modules:  ${plan.resolution.selected.map((m) => m.id).join(', ') || '(none)'}`);
   if (plan.resolution.skipped.length) {
@@ -95,11 +102,13 @@ function main() {
   try {
     if (!cmd || cmd === 'help' || args.help) {
       console.log('usage: agent-deploy <list|plan|apply> [--target T] [--profile P] [--modules a,b]\n'
-        + '       [--pack DIR[,DIR]] [--enable-pack-extensions] [--scope project|home] [--global] [--home DIR] [--project DIR] [--dry-run] [--json]\n'
+        + '       [--pack DIR[,DIR]] [--enable-pack-extensions] [--conflict-resolution FILE]\n'
+        + '       [--scope project|home] [--global] [--home DIR] [--project DIR] [--dry-run] [--json]\n'
         + '  scope project (default): install into a repo (.claude, .cursor … under --project)\n'
         + '  --global / --scope home: install into the user-global config dir (~/.claude, ~/.codex …)\n'
         + '  --pack: compose validated asset pack manifests into the plan; modules/profiles remain explicit\n'
-        + '  --enable-pack-extensions: opt in to shared-approved pack defaultProfileExtensions');
+        + '  --enable-pack-extensions: opt in to shared-approved pack defaultProfileExtensions\n'
+        + '  --conflict-resolution: JSON file of reviewed conflict decisions to record in install-state');
       return;
     }
     if (cmd === 'list') return cmdList();

@@ -3,6 +3,7 @@
 // what would change before anything is written.
 import { getAdapter } from './targets/registry.js';
 import { loadManifests, resolveRequest, ASSET_ROOT } from './manifest.js';
+import { normalizeConflictResolutions } from './packs/conflict-resolutions.js';
 import { loadComposedManifests } from './packs/pack-composer.js';
 
 function loadRequestManifests(request) {
@@ -15,12 +16,13 @@ function loadRequestManifests(request) {
   return loadManifests();
 }
 
-// request: { target, profile?, moduleIds?, packPaths?, enablePackExtensions?, scope?, projectRoot?, homeDir? }
+// request: { target, profile?, moduleIds?, packPaths?, enablePackExtensions?, conflictResolutions?, scope?, projectRoot?, homeDir? }
 //   scope: 'home' (user-global config dir) | 'project' (a repo). Library default
 //   is 'project' for safety; the CLI defaults to 'home'.
 export function buildPlan(request) {
   const adapter = getAdapter(request.target);
   const manifests = loadRequestManifests(request);
+  const conflictResolutions = normalizeConflictResolutions(request.conflictResolutions || []);
   const input = {
     assetRoot: ASSET_ROOT,
     scope: request.scope || 'project',
@@ -42,6 +44,7 @@ export function buildPlan(request) {
     scope: adapter.scopeOf(input),
     manifestVersion: manifests.modulesDoc.version,
     packs: manifests.packs || [],
+    conflictResolutions,
     baseRoot: adapter.baseRoot(input), // safety boundary for apply
     targetRoot: adapter.resolveRoot(input),
     statePath: adapter.statePath(input),
