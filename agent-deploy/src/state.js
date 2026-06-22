@@ -129,6 +129,7 @@ export function buildState({
   packs = [],
   conflictResolutions = [],
   backup = { enabled: false, root: null, entries: [] },
+  conflictPolicy = { policy: 'managed-overwrite', decisions: [] },
   operations,
   installedAt,
 }) {
@@ -165,6 +166,16 @@ export function buildState({
         source: entry.source,
         backupPath: entry.backupPath,
         reason: entry.reason,
+      })),
+    },
+    conflictPolicy: {
+      policy: conflictPolicy.policy || 'managed-overwrite',
+      decisions: (conflictPolicy.decisions || []).map((decision) => ({
+        moduleId: decision.moduleId,
+        kind: decision.kind,
+        dest: decision.dest,
+        decision: decision.decision,
+        reason: decision.reason,
       })),
     },
     operations: operations.map((o) => ({

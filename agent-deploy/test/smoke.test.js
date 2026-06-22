@@ -172,6 +172,92 @@ test('apply --backup preserves existing files and records backup provenance', ()
   assert.deepEqual(validateInstallState(result.state), []);
 });
 
+test('conflict policy skip records skipped existing destinations without rewriting them', () => {
+  const project = tmpProject();
+  const plan = buildPlan({ target: 'codex', profile: 'minimal', projectRoot: project });
+  applyPlan(plan, { installedAt: '2026-01-01T00:00:00Z' });
+  fs.appendFileSync(path.join(project, 'AGENTS.md'), '\nUser note that should survive skip policy.\n');
+
+  const result = applyPlan(plan, {
+    installedAt: '2026-01-01T00:00:01Z',
+    conflictPolicy: 'skip',
+  });
+
+  assert.match(fs.readFileSync(path.join(project, 'AGENTS.md'), 'utf8'), /User note that should survive skip policy/);
+  assert.equal(result.state.conflictPolicy.policy, 'skip');
+  assert.ok(result.state.conflictPolicy.decisions.some((decision) => (
+    decision.decision === 'skip'
+      && decision.kind === 'append-markdown'
+      && decision.dest.endsWith('AGENTS.md')
+  )));
+  assert.ok(result.state.operations.some((op) => (
+    op.kind === 'skip'
+      && op.strategy.endsWith('+conflict-skip')
+      && /conflict policy 'skip'/.test(op.reason)
+  )));
+  assert.deepEqual(validateInstallState(result.state), []);
+});
+
+test('conflict policy conflict-error fails before backup or writes', () => {
+  const project = tmpProject();
+  fs.writeFileSync(path.join(project, 'AGENTS.md'), '# Existing user instructions\n');
+  const plan = buildPlan({ target: 'codex', profile: 'minimal', projectRoot: project });
+
+  assert.throws(
+    () => applyPlan(plan, {
+      installedAt: '2026-01-01T00:00:00Z',
+      backup: true,
+      conflictPolicy: 'conflict-error',
+    }),
+    /conflict policy 'conflict-error' rejected/,
+  );
+  assert.equal(fs.readFileSync(path.join(project, 'AGENTS.md'), 'utf8'), '# Existing user instructions\n');
+  assert.ok(!fs.existsSync(path.join(project, '.agent-deploy')), 'failed conflict policy must not create backup/state');
+});
+
+test('conflict policy append allows only append-markdown conflicts', () => {
+  const project = tmpProject();
+  fs.writeFileSync(path.join(project, 'AGENTS.md'), '# Existing user instructions\n');
+  const appendOnlyPlan = buildPlan({ target: 'codex', profile: 'minimal', projectRoot: project });
+  appendOnlyPlan.operations = appendOnlyPlan.operations.filter((op) => op.kind === 'append-markdown');
+
+  const result = applyPlan(appendOnlyPlan, {
+    installedAt: '2026-01-01T00:00:00Z',
+    conflictPolicy: 'append',
+  });
+  assert.equal(result.state.conflictPolicy.policy, 'append');
+  assert.ok(result.state.conflictPolicy.decisions.every((decision) => decision.kind === 'append-markdown'));
+
+  fs.mkdirSync(path.join(project, '.agents/rules/common'), { recursive: true });
+  fs.writeFileSync(path.join(project, '.agents/rules/common/security.md'), '# existing security\n');
+  const fullPlan = buildPlan({ target: 'codex', profile: 'minimal', projectRoot: project });
+  assert.throws(
+    () => applyPlan(fullPlan, { conflictPolicy: 'append' }),
+    /append policy does not allow copy-file/,
+  );
+});
+
+test('conflict policy merge-json and merge-toml allow matching merge conflicts', () => {
+  const claudeProject = tmpProject();
+  fs.writeFileSync(path.join(claudeProject, '.mcp.json'), JSON.stringify({ mcpServers: { existing: { command: 'x' } } }));
+  const jsonResult = applyPlan(
+    buildPlan({ target: 'claude', moduleIds: ['mcp-baseline'], projectRoot: claudeProject }),
+    { installedAt: '2026-01-01T00:00:00Z', conflictPolicy: 'merge-json' },
+  );
+  assert.equal(jsonResult.state.conflictPolicy.policy, 'merge-json');
+  assert.ok(jsonResult.state.conflictPolicy.decisions.some((decision) => decision.kind === 'merge-json'));
+
+  const codexProject = tmpProject();
+  fs.mkdirSync(path.join(codexProject, '.codex'), { recursive: true });
+  fs.writeFileSync(path.join(codexProject, '.codex/config.toml'), 'model = "gpt-5"\n');
+  const tomlResult = applyPlan(
+    buildPlan({ target: 'codex', moduleIds: ['mcp-baseline'], projectRoot: codexProject }),
+    { installedAt: '2026-01-01T00:00:00Z', conflictPolicy: 'merge-toml' },
+  );
+  assert.equal(tomlResult.state.conflictPolicy.policy, 'merge-toml');
+  assert.ok(tomlResult.state.conflictPolicy.decisions.some((decision) => decision.kind === 'merge-toml'));
+});
+
 test('gemini minimal profile installs GEMINI.md, project rules, and shared install-state', () => {
   const project = tmpProject();
   applyPlan(buildPlan({ target: 'gemini', profile: 'minimal', projectRoot: project }));

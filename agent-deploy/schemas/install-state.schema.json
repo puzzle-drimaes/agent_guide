@@ -3,7 +3,7 @@
   "title": "agent-deploy install state (provenance)",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schemaVersion", "installedAt", "target", "request", "resolution", "source", "operations"],
+  "required": ["schemaVersion", "installedAt", "target", "request", "resolution", "source", "backup", "conflictPolicy", "operations"],
   "properties": {
     "schemaVersion": { "const": "agentdeploy.install.v1" },
     "installedAt": { "type": "string", "minLength": 1 },
@@ -103,6 +103,31 @@
             "properties": {
               "source": { "type": "string", "minLength": 1 },
               "backupPath": { "type": "string", "minLength": 1 },
+              "reason": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      }
+    },
+    "conflictPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["policy", "decisions"],
+      "properties": {
+        "policy": {
+          "enum": ["managed-overwrite", "skip", "append", "merge-json", "merge-toml", "conflict-error"]
+        },
+        "decisions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["moduleId", "kind", "dest", "decision", "reason"],
+            "properties": {
+              "moduleId": { "type": "string", "minLength": 1 },
+              "kind": { "enum": ["copy-file", "merge-json", "merge-toml", "append-markdown", "skip"] },
+              "dest": { "type": "string", "minLength": 1 },
+              "decision": { "enum": ["write", "skip", "error"] },
               "reason": { "type": "string", "minLength": 1 }
             }
           }

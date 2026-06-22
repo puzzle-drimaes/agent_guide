@@ -11,6 +11,7 @@ import { mergeTomlAddOnly } from './toml-merge.js';
 import { assertPathInsideRoot, assertNoSymlinkEscape } from './path-safety.js';
 import { assertValidInstallState, buildState, writeState } from './state.js';
 import { collectBackupEntries, copyBackupEntries } from './backup.js';
+import { resolveConflictPolicy } from './conflict-policy.js';
 
 function readJsonOrEmpty(p) {
   if (!fs.existsSync(p)) return {};
@@ -35,12 +36,17 @@ function upsertManagedMarkdownBlock(current, markerId, content) {
   return `${prefix ? `${prefix}\n\n` : ''}${block}\n`;
 }
 
-export function applyPlan(plan, { installedAt = new Date().toISOString(), backup = false } = {}) {
+export function applyPlan(
+  plan,
+  { installedAt = new Date().toISOString(), backup = false, conflictPolicy = 'managed-overwrite' } = {},
+) {
   // The safety boundary is the scope's base root: the user-global home dir for
   // home scope, or the project root for project scope. Every write — including
   // sibling files like ~/.claude.json — must stay inside it.
   const safetyRoot = plan.baseRoot;
-  const backupRecord = collectBackupEntries(plan, { enabled: backup, installedAt });
+  const conflictPolicyResult = resolveConflictPolicy(plan.operations, { policy: conflictPolicy });
+  const effectivePlan = { ...plan, operations: conflictPolicyResult.operations };
+  const backupRecord = collectBackupEntries(effectivePlan, { enabled: backup, installedAt });
 
   const state = buildState({
     adapter: plan.adapter,
@@ -51,7 +57,8 @@ export function applyPlan(plan, { installedAt = new Date().toISOString(), backup
     packs: plan.packs || [],
     conflictResolutions: plan.conflictResolutions || [],
     backup: backupRecord,
-    operations: plan.operations,
+    conflictPolicy: conflictPolicyResult.record,
+    operations: effectivePlan.operations,
     installedAt,
   });
   assertValidInstallState(state);
@@ -61,7 +68,7 @@ export function applyPlan(plan, { installedAt = new Date().toISOString(), backup
   // writes.
   assertPathInsideRoot(plan.statePath, safetyRoot, 'install-state path');
   assertNoSymlinkEscape(plan.statePath, safetyRoot, 'install-state path');
-  for (const op of plan.operations) {
+  for (const op of effectivePlan.operations) {
     if (op.kind === 'skip') continue;
     assertPathInsideRoot(op.dest, safetyRoot, `destination for ${op.moduleId}`);
     assertNoSymlinkEscape(op.dest, safetyRoot, `destination for ${op.moduleId}`);
@@ -69,7 +76,7 @@ export function applyPlan(plan, { installedAt = new Date().toISOString(), backup
 
   copyBackupEntries(backupRecord);
 
-  for (const op of plan.operations) {
+  for (const op of effectivePlan.operations) {
     if (op.kind === 'skip') continue; // unsupported capability: recorded only, nothing written
 
     assertPathInsideRoot(op.dest, safetyRoot, `destination for ${op.moduleId}`);
@@ -95,9 +102,10 @@ export function applyPlan(plan, { installedAt = new Date().toISOString(), backup
 
   return {
     applied: true,
-    operations: plan.operations.length,
+    operations: effectivePlan.operations.length,
     statePath: plan.statePath,
     backup: backupRecord,
+    conflictPolicy: conflictPolicyResult.record,
     state,
   };
 }

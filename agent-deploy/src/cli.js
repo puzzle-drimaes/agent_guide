@@ -12,6 +12,7 @@ import { loadManifests } from './manifest.js';
 import { buildPlan } from './planner.js';
 import { applyPlan } from './apply.js';
 import { readConflictResolutionsFile } from './packs/conflict-resolutions.js';
+import { resolveConflictPolicy } from './conflict-policy.js';
 
 function parseArgs(argv) {
   const args = { _: [] };
@@ -67,6 +68,12 @@ function printPlan(plan, asJson) {
   if (plan.conflictResolutions.length) {
     console.log(`conflict resolutions: ${plan.conflictResolutions.length} recorded`);
   }
+  if (plan.conflictPolicy) {
+    console.log(`conflict policy: ${plan.conflictPolicy.policy}`);
+    if (plan.conflictPolicy.decisions.length) {
+      console.log(`conflicts: ${plan.conflictPolicy.decisions.length} decision(s)`);
+    }
+  }
   console.log(`modules:  ${plan.resolution.selected.map((m) => m.id).join(', ') || '(none)'}`);
   if (plan.resolution.skipped.length) {
     console.log(`skipped:  ${plan.resolution.skipped.map((s) => `${s.id} (${s.reason})`).join(', ')}`);
@@ -103,13 +110,15 @@ function main() {
     if (!cmd || cmd === 'help' || args.help) {
       console.log('usage: agent-deploy <list|plan|apply> [--target T] [--profile P] [--modules a,b]\n'
         + '       [--pack DIR[,DIR]] [--enable-pack-extensions] [--conflict-resolution FILE]\n'
-        + '       [--scope project|home] [--global] [--home DIR] [--project DIR] [--backup] [--dry-run] [--json]\n'
+        + '       [--scope project|home] [--global] [--home DIR] [--project DIR]\n'
+        + '       [--backup] [--conflict-policy POLICY] [--dry-run] [--json]\n'
         + '  scope project (default): install into a repo (.claude, .cursor … under --project)\n'
         + '  --global / --scope home: install into the user-global config dir (~/.claude, ~/.codex …)\n'
         + '  --pack: compose validated asset pack manifests into the plan; modules/profiles remain explicit\n'
         + '  --enable-pack-extensions: opt in to shared-approved pack defaultProfileExtensions\n'
         + '  --conflict-resolution: JSON file of reviewed conflict decisions to record in install-state\n'
-        + '  --backup: copy existing write targets into a timestamped backup directory before apply');
+        + '  --backup: copy existing write targets into a timestamped backup directory before apply\n'
+        + '  --conflict-policy: managed-overwrite (default), skip, append, merge-json, merge-toml, conflict-error');
       return;
     }
     if (cmd === 'list') return cmdList();
@@ -121,13 +130,19 @@ function main() {
 
     if (cmd === 'apply') {
       const plan = buildPlan(buildRequest(args));
+      const conflictPolicy = args['conflict-policy'] || 'managed-overwrite';
       if (args['dry-run']) {
-        printPlan(plan, Boolean(args.json));
+        const conflictPreview = resolveConflictPolicy(plan.operations, { policy: conflictPolicy });
+        printPlan({
+          ...plan,
+          operations: conflictPreview.operations,
+          conflictPolicy: conflictPreview.record,
+        }, Boolean(args.json));
         // Human note goes to stderr so `--json` keeps stdout valid JSON.
         console.error('\n(dry-run: nothing written)');
         return;
       }
-      const result = applyPlan(plan, { backup: Boolean(args.backup) });
+      const result = applyPlan(plan, { backup: Boolean(args.backup), conflictPolicy });
       if (args.json) {
         process.stdout.write(`${JSON.stringify({
           applied: true,
@@ -138,10 +153,15 @@ function main() {
             root: result.backup.root,
             entries: result.backup.entries.length,
           },
+          conflictPolicy: {
+            policy: result.conflictPolicy.policy,
+            decisions: result.conflictPolicy.decisions.length,
+          },
         }, null, 2)}\n`);
       } else {
         console.log(`applied ${result.operations} operation(s) (scope: ${plan.scope}).`);
         console.log(`state:  ${path.relative(plan.baseRoot, result.statePath)}`);
+        console.log(`conflict policy: ${result.conflictPolicy.policy} (${result.conflictPolicy.decisions.length} decision(s))`);
         if (result.backup.enabled) {
           console.log(`backup: ${path.relative(plan.baseRoot, result.backup.root)} (${result.backup.entries.length} file(s))`);
         }

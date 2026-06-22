@@ -751,7 +751,7 @@ agent-deploy/install.bat
 - [x] backup 위치 결정
   - project scope: `project/.agent-deploy/backups/<timestamp>/`
   - user scope: global config root 하위
-- [ ] conflict policy 추가
+- [x] conflict policy 추가
   - managed-overwrite
   - skip
   - append
