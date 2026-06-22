@@ -118,25 +118,87 @@ The decision should be written to pack provenance, for example:
 Asset packs move through explicit trust states. A pack must not become `shared-approved` only because it installs
 successfully; it needs content, provenance, security, and conflict review.
 
-### Shared-approved approval criteria
+### Shared-approved 승인 체크리스트
 
-A pack can be marked `packType: "shared-approved"` only when all criteria below are met:
+A pack must not become `shared-approved` only because it installs successfully (위 Governance workflow 원칙).
+아래 체크리스트를 모두 통과해야 `packType: "shared-approved"`로 승격할 수 있다.
 
-- `pack.json` has a stable `id`, semantic `version`, `owner`, `source`, `license`, `reviewStatus: "approved"`, and `packType: "shared-approved"`.
-- `node scripts/check-pack.js --pack <pack-root>` passes without blocking errors.
-- Source attribution and license are clear enough for internal reuse.
-- All shipped assets have suitable frontmatter/catalog metadata: owner, audience, stability, review status, and module/profile references.
-- No secrets, credentials, customer-private data, hidden executable install behavior, path escape, or symlink escape are present.
-- Any `defaultProfileExtensions` are limited to non-confidential assets and existing bundled base profiles.
-- Conflict decisions are reviewed and recorded; unresolved collisions fail closed.
-- Approval is recorded in the pack PR/review issue or governance registry with reviewer, date, pack digest, and rationale.
-
-Recommended approvers:
+각 항목은 다음으로 구분한다.
 
 ```text
-content owner/team lead
-platform or agent-deploy maintainer
-security/governance reviewer when the pack affects shared profiles, MCP, rules, or confidential domains
+[도구]   node scripts/check-pack.js 또는 apply 파이프라인이 자동으로 강제한다.
+[승인자] 도구가 강제하지 못하므로 사람이 직접 확인하고 기록해야 한다.
+```
+
+#### A. 승인자 (approvers)
+
+누가 승인하는가. 영향 범위가 클수록 필요한 승인자가 늘어난다.
+
+- [ ] [승인자] content owner / team lead 승인 (모든 pack 필수)
+- [ ] [승인자] platform 또는 agent-deploy maintainer 승인 (모든 pack 필수)
+- [ ] [승인자] security/governance reviewer 승인 — pack이 shared profile, MCP, rule, 또는 confidential 도메인에 영향을 줄 때 필수
+- [ ] [승인자] 승인자가 작성자 본인이 아닌지 확인 (self-approve 금지)
+
+#### B. pack 메타데이터
+
+- [ ] [도구] `node scripts/check-pack.js --pack <pack-root>` 가 blocking error 없이 통과
+- [ ] [도구] `pack.json` 필수 필드 존재: `schemaVersion`, `id`, `title`, `version`, `owner`, `stability`, `reviewStatus`, `packType`
+- [ ] [도구] `packType: "shared-approved"` 이면 `reviewStatus: "approved"` 강제됨
+- [ ] [승인자] `source`, `license` 필드가 채워져 있고 사내 재사용에 충분한지 확인
+      (주의: 현재 schema는 `source`/`license`를 required로 강제하지 않으므로 승인자가 직접 확인한다)
+- [ ] [승인자] `version`이 semantic version이며 승인 대상 변경(content/profile 확장/conflict 결정)에 맞게 bump 됐는지 확인
+- [ ] [승인자] 모든 asset의 frontmatter/catalog 메타데이터(owner, audience, stability, review status, module/profile 참조)가 적절한지 확인
+
+#### C. security review 기준
+
+- [ ] [승인자] secret, credential, token, private key 미포함 (현재 자동 secret scan 미구현 → 직접 확인 필수)
+- [ ] [승인자] 고객 개인정보 / 미공개 계약 / 민감 재무·법무 검토 전 자료 미포함
+- [ ] [도구] install-time script / hook / postinstall / network fetch 없음 (v1 금지)
+- [ ] [도구] 절대경로 / `..` escape 없음, symlink가 pack root를 벗어나지 않음
+- [ ] [도구] module / asset / profile / target destination 충돌은 fail-closed
+- [ ] [승인자] `confidential` 공유 문서가 default profile extension에 포함되지 않았는지 확인
+- [ ] [도구] `defaultProfileExtensions`는 shared-approved pack에서만 허용되고, 기존 bundled base profile(developer/product/business 등)·기존 module만 참조함을 강제
+
+#### D. conflict 검토
+
+- [ ] [승인자] 모든 conflict 결정(keep-existing / add-namespaced / rename-proposed / replace-existing)이 검토됨
+- [ ] [승인자] `replace-existing`은 governance 승인이 있을 때만 사용하고, canonical company rule에는 금지
+- [ ] [도구] 미해결 충돌 없음 (있으면 fail-closed로 승격 불가)
+
+#### E. 승인 증거 / digest 기록 (approval evidence)
+
+승인은 재현 가능하도록 기록으로 남긴다. pack PR / review issue 또는 governance registry에 아래를 기록한다.
+
+- [ ] reviewer (승인자 이름/역할, A에서 확인한 모든 승인자)
+- [ ] approval date
+- [ ] pack digest — scratch project에 한 번 apply한 뒤 `install-state`의 `source.packs[].digest` 값(`sha256:<64-hex>`)을 기록한다.
+      (digest는 apply 시에만 install-state에 기록되며, `check-pack` 출력이나 dry-run에는 나오지 않는다)
+- [ ] source / license
+- [ ] rationale (승인 근거)
+- [ ] conflict 결정 기록 (아래 conflict resolution record policy 형식)
+
+digest 확보 예시:
+
+```text
+node src/cli.js apply --target codex --profile developer \
+  --pack <pack-root> --enable-pack-extensions --project /tmp/pack-review
+grep '"digest"' /tmp/pack-review/.agent-deploy/install-state.json
+```
+
+승인 기록 예시:
+
+```json
+{
+  "packId": "team-frontend-pack",
+  "version": "1.0.0",
+  "packDigest": "sha256:<64-hex>",
+  "reviewers": ["frontend-lead", "agent-deploy-maintainer", "security-reviewer"],
+  "approvedAt": "2026-06-22",
+  "source": "<internal repo/url>",
+  "license": "internal",
+  "rationale": "Frontend review checklist 표준화, shared profile 영향 검토 완료",
+  "conflictResolutions": []
+}
 ```
 
 ### Candidate to shared-approved promotion flow

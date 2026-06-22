@@ -46,6 +46,7 @@
 | 12 | `12-automation.md` | Slack/PR/Notion 자동화 |
 | 13 | `13-governance-and-roadmap.md` | 분기 리뷰, RACI, KPI, 30/60/90일 |
 | 14 | `14-claude-plan-review-and-gaps.md` | Claude 문서 비교 평가와 Codex 보강 백로그 |
+| 15 | `15-prompt-db-operations.md` | Prompt DB 필드/등록·승격 기준/owner·reviewer 역할 |
 
 ## 단계별 의존성
 

@@ -2,7 +2,17 @@
 
 ## 목적
 
-수동 운영 부담을 줄이고, 지식 공유를 자동화한다.
+수동 운영 부담을 줄이고, 지식 공유를 거들어준다.
+
+## 1차 도입 방침 (2026-06-22)
+
+1차 도입에서는 **회고/노하우 작성을 자동으로 강제·추적하지 않는다.** 자동화는 공유를 쉽게 만드는 쪽만 먼저 한다.
+
+```text
+- 먼저: 공유 폴더(Google Drive) 운영을 쉽게 만드는 보조(업로드 안내, 신규 .md 알림).
+- 나중에: 회고 폼/PR 노하우 reminder는 강제 발송·제출률 추적 없이 가벼운 권유 수준으로만.
+- 제출률/작성률은 KPI 목표가 아니라 참고지표다(D12 강등).
+```
 
 ## 자동화 후보
 
@@ -15,25 +25,26 @@
 | Usage dashboard | 계정별/profile별 사용 지표 |
 | Source check reminder | 외부 자료 출처 누락 경고 |
 
-## 우선순위
+## 우선순위 (1차 도입 기준 재정렬)
 
 ```text
-1. Weekly Slack form
-2. PR 공유 문서 reminder
-3. Prompt DB template
-4. Installer update notification
-5. Governance dashboard
+1. 공유 폴더 운영 보조 (업로드 안내 / 신규 .md 알림)
+2. Installer update notification
+3. Prompt DB template (반복 사용분 정리용)
+4. PR 공유 문서 reminder (가벼운 권유, 강제 아님)
+5. Weekly Slack form (가벼운 리마인더, 제출률 추적 없음)
+6. Governance dashboard (참고지표 위주)
 ```
 
-## 1. Weekly Slack form
+## 1. Weekly Slack form (가벼운 리마인더)
 
 동작:
 
 ```text
-매주 금 16:00
-  → #ai-knowhow에 회고 폼 발송
-  → 계정 담당자 mention
-  → 제출 현황 기록
+주 1회 (권장 cadence)
+  → #ai-knowhow에 "나눌 내용 있으면 공유해요" 가벼운 리마인더
+  → 개인 mention / 당번 지정 / 제출 현황 추적 없음
+  → 나온 좋은 사례만 가끔 모아 요약
 ```
 
 폼 항목:
@@ -46,15 +57,15 @@
 - 다음 주 실험 제안
 ```
 
-## 2. PR 공유 문서 reminder
+## 2. PR 공유 문서 reminder (가벼운 권유)
 
 동작:
 
 ```text
 PR opened 또는 merged
-  → AI 활용 노하우 section 확인
-  → 비어 있으면 reminder
-  → merged 후 Notion DB 후보로 기록
+  → AI 활용 노하우 section은 선택 입력 (필수 아님, merge 차단 안 함)
+  → 공유할 게 있으면 적도록 가볍게 권유
+  → 적은 내용은 공유 폴더 / Notion DB 후보로만 기록
 ```
 
 ## 3. Prompt DB template
@@ -96,20 +107,19 @@ agent-deploy apply --target codex --profile developer
 
 ## 5. Governance dashboard
 
-표시 항목:
+표시 항목 (참고지표 위주, 개인 추적/순위 매기기 아님):
 
 ```text
 - profile별 설치 수
 - OS별 설치 성공률
-- 계정별 회고 제출률
+- 공유 폴더 .md 수 / 재사용 사례 수
 - Prompt DB 등록 수
-- PR 공유 문서 작성률
 - 출처 누락 건수
 ```
 
 ## 완료 기준
 
-- 주간 회고가 자동 발송된다.
-- PR 노하우 누락이 자동으로 드러난다.
-- Prompt DB가 실제로 재사용된다.
+- 공유 폴더 업로드/적용이 쉽게 일어나도록 보조된다.
 - installer update가 공지된다.
+- (선택) 가벼운 회고 리마인더와 PR 노하우 권유가 동작한다.
+- Prompt DB가 실제로 재사용된다.

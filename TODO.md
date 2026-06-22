@@ -841,12 +841,14 @@ agent-deploy만으로 전부 커버하지 않는 영역이다. 별도 automation
 - [ ] merge 시 누락 reminder GitHub Action 설계
 - [ ] Notion/GitHub DB append 자동화 검토
 
-### 8.2 weekly 회고
+### 8.2 가벼운 공유 보조 (1차 도입; 회고는 권장)
 
-- [ ] Slack `#ai-knowhow` 폼 설계
-- [ ] 매주 금 16:00 자동 발송
-- [ ] 계정 담당자 mention
-- [ ] 제출 현황 기록
+2026-06-22 방침 변경: 회고/노하우 기록을 강제·추적하지 않는다. 공유 폴더 운영을 먼저 한다.
+
+- [ ] 공유 폴더(Google Drive) 구조/업로드·적용 안내 마련
+- [ ] 신규 .md 업로드 시 `#ai-knowhow` 가벼운 알림(선택)
+- [ ] `#ai-knowhow` 주간 리마인더(가벼운 권유, 제출률 추적 없음)
+- [ ] (보류) 매주 금 자동 발송 / 계정 담당자 mention / 제출 현황 기록 — 강제하지 않음(D12 참고지표 강등)
 
 ### 8.3 Prompt DB
 
@@ -897,10 +899,10 @@ docs/plans/codex/company-wide-agent-rollout/10-pilot.md
 - [x] Codex adapter 동작
 - [x] Claude adapter 동작
 - [x] minimal/developer/product/business profile 초안
-- [ ] SETUP_WIZARD.md 기반 agent setup flow 검증
+- [x] SETUP_WIZARD.md 기반 agent setup flow 검증 (CLI 명령 실동작 확인 + 비개발자 다리/troubleshooting 보강)
 - [ ] Windows 사용자의 shell 실행 전제와 fallback 안내 확인
-- [ ] Prompt DB 초안
-- [ ] 계정 9개 매핑표 초안
+- [x] Prompt DB 초안 (docs/plans/codex/company-wide-agent-rollout/15-prompt-db-operations.md)
+- [x] 계정 9개 매핑표 초안 (05-shared-ai-accounts.md 운영/매핑표)
 
 ### 9.3 Pilot 검증 항목
 

@@ -4,6 +4,25 @@
 shell script가 복잡한 QnA를 담당하지 않고, agent가 사용자와 선택지를 확인한 뒤
 결정론적인 `agent-deploy` CLI 명령(`dry-run` → `apply`)을 생성합니다.
 
+## 0. 처음 시작하기 (비개발자 / 터미널이 낯선 사용자)
+
+이 파일은 사람이 명령을 외워서 입력하는 매뉴얼이 아니라, **AI agent에게 건네주는 설정 안내서**입니다.
+터미널을 써본 적이 없어도 아래 순서만 따라오면 됩니다.
+
+```text
+1. zip bundle을 받은 폴더를 압축 해제한다.
+2. 평소 쓰는 AI 도구(Claude/Codex/Gemini 등)의 대화창을 연다.
+3. 대화창에 "이 파일을 읽고 내 설치를 도와줘"라고 말한 뒤,
+   - 이 SETUP_WIZARD.md 내용을 그대로 붙여넣거나,
+   - 파일 첨부가 되는 도구라면 이 파일을 첨부한다.
+4. 그 다음부터는 agent가 역할/목적/설치 경로를 물어보고,
+   실행할 명령을 대신 만들어 준다.
+5. agent가 만든 dry-run 결과를 함께 확인한 뒤 설치(apply)를 진행한다.
+```
+
+명령을 어디에 입력해야 할지 모르겠으면, agent에게 "이 명령을 어디에 어떻게 입력하는지 알려줘"라고 그대로 물어봅니다.
+설치 중 막히면 맨 아래 "## 10. 설치가 안 될 때"를 agent에게 함께 보여줍니다.
+
 ## 1. Bundle goal
 
 이 bundle의 목표는 단순히 특정 agent 설정 파일을 생성하는 것이 아닙니다.
@@ -118,7 +137,7 @@ Agent는 아래 원칙을 지킵니다.
 5. 기본 추천은 add-namespaced이며, canonical rule 교체는 별도 승인 없이는 금지한다.
 ```
 
-## 4. 권장 기본값
+## 5. 권장 기본값
 
 사용자가 잘 모르면 아래 기본값을 제안합니다.
 
@@ -251,3 +270,34 @@ Agent는 설치 전 최종 확인을 아래 형식으로 요약합니다.
 
 인자를 넘겨 실행하는 경우에는 고급 사용자용 direct apply wrapper로 사용할 수 있지만,
 Pilot 기본 흐름은 `SETUP_WIZARD.md`를 agent 대화에 제공하는 방식입니다.
+
+## 10. 설치가 안 될 때
+
+agent는 아래 증상별 대응을 사용자에게 안내합니다.
+
+```text
+- "node: command not found" / "Node.js가 필요합니다":
+  Node.js 미설치. https://nodejs.org 에서 LTS 버전 설치 후 다시 시도한다.
+
+- "agent-deploy bundle 구조를 확인할 수 없습니다":
+  bundle을 압축 해제하지 않았거나 잘못된 폴더에서 실행한 경우.
+  zip을 푼 폴더 안에서 install.sh 또는 node 명령을 실행한다.
+
+- "unknown profile" / "unknown target":
+  profile/target 이름 오타. 정확한 이름은 list로 확인한다.
+    node src/cli.js list
+
+- 경로에 공백이 있어 실패:
+  --project 경로를 큰따옴표로 감싼다.
+    예) --project "/Users/내 폴더/project"
+
+- 권한 오류(permission denied):
+  설치 대상 폴더의 쓰기 권한을 확인한다.
+  회사 관리 PC라 권한이 없으면 IT/관리 담당자에게 문의한다.
+
+- 무엇이 설치될지 확신이 안 설 때:
+  항상 --dry-run을 먼저 실행한다. 생성/수정될 파일 목록만 보여주고
+  실제로는 아무 파일도 쓰지 않는다.
+```
+
+해결되지 않는 오류는 실행한 명령과 dry-run 출력 전체를 함께 `#ai-help` 채널에 공유하도록 안내합니다.
