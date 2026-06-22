@@ -147,6 +147,31 @@ test('codex AGENTS.md managed block and TOML merge are add-only/idempotent', () 
   assert.match(toml, /\[mcp_servers\.filesystem\]/);
 });
 
+test('apply --backup preserves existing files and records backup provenance', () => {
+  const project = tmpProject();
+  const plan = buildPlan({ target: 'codex', profile: 'minimal', projectRoot: project });
+  applyPlan(plan, { installedAt: '2026-01-01T00:00:00Z' });
+
+  fs.appendFileSync(path.join(project, 'AGENTS.md'), '\nUser note before backup.\n');
+  const result = applyPlan(plan, {
+    installedAt: '2026-01-01T00:00:01Z',
+    backup: true,
+  });
+
+  const backupRoot = path.join(project, '.agent-deploy/backups/2026-01-01T00-00-01Z');
+  const agentsBackup = path.join(backupRoot, 'AGENTS.md');
+  const stateBackup = path.join(backupRoot, '.agent-deploy/install-state.json');
+  assert.ok(fs.existsSync(agentsBackup), 'existing AGENTS.md should be backed up');
+  assert.ok(fs.existsSync(stateBackup), 'previous install-state should be backed up');
+  assert.match(fs.readFileSync(agentsBackup, 'utf8'), /User note before backup/);
+  assert.equal(JSON.parse(fs.readFileSync(stateBackup, 'utf8')).schemaVersion, 'agentdeploy.install.v1');
+  assert.equal(result.state.backup.enabled, true);
+  assert.equal(result.state.backup.root, backupRoot);
+  assert.ok(result.state.backup.entries.some((entry) => entry.source.endsWith('AGENTS.md')));
+  assert.ok(result.state.backup.entries.some((entry) => entry.reason === 'install-state'));
+  assert.deepEqual(validateInstallState(result.state), []);
+});
+
 test('gemini minimal profile installs GEMINI.md, project rules, and shared install-state', () => {
   const project = tmpProject();
   applyPlan(buildPlan({ target: 'gemini', profile: 'minimal', projectRoot: project }));
@@ -236,12 +261,13 @@ test('merge-json preserves pre-existing user keys', () => {
 test('apply --dry-run --json emits valid JSON on stdout (no trailing text)', () => {
   const project = tmpProject();
   const out = execFileSync('node', [
-    CLI, 'apply', '--dry-run', '--json',
+    CLI, 'apply', '--dry-run', '--json', '--backup',
     '--target', 'claude', '--profile', 'core', '--project', project,
   ], { encoding: 'utf8' });
   const parsed = JSON.parse(out); // throws if the dry-run note leaked into stdout
   assert.ok(Array.isArray(parsed));
   assert.ok(!fs.existsSync(path.join(project, '.claude')), 'dry-run wrote nothing');
+  assert.ok(!fs.existsSync(path.join(project, '.agent-deploy')), 'dry-run backup wrote nothing');
 });
 
 test('apply --json emits a valid JSON result on stdout', () => {

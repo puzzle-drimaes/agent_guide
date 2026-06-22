@@ -103,12 +103,13 @@ function main() {
     if (!cmd || cmd === 'help' || args.help) {
       console.log('usage: agent-deploy <list|plan|apply> [--target T] [--profile P] [--modules a,b]\n'
         + '       [--pack DIR[,DIR]] [--enable-pack-extensions] [--conflict-resolution FILE]\n'
-        + '       [--scope project|home] [--global] [--home DIR] [--project DIR] [--dry-run] [--json]\n'
+        + '       [--scope project|home] [--global] [--home DIR] [--project DIR] [--backup] [--dry-run] [--json]\n'
         + '  scope project (default): install into a repo (.claude, .cursor … under --project)\n'
         + '  --global / --scope home: install into the user-global config dir (~/.claude, ~/.codex …)\n'
         + '  --pack: compose validated asset pack manifests into the plan; modules/profiles remain explicit\n'
         + '  --enable-pack-extensions: opt in to shared-approved pack defaultProfileExtensions\n'
-        + '  --conflict-resolution: JSON file of reviewed conflict decisions to record in install-state');
+        + '  --conflict-resolution: JSON file of reviewed conflict decisions to record in install-state\n'
+        + '  --backup: copy existing write targets into a timestamped backup directory before apply');
       return;
     }
     if (cmd === 'list') return cmdList();
@@ -126,16 +127,24 @@ function main() {
         console.error('\n(dry-run: nothing written)');
         return;
       }
-      const result = applyPlan(plan);
+      const result = applyPlan(plan, { backup: Boolean(args.backup) });
       if (args.json) {
         process.stdout.write(`${JSON.stringify({
           applied: true,
           operations: result.operations,
           statePath: result.statePath,
+          backup: {
+            enabled: result.backup.enabled,
+            root: result.backup.root,
+            entries: result.backup.entries.length,
+          },
         }, null, 2)}\n`);
       } else {
         console.log(`applied ${result.operations} operation(s) (scope: ${plan.scope}).`);
         console.log(`state:  ${path.relative(plan.baseRoot, result.statePath)}`);
+        if (result.backup.enabled) {
+          console.log(`backup: ${path.relative(plan.baseRoot, result.backup.root)} (${result.backup.entries.length} file(s))`);
+        }
       }
       return;
     }

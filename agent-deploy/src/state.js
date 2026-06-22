@@ -128,6 +128,7 @@ export function buildState({
   manifestVersion,
   packs = [],
   conflictResolutions = [],
+  backup = { enabled: false, root: null, entries: [] },
   operations,
   installedAt,
 }) {
@@ -156,6 +157,15 @@ export function buildState({
       manifestVersion,
       packs,
       conflictResolutions,
+    },
+    backup: {
+      enabled: Boolean(backup.enabled),
+      root: backup.root ?? null,
+      entries: (backup.entries || []).map((entry) => ({
+        source: entry.source,
+        backupPath: entry.backupPath,
+        reason: entry.reason,
+      })),
     },
     operations: operations.map((o) => ({
       kind: o.kind,

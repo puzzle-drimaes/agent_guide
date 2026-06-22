@@ -747,8 +747,8 @@ agent-deploy/install.bat
 
 해야 할 일:
 
-- [ ] `--backup` 추가
-- [ ] backup 위치 결정
+- [x] `--backup` 추가
+- [x] backup 위치 결정
   - project scope: `project/.agent-deploy/backups/<timestamp>/`
   - user scope: global config root 하위
 - [ ] conflict policy 추가
