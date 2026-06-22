@@ -778,10 +778,12 @@ agent-deploy/install.bat
 
 ### 6.4 uninstall
 
-- [ ] install-state operations 역재생
-- [ ] managed 파일만 삭제
-- [ ] 사용자 생성 파일 삭제 금지
-- [ ] uninstall dry-run 지원
+- [x] install-state operations 역재생 (dry-run 분류)
+- [x] managed 파일만 삭제 대상 분류 (copy-file=delete, merge/append=revert)
+- [x] 사용자 생성 파일 삭제 금지 (shared 파일은 삭제 대신 revert)
+- [x] uninstall dry-run 지원 (`agent-deploy uninstall --dry-run`)
+- [ ] uninstall 실제 write (삭제/revert 수행, 사용자 수정 안전장치)
+- [ ] 삭제 후 빈 디렉터리 정리
 
 ---
 

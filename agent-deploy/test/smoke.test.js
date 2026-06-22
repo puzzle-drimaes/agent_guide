@@ -11,6 +11,7 @@ import { buildPlan } from '../src/planner.js';
 import { applyPlan } from '../src/apply.js';
 import { applyUpdate } from '../src/update.js';
 import { buildRepairDryRun } from '../src/repair.js';
+import { buildUninstallDryRun } from '../src/uninstall.js';
 import { validateInstallState } from '../src/state.js';
 import { checkAssetSchemas } from '../scripts/check-asset-schema.js';
 import { checkCatalogParity } from '../scripts/check-catalog-parity.js';
@@ -572,6 +573,83 @@ test('repair rejects missing state and non-dry-run execution', () => {
       '--target', 'codex', '--project', project,
     ], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }),
     /repair currently supports --dry-run only/,
+  );
+});
+
+test('uninstall --dry-run classifies copy-file as delete, shared file as revert, and state as delete', () => {
+  const project = tmpProject();
+  applyPlan(buildPlan({ target: 'codex', profile: 'minimal', projectRoot: project }), {
+    installedAt: '2026-01-01T00:00:00Z',
+  });
+
+  const report = buildUninstallDryRun({ target: 'codex', projectRoot: project });
+  assert.equal(report.dryRun, true);
+  assert.equal(report.request.profile, 'minimal');
+
+  // fully managed copy-file -> would-delete
+  assert.ok(report.items.some((item) => (
+    item.status === 'would-delete'
+      && item.kind === 'copy-file'
+      && item.dest.endsWith('.agents/rules/common/security.md')
+  )));
+  // shared append-markdown (AGENTS.md) -> would-revert, never deleted
+  assert.ok(report.items.some((item) => (
+    item.status === 'would-revert'
+      && item.kind === 'append-markdown'
+      && item.dest.endsWith('AGENTS.md')
+  )));
+  assert.ok(!report.items.some((item) => item.status === 'would-delete' && item.dest.endsWith('AGENTS.md')));
+  // install-state file is a deletion target
+  assert.equal(report.stateFile.status, 'would-delete');
+  assert.ok(report.stateFile.dest.endsWith('.agent-deploy/install-state.json'));
+
+  // nothing written/removed
+  assert.ok(fs.existsSync(path.join(project, 'AGENTS.md')));
+  assert.ok(fs.existsSync(path.join(project, '.agents/rules/common/security.md')));
+});
+
+test('uninstall --dry-run --json reports already-absent for a deleted managed file and writes nothing', () => {
+  const project = tmpProject();
+  applyPlan(buildPlan({ target: 'codex', profile: 'minimal', projectRoot: project }), {
+    installedAt: '2026-01-01T00:00:00Z',
+  });
+  const securityPath = path.join(project, '.agents/rules/common/security.md');
+  fs.rmSync(securityPath);
+
+  const out = execFileSync('node', [
+    CLI, 'uninstall', '--dry-run', '--json',
+    '--target', 'codex', '--project', project,
+  ], { encoding: 'utf8' });
+  const parsed = JSON.parse(out);
+
+  assert.equal(parsed.dryRun, true);
+  assert.ok(parsed.summary['already-absent'] >= 1);
+  assert.ok(parsed.items.some((item) => (
+    item.status === 'already-absent' && item.dest.endsWith('.agents/rules/common/security.md')
+  )));
+  // dry-run removed nothing else
+  assert.ok(fs.existsSync(path.join(project, 'AGENTS.md')));
+  assert.ok(fs.existsSync(path.join(project, '.agent-deploy/install-state.json')));
+});
+
+test('uninstall rejects missing state and non-dry-run execution', () => {
+  const project = tmpProject();
+
+  assert.throws(
+    () => execFileSync('node', [
+      CLI, 'uninstall', '--dry-run',
+      '--target', 'codex', '--project', project,
+    ], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }),
+    /install-state not found/,
+  );
+
+  applyPlan(buildPlan({ target: 'codex', profile: 'minimal', projectRoot: project }));
+  assert.throws(
+    () => execFileSync('node', [
+      CLI, 'uninstall',
+      '--target', 'codex', '--project', project,
+    ], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }),
+    /uninstall currently supports --dry-run only/,
   );
 });
 

@@ -15,6 +15,7 @@ import { readConflictResolutionsFile } from './packs/conflict-resolutions.js';
 import { resolveConflictPolicy } from './conflict-policy.js';
 import { buildUpdateDryRun, applyUpdate } from './update.js';
 import { buildRepairDryRun } from './repair.js';
+import { buildUninstallDryRun } from './uninstall.js';
 
 function parseArgs(argv) {
   const args = { _: [] };
@@ -177,13 +178,35 @@ function printRepairReport(report, asJson) {
   }
 }
 
+function printUninstallReport(report, asJson) {
+  if (asJson) {
+    process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
+    return;
+  }
+
+  console.log(`uninstall dry-run: ${report.target.target} (${report.target.scope})`);
+  console.log(`state: ${report.statePath}`);
+  console.log(`profile: ${report.request.profile || '(none)'}`);
+  console.log('summary:');
+  for (const [status, count] of Object.entries(report.summary)) {
+    console.log(`  ${status}: ${count}`);
+  }
+  console.log('\nteardown plan (reverse-replay):');
+  for (const item of report.items) {
+    const rel = item.dest ? path.relative(report.target.root, item.dest) : '(none)';
+    console.log(`  ${item.status.padEnd(14)} ${item.kind.padEnd(15)} ${rel} [${item.moduleId}]`);
+  }
+  const stateRel = path.relative(report.target.root, report.stateFile.dest);
+  console.log(`\ninstall-state: ${report.stateFile.status} ${stateRel}`);
+}
+
 function main() {
   const [, , cmd, ...rest] = process.argv;
   const args = parseArgs(rest);
 
   try {
     if (!cmd || cmd === 'help' || args.help) {
-      console.log('usage: agent-deploy <list|plan|apply|update|repair> [--target T] [--profile P] [--modules a,b]\n'
+      console.log('usage: agent-deploy <list|plan|apply|update|repair|uninstall> [--target T] [--profile P] [--modules a,b]\n'
         + '       [--pack DIR[,DIR]] [--enable-pack-extensions] [--conflict-resolution FILE]\n'
         + '       [--scope project|home] [--global] [--home DIR] [--project DIR]\n'
         + '       [--backup] [--conflict-policy POLICY] [--dry-run] [--json]\n'
@@ -197,7 +220,8 @@ function main() {
         + '  --on-user-modified: fail (default), skip, overwrite — how update treats drifted managed files\n'
         + '  update --dry-run: reads install-state and prints a managed-file diff (no writes)\n'
         + '  update: refreshes managed files from install-state; fail-closed on user-modified drift\n'
-        + '  repair --dry-run: reads install-state and reports missing managed files (no writes)');
+        + '  repair --dry-run: reads install-state and reports missing managed files (no writes)\n'
+        + '  uninstall --dry-run: reverse-replays install-state and reports teardown targets (no writes)');
       return;
     }
     if (cmd === 'list') return cmdList();
@@ -269,6 +293,15 @@ function main() {
       }
       const report = buildRepairDryRun(buildRequest(args));
       printRepairReport(report, Boolean(args.json));
+      return;
+    }
+
+    if (cmd === 'uninstall') {
+      if (!args['dry-run']) {
+        throw new Error('uninstall currently supports --dry-run only');
+      }
+      const report = buildUninstallDryRun(buildRequest(args));
+      printUninstallReport(report, Boolean(args.json));
       return;
     }
 
