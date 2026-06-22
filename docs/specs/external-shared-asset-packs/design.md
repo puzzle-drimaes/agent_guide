@@ -316,7 +316,7 @@ Suggested modules:
 src/packs/pack-manifest.js       # load/parse pack.json
 src/packs/pack-validator.js      # pack-local validation
 src/packs/pack-composer.js       # base + packs virtual manifest composition
-src/packs/pack-digest.js         # deterministic digest
+src/packs/digest.js              # deterministic digest
 scripts/check-pack.js            # CI/CLI validation entry
 ```
 

@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { checkAssetSchemas } from '../../scripts/check-asset-schema.js';
 import { checkCatalogParity } from '../../scripts/check-catalog-parity.js';
 import { detectPackConflicts } from './conflicts.js';
+import { calculatePackDigest } from './digest.js';
 import { assertPackTreeSafe, isSafeRelativePath, normalizeRel } from './path-utils.js';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -141,6 +142,7 @@ export function validatePackRoot(packRoot, options = {}) {
     root,
     schemaPath,
     packJson: null,
+    digest: null,
     conflicts: [],
     errors,
     warnings,
@@ -161,6 +163,11 @@ export function validatePackRoot(packRoot, options = {}) {
   const packJson = readJson(path.join(root, 'pack.json'), errors, 'pack.json');
   result.packJson = packJson;
   if (packJson) validatePackJson(packJson, errors);
+  try {
+    result.digest = calculatePackDigest(root).digest;
+  } catch (error) {
+    errors.push(`pack digest: ${error.message}`);
+  }
 
   const modulesPath = path.join(root, 'manifests/modules.json');
   const profilesPath = path.join(root, 'manifests/profiles.json');

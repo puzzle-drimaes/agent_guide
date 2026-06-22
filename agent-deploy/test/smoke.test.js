@@ -13,6 +13,7 @@ import { checkAssetSchemas } from '../scripts/check-asset-schema.js';
 import { checkCatalogParity } from '../scripts/check-catalog-parity.js';
 import { scanExternals } from '../src/packs/externals-scanner.js';
 import { validatePackRoot } from '../src/packs/pack-validator.js';
+import { calculatePackDigest } from '../src/packs/digest.js';
 
 const CLI = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../src/cli.js');
 const FIXTURES = path.resolve(path.dirname(fileURLToPath(import.meta.url)), 'fixtures');
@@ -513,6 +514,22 @@ test('asset pack validator accepts a normal project-local pack', () => {
   const result = validatePackRoot(packRoot);
   assert.equal(result.ok, true, `unexpected pack errors:\n${result.errors.join('\n')}`);
   assert.equal(result.packJson.id, 'team-valid-pack');
+  assert.match(result.digest, /^sha256:[a-f0-9]{64}$/);
+});
+
+test('asset pack digest is stable and ignores VCS/OS temporary files', () => {
+  const packRoot = path.join(FIXTURES, 'packs/valid-pack');
+  const copiedPackRoot = path.join(tmpProject(), 'valid-pack-copy');
+  fs.cpSync(packRoot, copiedPackRoot, { recursive: true });
+  fs.mkdirSync(path.join(copiedPackRoot, '.git'), { recursive: true });
+  fs.writeFileSync(path.join(copiedPackRoot, '.git/config'), '[core]\nrepositoryformatversion = 0\n');
+  fs.writeFileSync(path.join(copiedPackRoot, '.DS_Store'), 'macOS finder metadata');
+  fs.writeFileSync(path.join(copiedPackRoot, 'assets/prompts/team-note.md~'), 'editor backup');
+
+  assert.equal(
+    calculatePackDigest(copiedPackRoot).digest,
+    calculatePackDigest(packRoot).digest,
+  );
 });
 
 test('asset pack validator rejects missing pack.json', () => {
@@ -601,6 +618,9 @@ test('planner composes pack-local profiles and apply records pack provenance', (
   const state = JSON.parse(fs.readFileSync(path.join(project, '.claude/agent-install-state.json'), 'utf8'));
   assert.equal(state.source.packs[0].id, 'team-valid-pack');
   assert.equal(state.source.packs[0].packType, 'project-local');
+  assert.equal(state.source.packs[0].digest, calculatePackDigest(packRoot).digest);
+  assert.equal(state.source.packs[0].root, packRoot);
+  assert.equal(state.source.packs[0].source, null);
 });
 
 test('CLI dry-run accepts --pack and prints pack operations', () => {

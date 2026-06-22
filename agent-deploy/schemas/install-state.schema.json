@@ -37,11 +37,31 @@
     },
     "source": {
       "type": "object",
-      "required": ["repoVersion", "repoCommit", "manifestVersion"],
+      "additionalProperties": false,
+      "required": ["repoVersion", "repoCommit", "manifestVersion", "packs"],
       "properties": {
         "repoVersion": { "type": ["string", "null"] },
         "repoCommit": { "type": ["string", "null"] },
-        "manifestVersion": { "type": "integer", "minimum": 1 }
+        "manifestVersion": { "type": "integer", "minimum": 1 },
+        "packs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "version", "packType", "digest", "source", "root"],
+            "properties": {
+              "id": { "type": "string", "minLength": 1 },
+              "version": { "type": "string", "minLength": 1 },
+              "packType": { "enum": ["shared-approved", "project-local", "candidate"] },
+              "digest": {
+                "type": "string",
+                "pattern": "^sha256:[a-f0-9]{64}$"
+              },
+              "source": { "type": ["string", "null"] },
+              "root": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
       }
     },
     "operations": {
@@ -50,7 +70,7 @@
         "type": "object",
         "required": ["kind", "moduleId", "dest", "strategy", "scope"],
         "properties": {
-          "kind": { "enum": ["copy-file", "merge-json", "skip"] },
+          "kind": { "enum": ["copy-file", "merge-json", "merge-toml", "append-markdown", "skip"] },
           "moduleId": { "type": "string" },
           "sourceRel": { "type": ["string", "null"] },
           "dest": { "type": ["string", "null"] },

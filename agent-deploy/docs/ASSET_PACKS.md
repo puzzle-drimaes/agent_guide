@@ -124,6 +124,31 @@ pack inspect / validate
   → install-state records pack provenance
 ```
 
+## Pack digest provenance
+
+`agent-deploy` calculates a normalized SHA-256 digest for every requested pack and records it in
+`install-state` under `source.packs[].digest`.
+
+Digest normalization rules:
+
+- file paths are sorted and normalized to `/` separators
+- text line endings are normalized to LF before hashing
+- `.git/`, other VCS metadata, OS metadata files such as `.DS_Store`/`Thumbs.db`, and editor temp files are excluded
+- the pack root path itself is not part of the digest
+
+Install-state pack provenance includes:
+
+```json
+{
+  "id": "team-valid-pack",
+  "version": "0.1.0",
+  "packType": "project-local",
+  "digest": "sha256:<64-hex>",
+  "source": null,
+  "root": "/absolute/path/to/pack"
+}
+```
+
 ## Safety rules
 
 - No install-time scripts, hooks, postinstall, or network fetch in v1.
@@ -168,4 +193,4 @@ node src/cli.js apply --target codex --pack ./packs/frontend --profile frontend-
 
 Pack modules and pack-local profiles must still be selected explicitly. The composed plan keeps the base bundle as the
 base layer, validates pack conflicts before planning, reads pack assets from their own `assets/` root, and records
-`source.packs` provenance when applied.
+`source.packs` provenance, including normalized pack digests, when applied.

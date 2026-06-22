@@ -63,6 +63,7 @@ function loadPack(packRoot, options = {}) {
   return {
     root: packRoot,
     packJson: validation.packJson,
+    digest: validation.digest,
     modulesDoc,
     profilesDoc,
   };
@@ -145,6 +146,7 @@ export function loadComposedManifests({ root, packPaths = [] } = {}) {
     id: pack.packJson.id,
     version: pack.packJson.version,
     packType: pack.packJson.packType,
+    digest: pack.digest,
     source: pack.packJson.source || null,
     root: pack.root,
   }));

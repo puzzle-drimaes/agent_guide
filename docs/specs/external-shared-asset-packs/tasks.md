@@ -45,11 +45,18 @@ Implementation notes:
 
 ## Phase 3 — Provenance and governance
 
-- [ ] Extend `install-state.schema.json` with `source.packs`.
-- [ ] Compute deterministic pack digest.
-- [ ] Record pack id/version/source/digest/root in install-state.
+- [x] Extend `install-state.schema.json` with `source.packs`.
+- [x] Compute deterministic pack digest.
+- [x] Record pack id/version/source/digest/root in install-state.
 - [ ] Add `shared-approved` profile extension opt-in.
 - [ ] Document approval workflow for shared packs.
+
+Implementation notes:
+
+- `src/packs/digest.js` computes `sha256:<64-hex>` from sorted normalized pack entries.
+- Text line endings are normalized to LF, and the absolute pack root path is excluded from the digest.
+- `.git/`, other VCS metadata, OS metadata files, and editor temp/backup files are excluded.
+- `source.packs[]` now records `id`, `version`, `packType`, `digest`, `source`, and `root`.
 
 ## Phase 4 — Production hardening
 

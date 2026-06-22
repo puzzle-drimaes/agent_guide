@@ -201,7 +201,7 @@ npm --prefix agent-deploy run validate
   → manifest/rule-drift/entry-parity/asset-schema/catalog-parity validation 통과
 
 npm --prefix agent-deploy test
-  → 35개 smoke test 전체 통과
+  → 36개 smoke test 전체 통과
 ```
 
 ### 2.1-A 최우선 전략 문서화
@@ -254,6 +254,19 @@ docs/specs/external-shared-asset-packs/
    - explicit pack module/profile plan/apply
    - pack assetRoot 분리와 install-state `source.packs` 기록
    - dry-run/apply smoke test
+8. [x] asset pack Phase 3 provenance 1차 구현
+   - pack 파일 정규화 SHA-256 digest 계산
+   - `.git/`, OS metadata, editor temp/backup 파일 digest 제외
+   - install-state `source.packs[].digest/root/source/packType` 기록
+   - digest 안정성 및 apply provenance smoke test
+9. [ ] shared-approved profile extension opt-in 구현
+   - `--enable-pack-extensions` 옵션 추가
+   - `shared-approved` pack만 builtin profile 확장 허용
+   - `candidate`/`project-local` builtin profile 확장 금지
+10. [ ] asset pack governance 문서 보강
+   - shared-approved pack 승인 기준
+   - candidate → shared-approved 승격 흐름
+   - conflict resolution 기록 정책
 ```
 
 ### 2.2 Codex adapter 추가

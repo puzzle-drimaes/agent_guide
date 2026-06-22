@@ -1078,6 +1078,40 @@ SDD mode: lite (기존 installer core 변경 없이 bundle entrypoint와 문서 
 
 ---
 
+### 4.20 Asset Pack Phase 3 시작: pack digest provenance
+
+대상 파일:
+
+```text
+agent-deploy/src/packs/digest.js
+agent-deploy/src/packs/pack-validator.js
+agent-deploy/src/packs/pack-composer.js
+agent-deploy/schemas/install-state.schema.json
+agent-deploy/test/smoke.test.js
+agent-deploy/docs/ASSET_PACKS.md
+```
+
+구현 내용:
+
+- [x] pack 파일 목록을 정렬하고 경로 구분자/텍스트 줄바꿈을 정규화해 SHA-256 digest를 계산.
+- [x] `.git/`, VCS metadata, `.DS_Store`, `Thumbs.db`, editor temp/backup 파일을 digest 대상에서 제외.
+- [x] pack validator 결과에 digest를 포함.
+- [x] composed manifest의 `source.packs[]` provenance에 `digest`, `root`, `source`, `packType`을 함께 기록.
+- [x] install-state schema의 `source.packs[]` 구조를 확장.
+- [x] pack digest 안정성 및 install-state 기록 smoke test 추가.
+
+검증 결과:
+
+```text
+npm --prefix agent-deploy run validate
+npm --prefix agent-deploy test
+  → 36개 smoke test 전체 통과
+```
+
+SDD mode: lite (기존 pack planner/apply 구조 안에서 provenance 신뢰성 보강).
+
+---
+
 ## 5. 아직 완료가 아닌 것
 
 다음은 아직 완료되지 않았다. 자세한 순서는 `TODO.md` 참고.
@@ -1146,6 +1180,9 @@ SDD mode: lite (기존 installer core 변경 없이 bundle entrypoint와 문서 
   - CLI `--pack` 옵션, composed manifest loader, pack-local profile/module plan/apply 지원
   - pack assetRoot를 bundled assets와 분리하고 install-state `source.packs` provenance 기록
   - pack module dry-run / pack profile apply smoke test 추가
+- external/shared asset pack Phase 3 provenance 시작
+  - pack digest 계산 및 install-state `source.packs[].digest` 기록
+  - `.git/`, OS metadata, editor temp/backup 파일 제외 및 정규화 digest smoke test 추가
 ```
 
 아직 남은 핵심은 SETUP_WIZARD.md 기반 flow 검증과 파일럿 운영 수준의 bundle/lifecycle 구현이다.

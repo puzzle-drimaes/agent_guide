@@ -51,7 +51,7 @@ pack provenance/install-state.
 
 - Whether pack profiles should be addressed as `<pack-id>:<profile>` or plain profile ids in the CLI.
 - Whether `templates/` should become a first-class target path or remain under `prompts/` for v1.
-- Whether pack digest should include generated catalog files or only source assets/manifests.
+- Whether conflict resolution records should live only in install-state or also in a pack-side decision log.
 - Whether `shared-approved` pack approval lives in GitHub review, Notion registry, or both.
 
 ## Review conclusion
@@ -79,3 +79,14 @@ Remaining Phase 2 risk: planner integration must keep pack logic out of target a
 
 Remaining risk: conflict resolution is still fail-closed only. Interactive `keep-existing` / `add-namespaced` /
 `rename-proposed` / `replace-existing` provenance remains a follow-up task.
+
+## Phase 3 provenance implementation review
+
+- `src/packs/digest.js` computes deterministic `sha256:<64-hex>` pack digests from sorted normalized entries.
+- The digest includes pack files, manifests, assets, catalog, and other non-ignored pack contents while excluding VCS/OS/editor temporary files.
+- `pack-validator` exposes the digest, `pack-composer` carries it into composed pack metadata, and apply writes it under `source.packs[].digest`.
+- `install-state.schema.json` now models `source.packs[]` with `id`, `version`, `packType`, `digest`, `source`, and `root`.
+- Smoke tests cover digest shape, ignored temp files, and install-state provenance recording.
+
+Remaining Phase 3 risk: builtin profile extension is still explicit profile/module only. `--enable-pack-extensions`
+for `shared-approved` packs remains a follow-up task.
