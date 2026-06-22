@@ -9,7 +9,7 @@ import path from 'node:path';
 import { deepMergeJson } from './json-merge.js';
 import { mergeTomlAddOnly } from './toml-merge.js';
 import { assertPathInsideRoot, assertNoSymlinkEscape } from './path-safety.js';
-import { buildState, writeState } from './state.js';
+import { assertValidInstallState, buildState, writeState } from './state.js';
 
 function readJsonOrEmpty(p) {
   if (!fs.existsSync(p)) return {};
@@ -40,6 +40,25 @@ export function applyPlan(plan, { installedAt = new Date().toISOString() } = {})
   // sibling files like ~/.claude.json — must stay inside it.
   const safetyRoot = plan.baseRoot;
 
+  const state = buildState({
+    adapter: plan.adapter,
+    input: plan.input,
+    request: plan.request,
+    resolution: plan.resolution,
+    manifestVersion: plan.manifestVersion,
+    packs: plan.packs || [],
+    conflictResolutions: plan.conflictResolutions || [],
+    operations: plan.operations,
+    installedAt,
+  });
+  assertValidInstallState(state);
+
+  // The install-state file must also stay inside the safety boundary. Check it
+  // before applying operations so a bad state destination fails without partial
+  // writes.
+  assertPathInsideRoot(plan.statePath, safetyRoot, 'install-state path');
+  assertNoSymlinkEscape(plan.statePath, safetyRoot, 'install-state path');
+
   for (const op of plan.operations) {
     if (op.kind === 'skip') continue; // unsupported capability: recorded only, nothing written
 
@@ -62,21 +81,6 @@ export function applyPlan(plan, { installedAt = new Date().toISOString() } = {})
     }
   }
 
-  // The install-state file must also stay inside the safety boundary.
-  assertPathInsideRoot(plan.statePath, safetyRoot, 'install-state path');
-  assertNoSymlinkEscape(plan.statePath, safetyRoot, 'install-state path');
-
-  const state = buildState({
-    adapter: plan.adapter,
-    input: plan.input,
-    request: plan.request,
-    resolution: plan.resolution,
-    manifestVersion: plan.manifestVersion,
-    packs: plan.packs || [],
-    conflictResolutions: plan.conflictResolutions || [],
-    operations: plan.operations,
-    installedAt,
-  });
   writeState(plan.statePath, state);
 
   return { applied: true, operations: plan.operations.length, statePath: plan.statePath, state };

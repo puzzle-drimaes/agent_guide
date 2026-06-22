@@ -9,6 +9,7 @@ import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { buildPlan } from '../src/planner.js';
 import { applyPlan } from '../src/apply.js';
+import { validateInstallState } from '../src/state.js';
 import { checkAssetSchemas } from '../scripts/check-asset-schema.js';
 import { checkCatalogParity } from '../scripts/check-catalog-parity.js';
 import { scanExternals } from '../src/packs/externals-scanner.js';
@@ -100,7 +101,7 @@ test('codex minimal profile installs AGENTS.md, project rules, and shared instal
 test('codex developer profile installs skills, agents, mcp toml, and command skip reason', () => {
   const project = tmpProject();
   const plan = buildPlan({ target: 'codex', profile: 'developer', projectRoot: project });
-  applyPlan(plan);
+  const result = applyPlan(plan);
 
   assertCommonCoreRules(path.join(project, '.agents'));
   assertDeveloperCoreRules(path.join(project, '.agents'));
@@ -119,6 +120,7 @@ test('codex developer profile installs skills, agents, mcp toml, and command ski
 
   const skipOps = plan.operations.filter((o) => o.kind === 'skip');
   assert.ok(skipOps.some((o) => o.sourceRel === 'commands' && /no native slash-command/.test(o.reason)));
+  assert.deepEqual(validateInstallState(result.state), []);
 });
 
 test('codex AGENTS.md managed block and TOML merge are add-only/idempotent', () => {
@@ -275,6 +277,16 @@ test('home scope refuses to escape the home base root', () => {
   // tamper: redirect an op outside the home root
   plan.operations[0].dest = path.join(home, '..', 'escape.md');
   assert.throws(() => applyPlan(plan), /must stay within/);
+});
+
+test('apply validates install-state before writing files', () => {
+  const project = tmpProject();
+  const plan = buildPlan({ target: 'codex', profile: 'minimal', projectRoot: project });
+  plan.operations[0].scope = 'workspace';
+
+  assert.throws(() => applyPlan(plan), /install-state validation failed/);
+  assert.ok(!fs.existsSync(path.join(project, 'AGENTS.md')), 'invalid state must fail before file writes');
+  assert.ok(!fs.existsSync(path.join(project, '.agent-deploy/install-state.json')), 'invalid state must not be written');
 });
 
 test('claude business profile installs non-developer skills, no developer-only assets', () => {
@@ -856,6 +868,7 @@ test('keep-existing decision skips colliding pack operations and records the rea
       && op.strategy === 'skip+keep-existing'
   ));
   assert.ok(stateSkip, 'install-state should record the keep-existing skip');
+  assert.equal(stateSkip.dest, null);
   assert.match(stateSkip.reason, /Skipped by keep-existing conflict decision/);
   assert.match(stateSkip.reason, new RegExp(keepExistingReason));
   assert.equal(state.source.conflictResolutions[0].decision, 'keep-existing');
