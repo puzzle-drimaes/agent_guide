@@ -10,6 +10,7 @@ import { fileURLToPath } from 'node:url';
 import { buildPlan } from '../src/planner.js';
 import { applyPlan } from '../src/apply.js';
 import { applyUpdate } from '../src/update.js';
+import { buildRepairDryRun } from '../src/repair.js';
 import { validateInstallState } from '../src/state.js';
 import { checkAssetSchemas } from '../scripts/check-asset-schema.js';
 import { checkCatalogParity } from '../scripts/check-catalog-parity.js';
@@ -514,6 +515,63 @@ test('update --json emits a valid result and rejects unknown --on-user-modified'
       '--target', 'codex', '--project', project,
     ], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }),
     /--on-user-modified must be one of/,
+  );
+});
+
+test('repair --dry-run reports zero missing for an intact install', () => {
+  const project = tmpProject();
+  applyPlan(buildPlan({ target: 'codex', profile: 'minimal', projectRoot: project }), {
+    installedAt: '2026-01-01T00:00:00Z',
+  });
+
+  const report = buildRepairDryRun({ target: 'codex', projectRoot: project });
+  assert.equal(report.dryRun, true);
+  assert.equal(report.request.profile, 'minimal');
+  assert.ok(!report.summary.missing, 'intact install has no missing files');
+  assert.ok(report.summary.present >= 1);
+  assert.ok(report.items.every((item) => item.status === 'present'));
+});
+
+test('repair --dry-run --json detects a deleted managed file and writes nothing', () => {
+  const project = tmpProject();
+  applyPlan(buildPlan({ target: 'codex', profile: 'minimal', projectRoot: project }), {
+    installedAt: '2026-01-01T00:00:00Z',
+  });
+  const securityPath = path.join(project, '.agents/rules/common/security.md');
+  fs.rmSync(securityPath);
+
+  const out = execFileSync('node', [
+    CLI, 'repair', '--dry-run', '--json',
+    '--target', 'codex', '--project', project,
+  ], { encoding: 'utf8' });
+  const parsed = JSON.parse(out);
+
+  assert.equal(parsed.dryRun, true);
+  assert.ok(parsed.summary.missing >= 1);
+  assert.ok(parsed.items.some((item) => (
+    item.status === 'missing' && item.dest.endsWith('.agents/rules/common/security.md')
+  )));
+  assert.ok(!fs.existsSync(securityPath), 'dry-run restored nothing');
+});
+
+test('repair rejects missing state and non-dry-run execution', () => {
+  const project = tmpProject();
+
+  assert.throws(
+    () => execFileSync('node', [
+      CLI, 'repair', '--dry-run',
+      '--target', 'codex', '--project', project,
+    ], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }),
+    /install-state not found/,
+  );
+
+  applyPlan(buildPlan({ target: 'codex', profile: 'minimal', projectRoot: project }));
+  assert.throws(
+    () => execFileSync('node', [
+      CLI, 'repair',
+      '--target', 'codex', '--project', project,
+    ], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }),
+    /repair currently supports --dry-run only/,
   );
 });
 

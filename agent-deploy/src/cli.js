@@ -14,6 +14,7 @@ import { applyPlan } from './apply.js';
 import { readConflictResolutionsFile } from './packs/conflict-resolutions.js';
 import { resolveConflictPolicy } from './conflict-policy.js';
 import { buildUpdateDryRun, applyUpdate } from './update.js';
+import { buildRepairDryRun } from './repair.js';
 
 function parseArgs(argv) {
   const args = { _: [] };
@@ -156,13 +157,33 @@ function printUpdateResult(result, asJson) {
   }
 }
 
+function printRepairReport(report, asJson) {
+  if (asJson) {
+    process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
+    return;
+  }
+
+  console.log(`repair dry-run: ${report.target.target} (${report.target.scope})`);
+  console.log(`state: ${report.statePath}`);
+  console.log(`profile: ${report.request.profile || '(none)'}`);
+  console.log('summary:');
+  for (const [status, count] of Object.entries(report.summary)) {
+    console.log(`  ${status}: ${count}`);
+  }
+  console.log('\nmanaged file status:');
+  for (const item of report.items) {
+    const rel = item.dest ? path.relative(report.target.root, item.dest) : '(none)';
+    console.log(`  ${item.status.padEnd(8)} ${item.kind.padEnd(15)} ${rel} [${item.moduleId}]`);
+  }
+}
+
 function main() {
   const [, , cmd, ...rest] = process.argv;
   const args = parseArgs(rest);
 
   try {
     if (!cmd || cmd === 'help' || args.help) {
-      console.log('usage: agent-deploy <list|plan|apply|update> [--target T] [--profile P] [--modules a,b]\n'
+      console.log('usage: agent-deploy <list|plan|apply|update|repair> [--target T] [--profile P] [--modules a,b]\n'
         + '       [--pack DIR[,DIR]] [--enable-pack-extensions] [--conflict-resolution FILE]\n'
         + '       [--scope project|home] [--global] [--home DIR] [--project DIR]\n'
         + '       [--backup] [--conflict-policy POLICY] [--dry-run] [--json]\n'
@@ -175,7 +196,8 @@ function main() {
         + '  --conflict-policy: managed-overwrite (default), skip, append, merge-json, merge-toml, conflict-error\n'
         + '  --on-user-modified: fail (default), skip, overwrite — how update treats drifted managed files\n'
         + '  update --dry-run: reads install-state and prints a managed-file diff (no writes)\n'
-        + '  update: refreshes managed files from install-state; fail-closed on user-modified drift');
+        + '  update: refreshes managed files from install-state; fail-closed on user-modified drift\n'
+        + '  repair --dry-run: reads install-state and reports missing managed files (no writes)');
       return;
     }
     if (cmd === 'list') return cmdList();
@@ -238,6 +260,15 @@ function main() {
         onUserModified: args['on-user-modified'] || 'fail',
       });
       printUpdateResult(result, Boolean(args.json));
+      return;
+    }
+
+    if (cmd === 'repair') {
+      if (!args['dry-run']) {
+        throw new Error('repair currently supports --dry-run only');
+      }
+      const report = buildRepairDryRun(buildRequest(args));
+      printRepairReport(report, Boolean(args.json));
       return;
     }
 

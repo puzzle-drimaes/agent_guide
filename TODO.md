@@ -770,8 +770,10 @@ agent-deploy/install.bat
 
 ### 6.3 repair
 
-- [ ] install-state 기반 누락 파일 감지
-- [ ] hash 또는 존재 여부 기반 drift detection
+- [x] install-state 기반 누락 파일 감지 (dry-run, 존재 여부 기반)
+- [x] dry-run repair 지원 (`agent-deploy repair --dry-run`)
+- [ ] hash 기반 drift detection (content 변조 감지)
+- [ ] repair 실제 write (누락 파일 복원)
 - [ ] `agent-deploy repair --scope project --project .`
 
 ### 6.4 uninstall
