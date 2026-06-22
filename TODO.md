@@ -761,11 +761,11 @@ agent-deploy/install.bat
 
 ### 6.2 update
 
-- [ ] 기존 install-state 읽기
-- [ ] 새 plan과 diff
+- [x] 기존 install-state 읽기
+- [x] 새 plan과 diff
 - [ ] managed file만 갱신
-- [ ] 사용자 수정 파일 감지
-- [ ] dry-run update 지원
+- [x] 사용자 수정 파일 감지
+- [x] dry-run update 지원
 
 ### 6.3 repair
 

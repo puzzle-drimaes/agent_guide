@@ -201,6 +201,20 @@ export function assertValidInstallState(state) {
   }
 }
 
+export function readState(statePath) {
+  let state;
+  try {
+    state = JSON.parse(fs.readFileSync(statePath, 'utf8'));
+  } catch (error) {
+    if (error.code === 'ENOENT') {
+      throw new Error(`install-state not found: ${statePath}`);
+    }
+    throw new Error(`install-state is invalid JSON at ${statePath}: ${error.message}`);
+  }
+  assertValidInstallState(state);
+  return state;
+}
+
 export function writeState(statePath, state) {
   // Validate the runtime provenance before touching the state file. Backup,
   // update, repair, and uninstall flows will rely on this record as trusted

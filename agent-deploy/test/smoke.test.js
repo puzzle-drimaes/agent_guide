@@ -367,6 +367,49 @@ test('apply --json emits a valid JSON result on stdout', () => {
   assert.ok(parsed.operations >= 1);
 });
 
+test('update --dry-run --json reads install-state and reports possible user modifications', () => {
+  const project = tmpProject();
+  applyPlan(buildPlan({ target: 'codex', profile: 'minimal', projectRoot: project }), {
+    installedAt: '2026-01-01T00:00:00Z',
+  });
+  fs.appendFileSync(path.join(project, '.agents/rules/common/security.md'), '\nUser local security note.\n');
+
+  const out = execFileSync('node', [
+    CLI, 'update', '--dry-run', '--json',
+    '--target', 'codex', '--project', project,
+  ], { encoding: 'utf8' });
+  const parsed = JSON.parse(out);
+  assert.equal(parsed.dryRun, true);
+  assert.equal(parsed.request.profile, 'minimal');
+  assert.ok(parsed.summary['possible-user-modified'] >= 1);
+  assert.ok(parsed.items.some((item) => (
+    item.status === 'possible-user-modified'
+      && item.dest.endsWith('.agents/rules/common/security.md')
+  )));
+  assert.match(fs.readFileSync(path.join(project, '.agents/rules/common/security.md'), 'utf8'), /User local security note/);
+});
+
+test('update rejects missing state and non-dry-run execution', () => {
+  const project = tmpProject();
+
+  assert.throws(
+    () => execFileSync('node', [
+      CLI, 'update', '--dry-run',
+      '--target', 'codex', '--profile', 'minimal', '--project', project,
+    ], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }),
+    /install-state not found/,
+  );
+
+  applyPlan(buildPlan({ target: 'codex', profile: 'minimal', projectRoot: project }));
+  assert.throws(
+    () => execFileSync('node', [
+      CLI, 'update',
+      '--target', 'codex', '--profile', 'minimal', '--project', project,
+    ], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }),
+    /update currently supports --dry-run only/,
+  );
+});
+
 test('home scope installs into the user-global config dir (fake home)', () => {
   const home = tmpProject(); // a throwaway dir standing in for ~ — never the real home
   const plan = buildPlan({ target: 'claude', profile: 'core', scope: 'home', homeDir: home });

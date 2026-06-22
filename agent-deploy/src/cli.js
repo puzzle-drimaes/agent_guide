@@ -13,6 +13,7 @@ import { buildPlan } from './planner.js';
 import { applyPlan } from './apply.js';
 import { readConflictResolutionsFile } from './packs/conflict-resolutions.js';
 import { resolveConflictPolicy } from './conflict-policy.js';
+import { buildUpdateDryRun } from './update.js';
 
 function parseArgs(argv) {
   const args = { _: [] };
@@ -102,13 +103,33 @@ function cmdList() {
   }
 }
 
+function printUpdateReport(report, asJson) {
+  if (asJson) {
+    process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
+    return;
+  }
+
+  console.log(`update dry-run: ${report.target.target} (${report.target.scope})`);
+  console.log(`state: ${report.statePath}`);
+  console.log(`profile: ${report.request.profile || '(none)'}`);
+  console.log('summary:');
+  for (const [status, count] of Object.entries(report.summary)) {
+    console.log(`  ${status}: ${count}`);
+  }
+  console.log('\nmanaged operation diff:');
+  for (const item of report.items) {
+    const rel = item.dest ? path.relative(report.target.root, item.dest) : '(none)';
+    console.log(`  ${item.status.padEnd(22)} ${item.kind.padEnd(15)} ${rel} [${item.moduleId}]`);
+  }
+}
+
 function main() {
   const [, , cmd, ...rest] = process.argv;
   const args = parseArgs(rest);
 
   try {
     if (!cmd || cmd === 'help' || args.help) {
-      console.log('usage: agent-deploy <list|plan|apply> [--target T] [--profile P] [--modules a,b]\n'
+      console.log('usage: agent-deploy <list|plan|apply|update> [--target T] [--profile P] [--modules a,b]\n'
         + '       [--pack DIR[,DIR]] [--enable-pack-extensions] [--conflict-resolution FILE]\n'
         + '       [--scope project|home] [--global] [--home DIR] [--project DIR]\n'
         + '       [--backup] [--conflict-policy POLICY] [--dry-run] [--json]\n'
@@ -118,7 +139,8 @@ function main() {
         + '  --enable-pack-extensions: opt in to shared-approved pack defaultProfileExtensions\n'
         + '  --conflict-resolution: JSON file of reviewed conflict decisions to record in install-state\n'
         + '  --backup: copy existing write targets into a timestamped backup directory before apply\n'
-        + '  --conflict-policy: managed-overwrite (default), skip, append, merge-json, merge-toml, conflict-error');
+        + '  --conflict-policy: managed-overwrite (default), skip, append, merge-json, merge-toml, conflict-error\n'
+        + '  update: currently supports --dry-run only; reads install-state and prints a managed-file diff');
       return;
     }
     if (cmd === 'list') return cmdList();
@@ -166,6 +188,15 @@ function main() {
           console.log(`backup: ${path.relative(plan.baseRoot, result.backup.root)} (${result.backup.entries.length} file(s))`);
         }
       }
+      return;
+    }
+
+    if (cmd === 'update') {
+      if (!args['dry-run']) {
+        throw new Error('update currently supports --dry-run only');
+      }
+      const report = buildUpdateDryRun(buildRequest(args));
+      printUpdateReport(report, Boolean(args.json));
       return;
     }
 
