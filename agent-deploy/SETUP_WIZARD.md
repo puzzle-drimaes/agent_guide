@@ -271,6 +271,11 @@ Agent는 설치 전 최종 확인을 아래 형식으로 요약합니다.
 인자를 넘겨 실행하는 경우에는 고급 사용자용 direct apply wrapper로 사용할 수 있지만,
 Pilot 기본 흐름은 `SETUP_WIZARD.md`를 agent 대화에 제공하는 방식입니다.
 
+> 참고: 이 wizard는 프로젝트에 설정을 설치하는 단계만 다룹니다.
+> 사내 공유 폴더(Google Drive AI-Knowhow)에서 스킬/프롬프트 `.md`를 받아 쓰거나,
+> agent가 그 폴더를 직접 읽게 Google Drive를 연동하는 방법은
+> `docs/SHARED_FOLDER_GUIDE.md`를 참고하세요. (공유 폴더는 브라우저만으로도 사용 가능하며 연동은 선택입니다.)
+
 ## 10. 설치가 안 될 때
 
 agent는 아래 증상별 대응을 사용자에게 안내합니다.

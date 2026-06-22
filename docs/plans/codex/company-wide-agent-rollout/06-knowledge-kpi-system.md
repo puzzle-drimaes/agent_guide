@@ -29,6 +29,8 @@ AI 사용 노하우가 개인 대화창 안에 갇히지 않고 회사 지식으
      (15-prompt-db-operations.md). 처음부터 강제하지 않는다.
 ```
 
+파일명/frontmatter/검토·적용 흐름의 운영 기준은 `agent-deploy/docs/SHARED_FOLDER_GUIDE.md`에 정리돼 있다.
+
 이 공유 문화가 자리 잡은 뒤에 아래의 회고 / 데모 / 거버넌스 루틴을 **권장 수준**으로 얹는다.
 
 ## 권장 루틴 (best-effort)

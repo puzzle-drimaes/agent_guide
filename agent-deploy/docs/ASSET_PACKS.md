@@ -7,6 +7,9 @@ The full SDD design lives in:
 docs/specs/external-shared-asset-packs/
 ```
 
+1차 도입 공유 폴더(Google Drive AI-Knowhow)에 `.md`를 올리고 고르는 운영 기준은
+[SHARED_FOLDER_GUIDE.md](SHARED_FOLDER_GUIDE.md) 참고. 이 문서는 그 파일을 `externals`로 적용하는 단계의 상세 규칙이다.
+
 ## Principle
 
 ```text

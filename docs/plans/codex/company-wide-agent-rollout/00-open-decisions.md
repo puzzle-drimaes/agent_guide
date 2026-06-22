@@ -370,6 +370,15 @@ Accepted
 계정 + 작성자 + 사용 목적 + profile + 재사용 가능 노하우
 ```
 
+변경됨 (2026-06-22):
+
+```text
+1차 도입에서는 위 "필수 기록"을 매 사용마다 강제하지 않는다(best-effort).
+예외 없이 지키는 것은 보안(금지 데이터 미입력)과 출처 표기뿐이다.
+공유는 Google Drive 공유 폴더(.md 업로드 → 선택 적용)를 우선한다.
+참고: 06-knowledge-kpi-system.md, 05-shared-ai-accounts.md
+```
+
 결정 시점:
 
 ```text
@@ -1113,8 +1122,7 @@ npx -y 기반 MCP는 공급망/보안 리스크가 있으므로 allowlist와 버
 
 ```text
 - profile 설치 수
-- 계정별 회고 제출 여부
-- PR 노하우 작성률
+- 공유 폴더 .md 수 / 재사용 사례 수
 - Prompt DB 사용 횟수
 - 출처 표기율
 ```

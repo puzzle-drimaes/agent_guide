@@ -1,5 +1,9 @@
 # 04. 비개발자 설치 경험 설계
 
+> 실제 사용자용 "따라하기" 문서: [docs/non-developer-guide.md](../../../non-developer-guide.md)
+> 이 문서는 경험 설계(요구사항)이고, 위 가이드가 현재 배포 방식(zip bundle + SETUP_WIZARD, 1차 도입)에 맞춘 정본이다.
+> 아래의 `npx` / `agent-deploy doctor·explain·examples`는 설계 시점 가정으로, 현재 배포 범위(D09)와 다르거나 미구현이다.
+
 ## 목적
 
 비개발자도 agent 설정을 설치하고 바로 업무에 사용할 수 있게 만든다.
