@@ -681,8 +681,8 @@ install.sh는 bootstrap과 wizard 안내, 고급 사용자용 direct wrapper만 
 해야 할 일:
 
 - [x] exe packaging 제외 결정 반영
-- [ ] Windows 사용자의 shell 실행 전제와 fallback 안내 작성
-- [ ] install.bat 유지 여부를 wrapper 관점에서 재검토
+- [x] Windows 사용자의 shell 실행 전제와 fallback 안내 작성 (SETUP_WIZARD 9.1: Node 전제 + install.bat/Git Bash·WSL/node 직접 실행 fallback)
+- [x] install.bat 유지 여부를 wrapper 관점에서 재검토 → 유지 (bash 없는 Windows fallback, 얇은 Node CLI wrapper)
 
 ### 5.2 OS 공통 zip bundle
 
@@ -745,12 +745,12 @@ agent-deploy/install.bat
   - wizard 파일 안내
   - 다음 agent 대화 시작 방법 출력
   - 고급 사용자용 direct wrapper 동작 유지 여부 검증
-- [ ] path with spaces 지원 확인
-- [ ] `--project` 명시 지원
-- [ ] `--target all` 또는 복수 target 지원 여부 결정
-- [ ] `--dry-run` 기본 안내
-- [ ] 실패 시 `doctor` 안내
-- [ ] install.bat은 optional wrapper로 유지할지 결정
+- [x] path with spaces 지원 확인 (install.sh passthrough 버그 수정: POSIX set-- 재구성 + 큰따옴표; install.bat per-arg 재인용)
+- [x] `--project` 명시 지원 (wrapper passthrough로 전달, 공백 경로 포함)
+- [x] `--target all` 또는 복수 target 지원 여부 결정 → 미지원, target별 명령 유지 (각 target 독립 install-state로 atomicity 확보, SETUP_WIZARD 7)
+- [x] `--dry-run` 기본 안내 (SETUP_WIZARD dry-run → apply 흐름)
+- [x] 실패 시 `doctor` 안내 (`agent-deploy doctor` 서브커맨드: Node/번들/쓰기권한 진단, install.sh/bat이 실패 시 안내)
+- [x] install.bat은 optional wrapper로 유지할지 결정 → 유지 (5.1 참조)
 
 ---
 

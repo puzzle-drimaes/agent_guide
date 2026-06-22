@@ -17,7 +17,9 @@ if "%~1"=="" goto run
 if /I "%~1"=="--global" (
   set "SCOPE=home"
 ) else (
-  set "PASS=!PASS! %~1"
+  rem Re-quote each passthrough arg so values with spaces survive
+  rem (e.g. --project "C:\My Projects\repo").
+  set PASS=!PASS! "%~1"
 )
 shift
 goto loop
@@ -25,7 +27,8 @@ goto loop
 :run
 where node >nul 2>nul
 if errorlevel 1 (
-  echo Node.js가 필요합니다. https://nodejs.org 에서 설치 후 다시 실행하세요.
+  echo Node.js가 필요합니다. https://nodejs.org 에서 LTS^(^>=18^) 설치 후 다시 실행하세요.
+  echo ^(설치 후에도 문제가 있으면 진단: node "%DIR%src\cli.js" doctor^)
   exit /b 1
 )
 

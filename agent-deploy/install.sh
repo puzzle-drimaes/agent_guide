@@ -27,7 +27,8 @@ if [ ! -f "$WIZARD" ]; then
 fi
 
 if ! command -v node >/dev/null 2>&1; then
-  echo "Node.js가 필요합니다. https://nodejs.org 에서 설치 후 다시 실행하세요." >&2
+  echo "Node.js가 필요합니다. https://nodejs.org 에서 LTS(>=18) 설치 후 다시 실행하세요." >&2
+  echo "(설치 후에도 문제가 있으면 진단: node \"$DIR/src/cli.js\" doctor)" >&2
   exit 1
 fi
 
@@ -48,6 +49,10 @@ bundle root:
   node "$DIR/src/cli.js" list
   node "$DIR/src/cli.js" apply --target codex --profile developer --project "\$(pwd)" --dry-run
 
+설치가 안 되면 먼저 진단하세요:
+  node "$DIR/src/cli.js" doctor
+  node "$DIR/src/cli.js" doctor --project "\$(pwd)"
+
 주의:
   install.sh는 QnA wizard가 아니라 bootstrap 안내입니다.
   실제 설치는 SETUP_WIZARD.md를 읽은 agent가 생성한 dry-run/apply 명령으로 진행하세요.
@@ -56,20 +61,26 @@ EOF
 fi
 
 scope=project
-pass=""
-for a in "$@"; do
-  case "$a" in
-    --global) scope=home ;;
-    *) pass="$pass $a" ;;  # simple flags/values; avoid spaces in passthrough paths
-  esac
+# Rebuild the positional parameters without --global, preserving each argument
+# verbatim. POSIX sh has no arrays, so we rotate "$@": pop the front, and push
+# back everything except --global. This keeps quoting intact so passthrough
+# values with spaces (e.g. --project "/Users/내 폴더/repo") survive.
+n=$#
+while [ "$n" -gt 0 ]; do
+  a="$1"
+  shift
+  if [ "$a" = "--global" ]; then
+    scope=home
+  else
+    set -- "$@" "$a"
+  fi
+  n=$((n - 1))
 done
 
 if [ "$scope" = home ]; then
   echo "→ 전역(home) direct apply wrapper: $HOME"
-  # shellcheck disable=SC2086
-  exec node "$DIR/src/cli.js" apply --scope home $pass
+  exec node "$DIR/src/cli.js" apply --scope home "$@"
 else
   echo "→ 프로젝트 direct apply wrapper: $(pwd)"
-  # shellcheck disable=SC2086
-  exec node "$DIR/src/cli.js" apply --scope project --project "$(pwd)" $pass
+  exec node "$DIR/src/cli.js" apply --scope project --project "$(pwd)" "$@"
 fi

@@ -13,6 +13,7 @@ import { applyPlan } from '../src/apply.js';
 import { applyUpdate } from '../src/update.js';
 import { buildRepairDryRun } from '../src/repair.js';
 import { buildUninstallDryRun } from '../src/uninstall.js';
+import { runDoctor } from '../src/doctor.js';
 import { validateInstallState } from '../src/state.js';
 import { checkAssetSchemas } from '../scripts/check-asset-schema.js';
 import { checkCatalogParity } from '../scripts/check-catalog-parity.js';
@@ -22,6 +23,7 @@ import { calculatePackDigest } from '../src/packs/digest.js';
 
 const CLI = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../src/cli.js');
 const BUILD_BUNDLE = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../scripts/build-bundle.js');
+const INSTALL_SH = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../install.sh');
 const FIXTURES = path.resolve(path.dirname(fileURLToPath(import.meta.url)), 'fixtures');
 
 function tmpProject() {
@@ -702,6 +704,44 @@ test('build-bundle is deterministic and includes runtime-required members', () =
   ]) {
     assert.ok(zipA.includes(Buffer.from(member)), `bundle must include ${member}`);
   }
+});
+
+test('doctor passes for the bundle with a writable project and fails on a missing one', () => {
+  const ok = runDoctor({ scope: 'project', projectRoot: tmpProject() });
+  assert.equal(ok.ok, true);
+  assert.ok(ok.checks.some((c) => c.name === 'node' && c.status === 'ok'));
+  assert.ok(ok.checks.some((c) => c.name === 'bundle' && /install-state\.schema\.json/.test(c.detail)));
+  assert.ok(ok.checks.some((c) => c.name === 'bundle' && /scripts\/check-asset-schema\.js/.test(c.detail)));
+  assert.ok(ok.checks.some((c) => c.name === 'project' && /writable/.test(c.detail)));
+
+  const bad = runDoctor({ scope: 'project', projectRoot: '/no/such/dir/agent-deploy-doctor-xyz' });
+  assert.equal(bad.ok, false);
+  assert.ok(bad.checks.some((c) => c.name === 'project' && c.status === 'fail'));
+});
+
+test('doctor CLI emits valid JSON and exits non-zero when a check fails', () => {
+  const okOut = execFileSync('node', [CLI, 'doctor', '--json', '--project', tmpProject()], { encoding: 'utf8' });
+  assert.equal(JSON.parse(okOut).ok, true);
+
+  assert.throws(
+    () => execFileSync('node', [CLI, 'doctor', '--project', '/no/such/dir/xyz'], {
+      encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'],
+    }),
+    (err) => err.status === 1,
+  );
+});
+
+test('install.sh passes a --project path with spaces through intact', () => {
+  const spaced = path.join(tmpProject(), 'my project dir');
+  fs.mkdirSync(spaced, { recursive: true });
+
+  const out = execFileSync('sh', [
+    INSTALL_SH, '--target', 'codex', '--profile', 'minimal', '--project', spaced, '--dry-run',
+  ], { encoding: 'utf8' });
+
+  // The resolved plan root must contain the full spaced path, not a truncated token.
+  assert.ok(out.includes(`${spaced}/.codex`), `root should resolve under the spaced path:\n${out}`);
+  assert.ok(!fs.existsSync(path.join(spaced, '.codex')), 'dry-run wrote nothing');
 });
 
 test('home scope installs into the user-global config dir (fake home)', () => {

@@ -16,6 +16,7 @@ import { resolveConflictPolicy } from './conflict-policy.js';
 import { buildUpdateDryRun, applyUpdate } from './update.js';
 import { buildRepairDryRun } from './repair.js';
 import { buildUninstallDryRun } from './uninstall.js';
+import { runDoctor } from './doctor.js';
 
 function parseArgs(argv) {
   const args = { _: [] };
@@ -200,13 +201,29 @@ function printUninstallReport(report, asJson) {
   console.log(`\ninstall-state: ${report.stateFile.status} ${stateRel}`);
 }
 
+function printDoctorReport(report, asJson) {
+  if (asJson) {
+    process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
+    return;
+  }
+
+  console.log('agent-deploy doctor');
+  for (const check of report.checks) {
+    console.log(`  [${check.status === 'ok' ? 'ok  ' : 'FAIL'}] ${check.name}: ${check.detail}`);
+    if (check.status !== 'ok' && check.hint) console.log(`         → ${check.hint}`);
+  }
+  console.log(report.ok
+    ? '\ndiagnosis: 모든 점검 통과'
+    : '\ndiagnosis: 일부 점검 실패 (위 → 안내 참고)');
+}
+
 function main() {
   const [, , cmd, ...rest] = process.argv;
   const args = parseArgs(rest);
 
   try {
     if (!cmd || cmd === 'help' || args.help) {
-      console.log('usage: agent-deploy <list|plan|apply|update|repair|uninstall> [--target T] [--profile P] [--modules a,b]\n'
+      console.log('usage: agent-deploy <list|plan|apply|update|repair|uninstall|doctor> [--target T] [--profile P] [--modules a,b]\n'
         + '       [--pack DIR[,DIR]] [--enable-pack-extensions] [--conflict-resolution FILE]\n'
         + '       [--scope project|home] [--global] [--home DIR] [--project DIR]\n'
         + '       [--backup] [--conflict-policy POLICY] [--dry-run] [--json]\n'
@@ -221,7 +238,8 @@ function main() {
         + '  update --dry-run: reads install-state and prints a managed-file diff (no writes)\n'
         + '  update: refreshes managed files from install-state; fail-closed on user-modified drift\n'
         + '  repair --dry-run: reads install-state and reports missing managed files (no writes)\n'
-        + '  uninstall --dry-run: reverse-replays install-state and reports teardown targets (no writes)');
+        + '  uninstall --dry-run: reverse-replays install-state and reports teardown targets (no writes)\n'
+        + '  doctor: diagnose Node version, bundle integrity, and target-dir writability (no writes)');
       return;
     }
     if (cmd === 'list') return cmdList();
@@ -302,6 +320,13 @@ function main() {
       }
       const report = buildUninstallDryRun(buildRequest(args));
       printUninstallReport(report, Boolean(args.json));
+      return;
+    }
+
+    if (cmd === 'doctor') {
+      const report = runDoctor(buildRequest(args));
+      printDoctorReport(report, Boolean(args.json));
+      if (!report.ok) process.exitCode = 1;
       return;
     }
 
