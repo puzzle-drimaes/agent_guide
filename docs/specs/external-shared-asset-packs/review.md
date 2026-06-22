@@ -68,3 +68,14 @@ keeps external packs read-only and declarative, and blocks automatic default-pro
 - Smoke fixtures cover a valid pack, missing `pack.json`, path escape, id collision, and externals Markdown scanning.
 
 Remaining Phase 2 risk: planner integration must keep pack logic out of target adapters by passing a composed manifest object into planning.
+
+## Phase 2 implementation review
+
+- CLI `plan`/`apply` accepts `--pack DIR[,DIR]` and prints composed pack metadata in human-readable plans.
+- `src/packs/pack-composer.js` validates packs, sorts them by trust layer, and composes modules/profiles with the base bundle.
+- Target adapters now honor a module-level `assetRoot`, keeping pack file reads separate from bundled assets.
+- Applied pack plans write `source.packs` provenance to install-state.
+- Smoke tests cover explicit pack module planning, pack-local profile apply, install-state pack provenance, and CLI dry-run output.
+
+Remaining risk: conflict resolution is still fail-closed only. Interactive `keep-existing` / `add-namespaced` /
+`rename-proposed` / `replace-existing` provenance remains a follow-up task.

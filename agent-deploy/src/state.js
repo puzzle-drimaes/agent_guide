@@ -28,7 +28,7 @@ function repoVersion() {
   }
 }
 
-export function buildState({ adapter, input, request, resolution, manifestVersion, operations, installedAt }) {
+export function buildState({ adapter, input, request, resolution, manifestVersion, packs = [], operations, installedAt }) {
   return {
     schemaVersion: 'agentdeploy.install.v1',
     installedAt,
@@ -52,6 +52,7 @@ export function buildState({ adapter, input, request, resolution, manifestVersio
       repoVersion: repoVersion(),
       repoCommit: repoCommit(),
       manifestVersion,
+      packs,
     },
     operations: operations.map((o) => ({
       kind: o.kind,

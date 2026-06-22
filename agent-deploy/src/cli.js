@@ -40,6 +40,7 @@ function buildRequest(args) {
     target: args.target,
     profile: args.profile || null,
     moduleIds: args.modules ? String(args.modules).split(',').map((s) => s.trim()).filter(Boolean) : [],
+    packPaths: args.pack ? String(args.pack).split(',').map((s) => path.resolve(s.trim())).filter(Boolean) : [],
     scope,
     projectRoot: path.resolve(args.project || process.cwd()),
     homeDir: args.home ? path.resolve(args.home) : undefined,
@@ -54,6 +55,9 @@ function printPlan(plan, asJson) {
   console.log(`target:   ${plan.adapter.target} (${plan.adapter.id})`);
   console.log(`scope:    ${plan.scope}`);
   console.log(`root:     ${plan.targetRoot}`);
+  if (plan.packs.length) {
+    console.log(`packs:    ${plan.packs.map((p) => `${p.id}@${p.version}`).join(', ')}`);
+  }
   console.log(`modules:  ${plan.resolution.selected.map((m) => m.id).join(', ') || '(none)'}`);
   if (plan.resolution.skipped.length) {
     console.log(`skipped:  ${plan.resolution.skipped.map((s) => `${s.id} (${s.reason})`).join(', ')}`);
@@ -89,9 +93,10 @@ function main() {
   try {
     if (!cmd || cmd === 'help' || args.help) {
       console.log('usage: agent-deploy <list|plan|apply> [--target T] [--profile P] [--modules a,b]\n'
-        + '       [--scope project|home] [--global] [--home DIR] [--project DIR] [--dry-run] [--json]\n'
+        + '       [--pack DIR[,DIR]] [--scope project|home] [--global] [--home DIR] [--project DIR] [--dry-run] [--json]\n'
         + '  scope project (default): install into a repo (.claude, .cursor … under --project)\n'
-        + '  --global / --scope home: install into the user-global config dir (~/.claude, ~/.codex …)');
+        + '  --global / --scope home: install into the user-global config dir (~/.claude, ~/.codex …)\n'
+        + '  --pack: compose validated asset pack manifests into the plan; modules/profiles remain explicit');
       return;
     }
     if (cmd === 'list') return cmdList();

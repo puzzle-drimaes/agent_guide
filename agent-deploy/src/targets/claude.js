@@ -22,18 +22,19 @@ export default createAdapter({
     const ops = [];
 
     for (const module of input.modules) {
+      const moduleAssetRoot = module.assetRoot || assetRoot;
       for (const sourceRel of module.paths) {
         const category = sourceRel.split('/')[0];
         if (category === 'mcp') {
           const op = mergeJsonOp({
-            moduleId: module.id, assetRoot,
+            moduleId: module.id, assetRoot: moduleAssetRoot,
             sourceRel: 'mcp/servers.json',
             dest: mcpDest,
           });
           if (op) ops.push(op);
         } else {
           // rules / agents / commands / skills -> mirror under .claude/
-          ops.push(...mirrorOps({ moduleId: module.id, assetRoot, sourceRel, destRoot: root }));
+          ops.push(...mirrorOps({ moduleId: module.id, assetRoot: moduleAssetRoot, sourceRel, destRoot: root }));
         }
       }
     }

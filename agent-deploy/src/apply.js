@@ -72,6 +72,7 @@ export function applyPlan(plan, { installedAt = new Date().toISOString() } = {})
     request: plan.request,
     resolution: plan.resolution,
     manifestVersion: plan.manifestVersion,
+    packs: plan.packs || [],
     operations: plan.operations,
     installedAt,
   });

@@ -156,3 +156,16 @@ node scripts/check-pack.js --externals ./.agent-packs/externals
 These commands are read-only. They validate pack structure, module/profile references,
 asset metadata, catalog parity, path safety, and base-bundle conflicts, or generate draft
 candidate metadata from external Markdown without modifying source files.
+
+## Phase 2 planner/apply entry point
+
+Implemented planner integration:
+
+```text
+node src/cli.js plan  --target codex --pack ./packs/frontend --modules frontend-team-pack-review-checklist
+node src/cli.js apply --target codex --pack ./packs/frontend --profile frontend-review --dry-run
+```
+
+Pack modules and pack-local profiles must still be selected explicitly. The composed plan keeps the base bundle as the
+base layer, validates pack conflicts before planning, reads pack assets from their own `assets/` root, and records
+`source.packs` provenance when applied.

@@ -50,18 +50,19 @@ export default createAdapter({
     let needsRootInstruction = false;
 
     for (const module of input.modules) {
+      const moduleAssetRoot = module.assetRoot || assetRoot;
       for (const sourceRel of module.paths) {
         const category = sourceRel.split('/')[0];
         switch (category) {
           case 'rules':
             if (module.id === 'baseline-rules') needsRootInstruction = true;
-            ops.push(...mirrorOps({ moduleId: module.id, assetRoot, sourceRel, destRoot: root }));
+            ops.push(...mirrorOps({ moduleId: module.id, assetRoot: moduleAssetRoot, sourceRel, destRoot: root }));
             break;
           case 'commands':
           case 'agents':
           case 'skills':
           case 'prompts':
-            ops.push(...mirrorOps({ moduleId: module.id, assetRoot, sourceRel, destRoot: root }));
+            ops.push(...mirrorOps({ moduleId: module.id, assetRoot: moduleAssetRoot, sourceRel, destRoot: root }));
             break;
           case 'mcp':
             ops.push(skipOp({

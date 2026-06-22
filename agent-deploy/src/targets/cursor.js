@@ -48,16 +48,17 @@ export default createAdapter({
     const ops = [];
 
     for (const module of input.modules) {
+      const moduleAssetRoot = module.assetRoot || assetRoot;
       for (const sourceRel of module.paths) {
         const category = sourceRel.split('/')[0];
         switch (category) {
           case 'rules':
-            ops.push(...cursorRuleOps({ moduleId: module.id, assetRoot, sourceRel, root }));
+            ops.push(...cursorRuleOps({ moduleId: module.id, assetRoot: moduleAssetRoot, sourceRel, root }));
             break;
           case 'agents':
           case 'skills':
           case 'prompts':
-            ops.push(...mirrorOps({ moduleId: module.id, assetRoot, sourceRel, destRoot: root }));
+            ops.push(...mirrorOps({ moduleId: module.id, assetRoot: moduleAssetRoot, sourceRel, destRoot: root }));
             break;
           case 'commands':
             // Cursor has no slash-command surface -> record the skip, don't write.
@@ -68,7 +69,7 @@ export default createAdapter({
             break;
           case 'mcp': {
             const op = mergeJsonOp({
-              moduleId: module.id, assetRoot,
+              moduleId: module.id, assetRoot: moduleAssetRoot,
               sourceRel: 'mcp/servers.json',
               dest: path.join(root, 'mcp.json'),
             });

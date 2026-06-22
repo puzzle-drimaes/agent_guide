@@ -569,3 +569,53 @@ test('check-pack CLI emits JSON for valid packs and externals scans', () => {
   ], { encoding: 'utf8' });
   assert.equal(JSON.parse(externalsOut).assets.length, 3);
 });
+
+test('planner composes explicit pack modules into the install plan', () => {
+  const project = tmpProject();
+  const packRoot = path.join(FIXTURES, 'packs/valid-pack');
+  const plan = buildPlan({
+    target: 'codex',
+    moduleIds: ['team-valid-pack-team-note-module'],
+    packPaths: [packRoot],
+    projectRoot: project,
+  });
+
+  assert.equal(plan.packs.length, 1);
+  assert.equal(plan.packs[0].id, 'team-valid-pack');
+  assert.deepEqual(plan.resolution.selected.map((module) => module.id), ['team-valid-pack-team-note-module']);
+  assert.ok(plan.operations.some((op) => op.dest.endsWith('.agents/prompts/team-note.md')));
+});
+
+test('planner composes pack-local profiles and apply records pack provenance', () => {
+  const project = tmpProject();
+  const packRoot = path.join(FIXTURES, 'packs/valid-pack');
+  const plan = buildPlan({
+    target: 'claude',
+    profile: 'team-valid',
+    packPaths: [packRoot],
+    projectRoot: project,
+  });
+  applyPlan(plan, { installedAt: '2026-01-01T00:00:00Z' });
+
+  assert.ok(fs.existsSync(path.join(project, '.claude/prompts/team-note.md')));
+  const state = JSON.parse(fs.readFileSync(path.join(project, '.claude/agent-install-state.json'), 'utf8'));
+  assert.equal(state.source.packs[0].id, 'team-valid-pack');
+  assert.equal(state.source.packs[0].packType, 'project-local');
+});
+
+test('CLI dry-run accepts --pack and prints pack operations', () => {
+  const project = tmpProject();
+  const packRoot = path.join(FIXTURES, 'packs/valid-pack');
+  const out = execFileSync('node', [
+    CLI, 'apply', '--dry-run',
+    '--target', 'codex',
+    '--modules', 'team-valid-pack-team-note-module',
+    '--pack', packRoot,
+    '--project', project,
+  ], { encoding: 'utf8' });
+
+  assert.match(out, /packs:\s+team-valid-pack@0\.1\.0/);
+  assert.match(out, /team-valid-pack-team-note-module/);
+  assert.match(out, /\.agents\/prompts\/team-note\.md/);
+  assert.ok(!fs.existsSync(path.join(project, '.agents/prompts/team-note.md')), 'dry-run wrote nothing');
+});

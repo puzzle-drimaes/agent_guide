@@ -75,21 +75,22 @@ export default createAdapter({
     let needsRootInstruction = false;
 
     for (const module of input.modules) {
+      const moduleAssetRoot = module.assetRoot || assetRoot;
       for (const sourceRel of module.paths) {
         const category = sourceRel.split('/')[0];
         switch (category) {
           case 'rules':
             if (module.id === 'baseline-rules') needsRootInstruction = true;
-            ops.push(...mirrorOps({ moduleId: module.id, assetRoot, sourceRel, destRoot: sharedRoot }));
+            ops.push(...mirrorOps({ moduleId: module.id, assetRoot: moduleAssetRoot, sourceRel, destRoot: sharedRoot }));
             break;
           case 'skills':
-            ops.push(...mirrorOps({ moduleId: module.id, assetRoot, sourceRel, destRoot: sharedRoot }));
+            ops.push(...mirrorOps({ moduleId: module.id, assetRoot: moduleAssetRoot, sourceRel, destRoot: sharedRoot }));
             break;
           case 'prompts':
-            ops.push(...mirrorOps({ moduleId: module.id, assetRoot, sourceRel, destRoot: sharedRoot }));
+            ops.push(...mirrorOps({ moduleId: module.id, assetRoot: moduleAssetRoot, sourceRel, destRoot: sharedRoot }));
             break;
           case 'agents':
-            ops.push(...mirrorOps({ moduleId: module.id, assetRoot, sourceRel, destRoot: codexRoot }));
+            ops.push(...mirrorOps({ moduleId: module.id, assetRoot: moduleAssetRoot, sourceRel, destRoot: codexRoot }));
             break;
           case 'commands':
             ops.push(skipOp({
@@ -101,7 +102,7 @@ export default createAdapter({
           case 'mcp': {
             const op = mergeTomlOp({
               moduleId: module.id,
-              assetRoot,
+              assetRoot: moduleAssetRoot,
               sourceRel: 'mcp/servers.json',
               dest: path.join(codexRoot, 'config.toml'),
               convert: codexMcpPayload,

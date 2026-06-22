@@ -28,12 +28,20 @@ Implementation notes:
 
 ## Phase 2 — Planner integration
 
-- [ ] Add `--pack <path>` parsing to CLI.
-- [ ] Refactor manifest loading so planner can receive composed manifests.
-- [ ] Add pack manifest composition with collision detection.
+- [x] Add `--pack <path>` parsing to CLI.
+- [x] Refactor manifest loading so planner can receive composed manifests.
+- [x] Add pack manifest composition with collision detection.
 - [ ] Add conflict resolution provenance for `keep-existing`, `add-namespaced`, `rename-proposed`, and `replace-existing`.
-- [ ] Add explicit pack module/profile selection to plan/apply.
-- [ ] Extend smoke tests for pack dry-run and apply.
+- [x] Add explicit pack module/profile selection to plan/apply.
+- [x] Extend smoke tests for pack dry-run and apply.
+
+Implementation notes:
+
+- `plan`/`apply` now accept `--pack DIR[,DIR]`.
+- Pack manifests are composed after validation; base bundle remains the base layer.
+- Pack modules retain their own `assetRoot`, so target adapters can copy from pack assets without mixing files into bundled `assets/`.
+- `source.packs` is recorded in install-state for applied pack plans.
+- Conflict resolution decisions are not interactive yet; unresolved conflicts still fail closed.
 
 ## Phase 3 — Provenance and governance
 
