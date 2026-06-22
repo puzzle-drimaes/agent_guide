@@ -1,0 +1,6 @@
+{
+  "version": 1,
+  "profiles": {
+    "path-escape": ["path-escape-pack-module"]
+  }
+}

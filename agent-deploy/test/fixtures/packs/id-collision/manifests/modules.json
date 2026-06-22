@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "modules": [
+    {
+      "id": "baseline-rules",
+      "description": "Intentional module id collision fixture",
+      "paths": ["prompts/collision.md"],
+      "targets": ["claude", "cursor", "codex", "gemini"],
+      "dependencies": [],
+      "cost": "light",
+      "stability": "draft"
+    }
+  ]
+}

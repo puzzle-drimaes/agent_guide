@@ -58,3 +58,13 @@ pack provenance/install-state.
 
 The design is suitable as a safe v1 direction because it preserves the existing bundled flow,
 keeps external packs read-only and declarative, and blocks automatic default-profile mutation unless a pack is explicitly approved.
+
+## Phase 1 implementation review
+
+- `schemas/asset-pack.schema.json` now captures the required `pack.json` shape, including `packType`, `id`, `version`, `owner`, and `reviewStatus`.
+- `src/packs/pack-validator.js` validates pack structure, module/profile references, path safety, reused asset metadata checks, catalog parity, and base-bundle conflicts.
+- `src/packs/externals-scanner.js` treats `.agent-packs/externals/` style folders as read-only candidate metadata sources.
+- `src/packs/conflicts.js` detects module/profile/asset/destination collisions and exposes the required user decision choices.
+- Smoke fixtures cover a valid pack, missing `pack.json`, path escape, id collision, and externals Markdown scanning.
+
+Remaining Phase 2 risk: planner integration must keep pack logic out of target adapters by passing a composed manifest object into planning.

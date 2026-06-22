@@ -1,0 +1,10 @@
+{
+  "schemaVersion": "agentdeploy.assetPack.v1",
+  "id": "path-escape-pack",
+  "title": "Path Escape Pack",
+  "version": "0.1.0",
+  "owner": "security-team",
+  "stability": "draft",
+  "reviewStatus": "candidate",
+  "packType": "candidate"
+}

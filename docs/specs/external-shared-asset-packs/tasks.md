@@ -10,14 +10,21 @@
 
 ## Phase 1 — Validation only
 
-- [ ] Add `schemas/asset-pack.schema.json`.
-- [ ] Add `scripts/check-pack.js` for a single pack root.
-- [ ] Add `.agent-packs/externals/` Markdown scanner for drop-in skill/doc proposals.
-- [ ] Generate candidate pack metadata from externals Markdown files without modifying source files.
-- [ ] Detect conflicts with existing docs/rules/assets and present user decision options.
-- [ ] Reuse asset frontmatter and catalog parity validators for pack asset roots.
-- [ ] Add symlink/path escape checks for pack root.
-- [ ] Add fixture packs under `agent-deploy/test/fixtures/packs/`.
+- [x] Add `schemas/asset-pack.schema.json`.
+- [x] Add `scripts/check-pack.js` for a single pack root.
+- [x] Add `.agent-packs/externals/` Markdown scanner for drop-in skill/doc proposals.
+- [x] Generate candidate pack metadata from externals Markdown files without modifying source files.
+- [x] Detect conflicts with existing docs/rules/assets and present user decision options.
+- [x] Reuse asset frontmatter and catalog parity validators for pack asset roots.
+- [x] Add symlink/path escape checks for pack root.
+- [x] Add fixture packs under `agent-deploy/test/fixtures/packs/`.
+
+Implementation notes:
+
+- `scripts/check-pack.js --pack <pack-root>` validates a declarative pack root and fails on conflicts by default.
+- `scripts/check-pack.js --externals <externals-root>` scans `skills/`, `docs/`, and `prompts/` Markdown into read-only candidate pack metadata.
+- Conflict reports expose the explicit decision set: `keep-existing`, `add-namespaced`, `rename-proposed`, `replace-existing`.
+- Phase 1 remains validation-only; planner/apply integration is still Phase 2.
 
 ## Phase 2 — Planner integration
 

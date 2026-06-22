@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "agentdeploy.assetCatalog.v1",
+  "generatedAt": null,
+  "assets": [
+    {
+      "id": "team-valid-pack-team-note",
+      "assetType": "prompt",
+      "title": "Team Note",
+      "description": "Draft a concise team note from rough bullets.",
+      "path": "prompts/team-note.md",
+      "moduleIds": ["team-valid-pack-team-note-module"],
+      "profiles": ["team-valid"],
+      "audience": ["project"],
+      "stability": "beta",
+      "owner": "platform-team",
+      "tags": ["team"],
+      "reviewStatus": "reviewing"
+    }
+  ]
+}

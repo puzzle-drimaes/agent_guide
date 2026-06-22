@@ -11,8 +11,11 @@ import { buildPlan } from '../src/planner.js';
 import { applyPlan } from '../src/apply.js';
 import { checkAssetSchemas } from '../scripts/check-asset-schema.js';
 import { checkCatalogParity } from '../scripts/check-catalog-parity.js';
+import { scanExternals } from '../src/packs/externals-scanner.js';
+import { validatePackRoot } from '../src/packs/pack-validator.js';
 
 const CLI = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../src/cli.js');
+const FIXTURES = path.resolve(path.dirname(fileURLToPath(import.meta.url)), 'fixtures');
 
 function tmpProject() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'agent-deploy-'));
@@ -503,4 +506,66 @@ test('catalog parity guard catches catalog/module/profile drift', () => {
   assert.match(errorText, /unknown module 'wrong-module'/);
   assert.match(errorText, /unknown profile 'ghost'/);
   assert.match(warnings.join('\n'), /has no draft frontmatter to compare/);
+});
+
+test('asset pack validator accepts a normal project-local pack', () => {
+  const packRoot = path.join(FIXTURES, 'packs/valid-pack');
+  const result = validatePackRoot(packRoot);
+  assert.equal(result.ok, true, `unexpected pack errors:\n${result.errors.join('\n')}`);
+  assert.equal(result.packJson.id, 'team-valid-pack');
+});
+
+test('asset pack validator rejects missing pack.json', () => {
+  const packRoot = path.join(FIXTURES, 'packs/missing-pack-json');
+  const result = validatePackRoot(packRoot);
+  assert.equal(result.ok, false);
+  assert.match(result.errors.join('\n'), /missing pack\.json/);
+});
+
+test('asset pack validator rejects module path escape', () => {
+  const packRoot = path.join(FIXTURES, 'packs/path-escape');
+  const result = validatePackRoot(packRoot);
+  assert.equal(result.ok, false);
+  assert.match(result.errors.join('\n'), /path '\.\.\/escape\.md' must stay under assets\//);
+});
+
+test('asset pack validator reports id and destination collision options', () => {
+  const packRoot = path.join(FIXTURES, 'packs/id-collision');
+  const result = validatePackRoot(packRoot);
+  const errors = result.errors.join('\n');
+  assert.equal(result.ok, false);
+  assert.match(errors, /module id 'baseline-rules' already exists/);
+  assert.ok(result.conflicts.some((item) => item.type === 'module-id'));
+  assert.ok(result.conflicts.some((item) => item.type === 'asset-id'));
+  assert.ok(result.conflicts.some((item) => item.choices.includes('keep-existing')));
+  assert.ok(result.conflicts.some((item) => item.choices.includes('add-namespaced')));
+  assert.ok(result.conflicts.some((item) => item.choices.includes('rename-proposed')));
+  assert.ok(result.conflicts.some((item) => item.choices.includes('replace-existing')));
+});
+
+test('externals scanner classifies Markdown and drafts candidate metadata', () => {
+  const result = scanExternals(path.join(FIXTURES, 'externals'), { packId: 'team-externals' });
+  assert.deepEqual(result.errors, []);
+  assert.equal(result.assets.length, 3);
+  assert.deepEqual(new Set(result.assets.map((asset) => asset.assetType)), new Set(['skill', 'doc', 'prompt']));
+  assert.equal(result.pack.packJson.packType, 'candidate');
+  assert.equal(result.pack.packJson.reviewStatus, 'candidate');
+  assert.ok(result.pack.modulesDoc.modules.every((module) => module.id.startsWith('team-externals-')));
+  assert.ok(result.pack.profilesDoc.profiles.candidate.length === 3);
+});
+
+test('check-pack CLI emits JSON for valid packs and externals scans', () => {
+  const packOut = execFileSync('node', [
+    path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../scripts/check-pack.js'),
+    '--pack', path.join(FIXTURES, 'packs/valid-pack'),
+    '--json',
+  ], { encoding: 'utf8' });
+  assert.equal(JSON.parse(packOut).ok, true);
+
+  const externalsOut = execFileSync('node', [
+    path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../scripts/check-pack.js'),
+    '--externals', path.join(FIXTURES, 'externals'),
+    '--json',
+  ], { encoding: 'utf8' });
+  assert.equal(JSON.parse(externalsOut).assets.length, 3);
 });

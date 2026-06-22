@@ -1139,6 +1139,9 @@ SDD mode: lite (기존 installer core 변경 없이 bundle entrypoint와 문서 
 - 비개발 직무 skill 추가 (meeting-summary / customer-response / product-spec) + business/product profile 신설
 - governance skill 추가 (quarterly-review / kpi-report / prompt-db-curation) + governance profile 신설
 - 직무별 스타터 프롬프트 추가 (product: prd/user-story/prioritization, business: faq/proposal/announcement)
+- external/shared asset pack Phase 1 validation-only 구현
+  - `asset-pack.schema.json`, `check-pack.js`, pack validator, externals scanner, conflict detector 추가
+  - 정상 pack / 누락 pack.json / path escape / id collision / externals scan smoke test 추가
 ```
 
 아직 남은 핵심은 SETUP_WIZARD.md 기반 flow 검증과 파일럿 운영 수준의 bundle/lifecycle 구현이다.

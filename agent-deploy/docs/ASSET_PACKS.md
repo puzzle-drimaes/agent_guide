@@ -143,3 +143,16 @@ agent-deploy apply --target codex --profile developer --pack ./packs/frontend --
 ```
 
 `--enable-pack-extensions` may be added later for approved shared packs only.
+
+## Phase 1 validation entry point
+
+Implemented validation-only commands:
+
+```text
+node scripts/check-pack.js --pack ./packs/frontend
+node scripts/check-pack.js --externals ./.agent-packs/externals
+```
+
+These commands are read-only. They validate pack structure, module/profile references,
+asset metadata, catalog parity, path safety, and base-bundle conflicts, or generate draft
+candidate metadata from external Markdown without modifying source files.

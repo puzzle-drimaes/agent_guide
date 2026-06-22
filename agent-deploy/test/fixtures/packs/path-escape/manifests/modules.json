@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "modules": [
+    {
+      "id": "path-escape-pack-module",
+      "description": "Unsafe path fixture",
+      "paths": ["../escape.md"],
+      "targets": ["codex"],
+      "dependencies": [],
+      "cost": "light",
+      "stability": "draft"
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "schemaVersion": "agentdeploy.assetPack.v1",
+  "id": "id-collision-pack",
+  "title": "ID Collision Pack",
+  "version": "0.1.0",
+  "owner": "platform-team",
+  "stability": "draft",
+  "reviewStatus": "candidate",
+  "packType": "candidate"
+}

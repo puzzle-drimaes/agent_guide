@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "modules": [
+    {
+      "id": "team-valid-pack-team-note-module",
+      "description": "Team note prompt",
+      "paths": ["prompts/team-note.md"],
+      "targets": ["claude", "cursor", "codex", "gemini"],
+      "dependencies": [],
+      "cost": "light",
+      "stability": "beta"
+    }
+  ]
+}

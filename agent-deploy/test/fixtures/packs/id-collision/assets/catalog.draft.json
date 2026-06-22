@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "agentdeploy.assetCatalog.v1",
+  "generatedAt": null,
+  "assets": [
+    {
+      "id": "universal-prompt-template",
+      "assetType": "prompt",
+      "title": "Collision",
+      "description": "Intentional asset id collision fixture.",
+      "path": "prompts/collision.md",
+      "moduleIds": ["baseline-rules"],
+      "profiles": ["minimal"],
+      "audience": ["project"],
+      "stability": "draft",
+      "owner": "platform-team",
+      "tags": ["fixture"],
+      "reviewStatus": "candidate"
+    }
+  ]
+}

@@ -201,7 +201,7 @@ npm --prefix agent-deploy run validate
   → manifest/rule-drift/entry-parity/asset-schema/catalog-parity validation 통과
 
 npm --prefix agent-deploy test
-  → 26개 smoke test 전체 통과
+  → 32개 smoke test 전체 통과
 ```
 
 ### 2.1-A 최우선 전략 문서화
@@ -242,6 +242,12 @@ docs/specs/external-shared-asset-packs/
 3. [x] shared document asset 작성/승격 skill 추가
 4. [x] 외부/shared asset pack 적용 방식 설계
 5. [x] SETUP_WIZARD.md 기반 초보자 role guide 보강
+6. [x] asset pack Phase 1 validation-only 구현
+   - `schemas/asset-pack.schema.json`
+   - `scripts/check-pack.js`
+   - pack root 구조/module/profile/path/conflict 검증
+   - `.agent-packs/externals/` Markdown scanner
+   - fixture + smoke test
 ```
 
 ### 2.2 Codex adapter 추가
