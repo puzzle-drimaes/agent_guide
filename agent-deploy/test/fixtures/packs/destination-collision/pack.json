@@ -1,0 +1,11 @@
+{
+  "schemaVersion": "agentdeploy.assetPack.v1",
+  "id": "team-conflict-pack",
+  "title": "Team Conflict Pack",
+  "version": "0.1.0",
+  "owner": "platform-team",
+  "stability": "beta",
+  "reviewStatus": "reviewing",
+  "packType": "project-local",
+  "license": "Internal-Use-Only"
+}

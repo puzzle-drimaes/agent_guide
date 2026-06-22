@@ -1,0 +1,6 @@
+{
+  "version": 1,
+  "profiles": {
+    "team-conflict": ["team-conflict-pack-dev-prompt-module"]
+  }
+}

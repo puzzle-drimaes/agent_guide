@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "modules": [
+    {
+      "id": "team-conflict-pack-dev-prompt-module",
+      "description": "Team-specific dev prompt with a destination collision",
+      "paths": ["prompts/dev-implementation.md"],
+      "targets": ["claude", "cursor", "codex", "gemini"],
+      "dependencies": [],
+      "cost": "light",
+      "stability": "beta"
+    }
+  ]
+}

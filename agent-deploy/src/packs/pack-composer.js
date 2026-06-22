@@ -39,6 +39,7 @@ function annotatePackModule(module, pack) {
   return {
     ...module,
     assetRoot: path.join(pack.root, 'assets'),
+    ...(pack.installNamespace ? { installNamespace: pack.installNamespace } : {}),
     sourcePack: {
       id: pack.packJson.id,
       version: pack.packJson.version,
@@ -47,23 +48,53 @@ function annotatePackModule(module, pack) {
   };
 }
 
+function isAddNamespacedResolutionForPack(resolution, pack) {
+  if (resolution.decision !== 'add-namespaced') return false;
+  if (resolution.packId && resolution.packId !== pack.packJson.id) return false;
+  if (resolution.packDigest && resolution.packDigest !== pack.digest) {
+    throw new Error(`pack ${pack.packJson.id}: conflict resolution packDigest does not match current pack digest`);
+  }
+  return resolution.packId === pack.packJson.id;
+}
+
+function isAddNamespacedResolvableConflict(conflict) {
+  return ['target-destination', 'asset-path'].includes(conflict.type);
+}
+
+function resolvePackConflicts(pack, conflicts, conflictResolutions) {
+  if (!conflicts.length) return { unresolved: [], installNamespace: null };
+  const hasAddNamespaced = conflictResolutions.some((resolution) => isAddNamespacedResolutionForPack(resolution, pack));
+  const unresolved = conflicts.filter((conflict) => {
+    return !(hasAddNamespaced && isAddNamespacedResolvableConflict(conflict));
+  });
+  return {
+    unresolved,
+    installNamespace: hasAddNamespaced ? pack.packJson.id : null,
+  };
+}
+
 function loadPack(packRoot, options = {}) {
   const validation = validatePackRoot(packRoot, { ...options, allowConflicts: true });
   if (!validation.ok) {
     throw new Error(`pack validation failed for ${packRoot}: ${validation.errors.join('; ')}`);
   }
-  if (validation.conflicts.length) {
+  const pack = {
+    root: packRoot,
+    packJson: validation.packJson,
+    digest: validation.digest,
+  };
+  const conflictResult = resolvePackConflicts(pack, validation.conflicts, options.conflictResolutions || []);
+  if (conflictResult.unresolved.length) {
     throw new Error(
-      `pack conflict failed for ${packRoot}: ${validation.conflicts.map((item) => item.message).join('; ')}`
+      `pack conflict failed for ${packRoot}: ${conflictResult.unresolved.map((item) => item.message).join('; ')}`
     );
   }
 
   const modulesDoc = readJson(path.join(packRoot, 'manifests/modules.json'));
   const profilesDoc = readJson(path.join(packRoot, 'manifests/profiles.json'));
   return {
-    root: packRoot,
-    packJson: validation.packJson,
-    digest: validation.digest,
+    ...pack,
+    installNamespace: conflictResult.installNamespace,
     modulesDoc,
     profilesDoc,
   };
@@ -131,7 +162,12 @@ function applyDefaultProfileExtensions({ pack, profiles, baseProfileIds, moduleO
   }
 }
 
-export function loadComposedManifests({ root, packPaths = [], enablePackExtensions = false } = {}) {
+export function loadComposedManifests({
+  root,
+  packPaths = [],
+  enablePackExtensions = false,
+  conflictResolutions = [],
+} = {}) {
   const base = loadManifests(root);
   const baseAssetRoot = root ? path.join(root, 'assets') : ASSET_ROOT;
   const normalizedPackPaths = normalizePackPaths(packPaths);
@@ -146,7 +182,10 @@ export function loadComposedManifests({ root, packPaths = [], enablePackExtensio
     };
   }
 
-  const loadedPacks = sortPacks(normalizedPackPaths.map((packRoot) => loadPack(packRoot, { baseRoot: root })));
+  const loadedPacks = sortPacks(normalizedPackPaths.map((packRoot) => loadPack(packRoot, {
+    baseRoot: root,
+    conflictResolutions,
+  })));
   const modules = base.modulesDoc.modules.map((module) => annotateBaseModule(module, baseAssetRoot));
   const profiles = cloneJson(base.profilesDoc.profiles);
   const baseProfileIds = new Set(Object.keys(base.profilesDoc.profiles));

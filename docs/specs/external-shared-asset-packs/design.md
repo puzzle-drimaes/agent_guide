@@ -197,10 +197,11 @@ Resolution provenance:
 ```
 
 Runtime capture supports a `--conflict-resolution <json-file>` option that records externally reviewed decisions in
-install-state under `source.conflictResolutions[]`. The records are provenance-only in v1: unresolved pack conflicts
-still fail closed, and any path/id renames must be reflected in the pack files before planning. The JSON file may be
-either an array of decision records or an object with a `conflictResolutions` array. Each record uses the same fields
-and may include `decidedAt`, `packId`, and `packDigest`.
+install-state under `source.conflictResolutions[]`. `add-namespaced` records can resolve target-destination/asset-path collisions by transforming copy-file destinations
+to `shared/<pack-id>/...`. Other decisions remain provenance-only in v1: any path/id renames or replacements must be
+reflected in the pack files before planning. The JSON file may be either an array of decision records or an object with
+a `conflictResolutions` array. Each record uses the same fields and may include `decidedAt`, `packId`, and
+`packDigest`.
 
 ## 5. CLI shape
 

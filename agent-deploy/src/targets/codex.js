@@ -67,6 +67,9 @@ export default createAdapter({
   scope: 'project',
   rootSegments: ['.codex'],
   stateSegments: ['.agent-deploy', 'install-state.json'],
+  sharedRoot(input, adapter) {
+    return path.join(codexSharedRoot(input, adapter), 'shared');
+  },
   planOperations(input, adapter) {
     const { assetRoot } = input;
     const sharedRoot = codexSharedRoot(input, adapter);

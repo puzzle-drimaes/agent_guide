@@ -101,7 +101,7 @@ from a JSON file and written to install-state provenance.
 - Conflict-resolution record policy defines required fields and decision constraints for `keep-existing`, `add-namespaced`, `rename-proposed`, and `replace-existing`.
 - Runtime conflict decision capture now mirrors the documented fields into install-state when `--conflict-resolution` is provided.
 
-Remaining Phase 3 risk: governance policy is documented and decisions can be captured, but automatic plan transformation for those decisions is not implemented.
+Remaining Phase 3 risk: `add-namespaced` plan transformation is implemented for copy-file destination conflicts, but `keep-existing`, `rename-proposed`, and `replace-existing` plan transformations are not implemented.
 
 
 ## Phase 2 conflict-resolution capture review
@@ -109,6 +109,6 @@ Remaining Phase 3 risk: governance policy is documented and decisions can be cap
 - CLI `plan`/`apply` accepts `--conflict-resolution <json-file>` and validates decision records before planning.
 - Decision records are written to `source.conflictResolutions[]` in install-state.
 - Invalid decision values are rejected with a clear error before any write.
-- The feature is provenance-only in v1: it records reviewed decisions but does not automatically rename, namespace, skip, or replace conflicting pack files.
+- `add-namespaced` now transforms colliding copy-file destinations under `shared/<pack-id>/...`; `keep-existing`, `rename-proposed`, and `replace-existing` remain provenance-only in v1.
 
-Remaining risk: applying conflict decisions to transform plans is still a follow-up task; unresolved pack conflicts continue to fail closed.
+Remaining risk: applying `keep-existing`, `rename-proposed`, and `replace-existing` to transform plans is still a follow-up task; unresolved pack conflicts continue to fail closed.

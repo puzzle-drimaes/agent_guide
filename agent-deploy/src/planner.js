@@ -6,11 +6,12 @@ import { loadManifests, resolveRequest, ASSET_ROOT } from './manifest.js';
 import { normalizeConflictResolutions } from './packs/conflict-resolutions.js';
 import { loadComposedManifests } from './packs/pack-composer.js';
 
-function loadRequestManifests(request) {
+function loadRequestManifests(request, conflictResolutions) {
   if (request.packPaths && request.packPaths.length) {
     return loadComposedManifests({
       packPaths: request.packPaths,
       enablePackExtensions: Boolean(request.enablePackExtensions),
+      conflictResolutions,
     });
   }
   return loadManifests();
@@ -21,8 +22,8 @@ function loadRequestManifests(request) {
 //   is 'project' for safety; the CLI defaults to 'home'.
 export function buildPlan(request) {
   const adapter = getAdapter(request.target);
-  const manifests = loadRequestManifests(request);
   const conflictResolutions = normalizeConflictResolutions(request.conflictResolutions || []);
+  const manifests = loadRequestManifests(request, conflictResolutions);
   const input = {
     assetRoot: ASSET_ROOT,
     scope: request.scope || 'project',

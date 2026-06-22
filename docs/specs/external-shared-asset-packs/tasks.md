@@ -41,7 +41,7 @@ Implementation notes:
 - Pack manifests are composed after validation; base bundle remains the base layer.
 - Pack modules retain their own `assetRoot`, so target adapters can copy from pack assets without mixing files into bundled `assets/`.
 - `source.packs` is recorded in install-state for applied pack plans.
-- `--conflict-resolution <json-file>` records reviewed decisions in install-state; unresolved conflicts still fail closed and records are provenance-only in v1.
+- `--conflict-resolution <json-file>` records reviewed decisions in install-state; `add-namespaced` can transform colliding copy-file destinations to `shared/<pack-id>/...`; unresolved conflicts still fail closed.
 
 ## Phase 3 — Provenance and governance
 
@@ -60,7 +60,7 @@ Implementation notes:
 - CLI `--enable-pack-extensions` applies `defaultProfileExtensions` only from `shared-approved` packs.
 - Extension targets must be bundled base profiles; `project-local` and `candidate` packs cannot mutate builtin profiles.
 - Shared-approved approval criteria now cover source/license, validation, metadata, security, conflict decisions, reviewers, and pack digest.
-- Candidate promotion and conflict-resolution record policies are documented; runtime conflict-decision capture now records reviewed decisions in install-state, while automatic conflict transformation remains a follow-up.
+- Candidate promotion and conflict-resolution record policies are documented; runtime conflict-decision capture now records reviewed decisions in install-state, and `add-namespaced` transforms copy-file destination collisions under `shared/<pack-id>/...`.
 
 ## Phase 4 — Production hardening
 

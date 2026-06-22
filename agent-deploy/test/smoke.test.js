@@ -749,6 +749,65 @@ test('conflict resolution file rejects invalid decisions before apply', () => {
   assert.ok(!fs.existsSync(path.join(project, '.claude/agent-install-state.json')));
 });
 
+test('destination collisions remain fail-closed without an add-namespaced decision', () => {
+  const project = tmpProject();
+  const packRoot = path.join(FIXTURES, 'packs/destination-collision');
+
+  assert.throws(
+    () => buildPlan({
+      target: 'codex',
+      profile: 'developer',
+      moduleIds: ['team-conflict-pack-dev-prompt-module'],
+      packPaths: [packRoot],
+      projectRoot: project,
+    }),
+    /destination collision/,
+  );
+});
+
+test('add-namespaced decision installs colliding pack assets under shared namespace', () => {
+  const project = tmpProject();
+  const packRoot = path.join(FIXTURES, 'packs/destination-collision');
+  const packDigest = calculatePackDigest(packRoot).digest;
+  const plan = buildPlan({
+    target: 'codex',
+    profile: 'developer',
+    moduleIds: ['team-conflict-pack-dev-prompt-module'],
+    packPaths: [packRoot],
+    conflictResolutions: [
+      {
+        proposed: 'codex:team-conflict-pack-dev-prompt-module',
+        conflictsWith: 'codex:prompt-library',
+        decision: 'add-namespaced',
+        decidedBy: 'platform-team',
+        decidedAt: '2026-06-22',
+        reason: 'Keep the base implementation prompt and add the team variant under shared namespace.',
+        packId: 'team-conflict-pack',
+        packDigest,
+      },
+    ],
+    projectRoot: project,
+  });
+
+  assert.ok(plan.operations.some((op) => (
+    op.moduleId === 'team-conflict-pack-dev-prompt-module'
+      && op.dest.endsWith('.agents/shared/team-conflict-pack/prompts/dev-implementation.md')
+      && op.strategy.endsWith('+add-namespaced')
+  )));
+
+  applyPlan(plan, { installedAt: '2026-01-01T00:00:00Z' });
+  assert.ok(fs.existsSync(path.join(project, '.agents/prompts/dev-implementation.md')));
+  assert.ok(fs.existsSync(path.join(project, '.agents/shared/team-conflict-pack/prompts/dev-implementation.md')));
+
+  const state = JSON.parse(fs.readFileSync(path.join(project, '.agent-deploy/install-state.json'), 'utf8'));
+  assert.ok(state.operations.some((op) => (
+    op.moduleId === 'team-conflict-pack-dev-prompt-module'
+      && op.dest.endsWith('.agents/shared/team-conflict-pack/prompts/dev-implementation.md')
+      && op.strategy.endsWith('+add-namespaced')
+  )));
+  assert.equal(state.source.conflictResolutions[0].decision, 'add-namespaced');
+});
+
 test('CLI dry-run applies shared-approved extensions only with explicit opt-in', () => {
   const project = tmpProject();
   const packRoot = path.join(FIXTURES, 'packs/shared-approved-extension');

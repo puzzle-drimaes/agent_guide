@@ -181,7 +181,20 @@ export function createAdapter(config) {
       return [];
     },
     planOperations(input = {}) {
-      const ops = config.planOperations(input, adapter);
+      const moduleById = new Map((input.modules || []).map((module) => [module.id, module]));
+      const sharedRoot = typeof config.sharedRoot === 'function'
+        ? config.sharedRoot(input, adapter)
+        : path.join(adapter.resolveRoot(input), 'shared');
+      const ops = config.planOperations(input, adapter).map((op) => {
+        if (!op || op.kind !== 'copy-file' || !op.dest || !op.sourceRel) return op;
+        const module = moduleById.get(op.moduleId);
+        if (!module?.installNamespace) return op;
+        return {
+          ...op,
+          dest: path.join(sharedRoot, module.installNamespace, normalizeRel(op.sourceRel)),
+          strategy: `${op.strategy}+add-namespaced`,
+        };
+      });
       const scope = adapter.scopeOf(input);
       // Stamp scope on every op; dedup writes by destination (skip ops have no
       // dest and are always kept so the unsupported-capability record survives).

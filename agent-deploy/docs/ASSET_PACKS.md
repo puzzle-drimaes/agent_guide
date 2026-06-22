@@ -122,9 +122,9 @@ node src/cli.js apply \
   --conflict-resolution ./conflicts.reviewed.json
 ```
 
-Important v1 limitation: conflict-resolution records are provenance-only. They do not automatically rename, namespace,
-skip, or replace conflicting files. Pack contents must already reflect the chosen resolution before planning; unresolved
-physical conflicts still fail closed.
+Runtime behavior: `add-namespaced` can resolve target-destination/asset-path collisions by installing the selected
+pack copy-file operations under `shared/<pack-id>/...`. Other decisions are still provenance-only in v1 and require
+the pack contents to already reflect the chosen resolution before planning. Unresolved physical conflicts still fail closed.
 
 ## Trust levels
 
@@ -409,4 +409,4 @@ node src/cli.js apply --target codex --profile developer --pack ./packs/frontend
 ```
 
 Invalid decision values are rejected before apply. Valid records are written to `source.conflictResolutions[]` in
-install-state.
+install-state. `add-namespaced` records also transform colliding copy-file destinations to `shared/<pack-id>/...`.
