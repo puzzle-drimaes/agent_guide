@@ -288,19 +288,26 @@ bundle은 OS 공통입니다(순수 Node, 의존성 0). 차이는 "무엇으로 
 전제: Windows에도 Node.js(LTS >=18)가 설치되어 있어야 한다. (https://nodejs.org)
 
 실행 방법 (택1):
-  1) install.bat 더블클릭/실행 (cmd, PowerShell)  ← bash 없이 가능한 기본 fallback
+  1) PowerShell: install.ps1  ← Windows 권장 (공백 경로 자연 처리)
+       pwsh -ExecutionPolicy Bypass -File .\install.ps1 --target codex --profile developer --dry-run
+       (Windows PowerShell이면: powershell -ExecutionPolicy Bypass -File .\install.ps1 ...)
+  2) cmd: install.bat
        install.bat --target codex --profile developer --dry-run
-  2) Git Bash 또는 WSL에서 install.sh 실행
+  3) Git Bash 또는 WSL: install.sh
        ./install.sh --target codex --profile developer --dry-run
-  3) launcher 없이 node로 직접 실행 (가장 이식성 높음)
+  4) launcher 없이 node로 직접 실행 (가장 이식성 높음)
        node src\cli.js apply --target codex --profile developer --project "%CD%" --dry-run
 
-bash(install.sh)가 없거나 권한 문제로 막히면 install.bat 또는 위 3) node 직접 실행으로 우회한다.
+다운로드한 zip의 install.ps1이 PowerShell에서 막히면(execution policy / 다운로드 파일 표시):
+  - 위처럼 -ExecutionPolicy Bypass 로 실행하거나
+  - 한 번 차단 해제: Unblock-File .\install.ps1
+PowerShell/cmd 둘 다 막히면 Git Bash·WSL(install.sh) 또는 4) node 직접 실행으로 우회한다.
 경로에 공백이 있으면 항상 큰따옴표로 감싼다: --project "C:\My Projects\repo"
 ```
 
-> install.bat은 QnA를 하지 않는 얇은 wrapper입니다. 인자를 Node CLI로 그대로 넘기며,
-> bash가 없는 Windows 사용자의 fallback 실행 경로로 유지됩니다.
+> install.ps1(PowerShell)·install.bat(cmd)은 QnA를 하지 않는 얇은 wrapper입니다.
+> 인자를 Node CLI로 그대로 넘기며, bash가 없는 Windows 사용자의 실행 경로로 유지됩니다.
+> install.ps1은 PowerShell 배열로 인자를 넘겨 공백 경로를 자연스럽게 처리합니다.
 
 ## 10. 설치가 안 될 때
 

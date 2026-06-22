@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { buildPlan } from '../src/planner.js';
@@ -24,6 +24,7 @@ import { calculatePackDigest } from '../src/packs/digest.js';
 const CLI = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../src/cli.js');
 const BUILD_BUNDLE = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../scripts/build-bundle.js');
 const INSTALL_SH = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../install.sh');
+const INSTALL_PS1 = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../install.ps1');
 const FIXTURES = path.resolve(path.dirname(fileURLToPath(import.meta.url)), 'fixtures');
 
 function tmpProject() {
@@ -700,6 +701,8 @@ test('build-bundle is deterministic and includes runtime-required members', () =
     'company-agent-kit/scripts/check-asset-schema.js',
     'company-agent-kit/scripts/check-catalog-parity.js',
     'company-agent-kit/install.sh',
+    'company-agent-kit/install.bat',
+    'company-agent-kit/install.ps1',
     'company-agent-kit/SETUP_WIZARD.md',
   ]) {
     assert.ok(zipA.includes(Buffer.from(member)), `bundle must include ${member}`);
@@ -741,6 +744,50 @@ test('install.sh passes a --project path with spaces through intact', () => {
 
   // The resolved plan root must contain the full spaced path, not a truncated token.
   assert.ok(out.includes(`${spaced}/.codex`), `root should resolve under the spaced path:\n${out}`);
+  assert.ok(!fs.existsSync(path.join(spaced, '.codex')), 'dry-run wrote nothing');
+});
+
+test('install.ps1 is a thin pwsh wrapper that delegates to the CLI and propagates exit code', () => {
+  const ps1 = fs.readFileSync(INSTALL_PS1, 'utf8');
+  assert.match(ps1, /^#!\/usr\/bin\/env pwsh/, 'shebang');
+  assert.match(ps1, /Set-StrictMode/);
+  assert.match(ps1, /cli\.js/, 'delegates to the node CLI entry');
+  assert.match(ps1, /Get-Command node/, 'checks Node availability');
+  assert.match(ps1, /--global/, 'handles the --global scope flag');
+  assert.match(ps1, /@rest/, 'splats passthrough args (preserves spaces)');
+  assert.match(ps1, /exit \$LASTEXITCODE/, 'propagates the CLI exit code');
+});
+
+// Resolve a usable PowerShell across platforms; null when none is on PATH
+// (this Linux CI has no pwsh, so the execution test below skips gracefully).
+function resolvePowerShell() {
+  const candidates = process.platform === 'win32'
+    ? ['powershell.exe', 'pwsh.exe', 'pwsh']
+    : ['pwsh'];
+  for (const candidate of candidates) {
+    const result = spawnSync(candidate, ['-NoLogo', '-NoProfile', '-Command', '$PSVersionTable.PSVersion.ToString()'], {
+      encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'], timeout: 5000,
+    });
+    if (!result.error && result.status === 0) return candidate;
+  }
+  return null;
+}
+
+test('install.ps1 passes a --project path with spaces through intact', (t) => {
+  const pwsh = resolvePowerShell();
+  if (!pwsh) {
+    t.skip('PowerShell not available on PATH (expected on Linux CI)');
+    return;
+  }
+
+  const spaced = path.join(tmpProject(), 'my project dir');
+  fs.mkdirSync(spaced, { recursive: true });
+  const out = execFileSync(pwsh, [
+    '-NoLogo', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', INSTALL_PS1,
+    '--target', 'codex', '--profile', 'minimal', '--project', spaced, '--dry-run',
+  ], { encoding: 'utf8' });
+
+  assert.ok(out.includes(`${spaced}`), `root should resolve under the spaced path:\n${out}`);
   assert.ok(!fs.existsSync(path.join(spaced, '.codex')), 'dry-run wrote nothing');
 });
 

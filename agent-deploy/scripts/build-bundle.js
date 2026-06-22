@@ -29,7 +29,7 @@ const ROOT = path.resolve(HERE, '..');
 const TOP = 'company-agent-kit';
 
 const BUNDLE_DIRS = ['src', 'scripts', 'manifests', 'schemas', 'docs', 'assets'];
-const BUNDLE_FILES = ['package.json', 'README.md', 'SETUP_WIZARD.md', 'install.sh', 'install.bat'];
+const BUNDLE_FILES = ['package.json', 'README.md', 'SETUP_WIZARD.md', 'install.sh', 'install.bat', 'install.ps1'];
 
 // Fixed DOS timestamp (1980-01-01 00:00:00) so archives are byte-reproducible.
 const DOS_TIME = 0;

@@ -681,8 +681,9 @@ install.sh는 bootstrap과 wizard 안내, 고급 사용자용 direct wrapper만 
 해야 할 일:
 
 - [x] exe packaging 제외 결정 반영
-- [x] Windows 사용자의 shell 실행 전제와 fallback 안내 작성 (SETUP_WIZARD 9.1: Node 전제 + install.bat/Git Bash·WSL/node 직접 실행 fallback)
+- [x] Windows 사용자의 shell 실행 전제와 fallback 안내 작성 (SETUP_WIZARD 9.1: Node 전제 + PowerShell(install.ps1)/cmd(install.bat)/Git Bash·WSL(install.sh)/node 직접 실행)
 - [x] install.bat 유지 여부를 wrapper 관점에서 재검토 → 유지 (bash 없는 Windows fallback, 얇은 Node CLI wrapper)
+- [x] PowerShell 런처 `install.ps1` 추가 (얇은 wrapper, `@rest` splat으로 공백 경로 자연 처리, execution-policy 안내, bundle/test 연동)
 
 ### 5.2 OS 공통 zip bundle
 

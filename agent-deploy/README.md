@@ -60,6 +60,21 @@ node src/cli.js apply --target codex --profile developer --project /path/to/repo
 ./install.sh --target claude --profile developer --global    # home scope apply
 ```
 
+### Windows
+
+`install.sh`는 Git Bash/WSL용입니다. Windows 기본 환경에서는 PowerShell(`install.ps1`) 또는
+cmd(`install.bat`)를 쓰세요. (전제: Node.js LTS >=18)
+
+```powershell
+# PowerShell (권장) — 공백 경로 자연 처리
+pwsh -ExecutionPolicy Bypass -File .\install.ps1 --target codex --profile developer --dry-run
+# cmd
+install.bat --target codex --profile developer --dry-run
+```
+
+다운로드한 zip의 `install.ps1`이 막히면 위처럼 `-ExecutionPolicy Bypass`로 실행하거나
+한 번 `Unblock-File .\install.ps1`로 차단을 해제합니다. 자세한 안내는 `SETUP_WIZARD.md` 9.1을 참고하세요.
+
 ### 개발/검증
 
 ```bash
