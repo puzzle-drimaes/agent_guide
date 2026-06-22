@@ -106,7 +106,32 @@ function assertNoDestinationCollisions(modules) {
   }
 }
 
-export function loadComposedManifests({ root, packPaths = [] } = {}) {
+function applyDefaultProfileExtensions({ pack, profiles, baseProfileIds, moduleOwners }) {
+  if (!pack.packJson.defaultProfileExtensions) return;
+  if (pack.packJson.packType !== 'shared-approved') {
+    throw new Error(`pack ${pack.packJson.id}: only shared-approved packs can extend builtin profiles`);
+  }
+
+  for (const [profileId, moduleIds] of Object.entries(pack.packJson.defaultProfileExtensions)) {
+    if (!baseProfileIds.has(profileId)) {
+      throw new Error(`pack ${pack.packJson.id}: defaultProfileExtensions references unknown builtin profile '${profileId}'`);
+    }
+    for (const moduleId of moduleIds) {
+      if (!moduleOwners.has(moduleId)) {
+        throw new Error(`pack ${pack.packJson.id}: defaultProfileExtensions.${profileId} references unknown module '${moduleId}'`);
+      }
+    }
+    const existing = new Set(profiles[profileId]);
+    for (const moduleId of moduleIds) {
+      if (!existing.has(moduleId)) {
+        profiles[profileId].push(moduleId);
+        existing.add(moduleId);
+      }
+    }
+  }
+}
+
+export function loadComposedManifests({ root, packPaths = [], enablePackExtensions = false } = {}) {
   const base = loadManifests(root);
   const baseAssetRoot = root ? path.join(root, 'assets') : ASSET_ROOT;
   const normalizedPackPaths = normalizePackPaths(packPaths);
@@ -124,6 +149,7 @@ export function loadComposedManifests({ root, packPaths = [] } = {}) {
   const loadedPacks = sortPacks(normalizedPackPaths.map((packRoot) => loadPack(packRoot, { baseRoot: root })));
   const modules = base.modulesDoc.modules.map((module) => annotateBaseModule(module, baseAssetRoot));
   const profiles = cloneJson(base.profilesDoc.profiles);
+  const baseProfileIds = new Set(Object.keys(base.profilesDoc.profiles));
   const moduleOwners = new Map(modules.map((module) => [module.id, 'base bundle']));
   const profileOwners = new Map(Object.keys(profiles).map((profileId) => [profileId, 'base bundle']));
 
@@ -136,6 +162,9 @@ export function loadComposedManifests({ root, packPaths = [] } = {}) {
     for (const [profileId, moduleIds] of Object.entries(pack.profilesDoc.profiles || {})) {
       assertUniqueId(profileId, profileOwners, 'profile', owner);
       profiles[profileId] = moduleIds;
+    }
+    if (enablePackExtensions) {
+      applyDefaultProfileExtensions({ pack, profiles, baseProfileIds, moduleOwners });
     }
   }
 

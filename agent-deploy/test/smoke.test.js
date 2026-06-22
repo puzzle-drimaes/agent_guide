@@ -546,6 +546,24 @@ test('asset pack validator rejects module path escape', () => {
   assert.match(result.errors.join('\n'), /path '\.\.\/escape\.md' must stay under assets\//);
 });
 
+test('asset pack validator rejects non-shared default profile extensions', () => {
+  const packRoot = path.join(FIXTURES, 'packs/project-local-extension');
+  const result = validatePackRoot(packRoot);
+  assert.equal(result.ok, false);
+  assert.match(result.errors.join('\n'), /defaultProfileExtensions is only allowed for shared-approved packs/);
+
+  const candidateRoot = path.join(tmpProject(), 'candidate-extension');
+  fs.cpSync(packRoot, candidateRoot, { recursive: true });
+  const candidatePackJson = JSON.parse(fs.readFileSync(path.join(candidateRoot, 'pack.json'), 'utf8'));
+  candidatePackJson.packType = 'candidate';
+  candidatePackJson.reviewStatus = 'candidate';
+  fs.writeFileSync(path.join(candidateRoot, 'pack.json'), `${JSON.stringify(candidatePackJson, null, 2)}\n`);
+
+  const candidateResult = validatePackRoot(candidateRoot);
+  assert.equal(candidateResult.ok, false);
+  assert.match(candidateResult.errors.join('\n'), /defaultProfileExtensions is only allowed for shared-approved packs/);
+});
+
 test('asset pack validator reports id and destination collision options', () => {
   const packRoot = path.join(FIXTURES, 'packs/id-collision');
   const result = validatePackRoot(packRoot);
@@ -603,6 +621,29 @@ test('planner composes explicit pack modules into the install plan', () => {
   assert.ok(plan.operations.some((op) => op.dest.endsWith('.agents/prompts/team-note.md')));
 });
 
+test('shared-approved pack extensions are opt-in for builtin profiles', () => {
+  const project = tmpProject();
+  const packRoot = path.join(FIXTURES, 'packs/shared-approved-extension');
+
+  const withoutExtensions = buildPlan({
+    target: 'codex',
+    profile: 'developer',
+    packPaths: [packRoot],
+    projectRoot: project,
+  });
+  assert.ok(!withoutExtensions.resolution.selected.some((module) => module.id === 'approved-dev-pack-review-prompt-module'));
+
+  const withExtensions = buildPlan({
+    target: 'codex',
+    profile: 'developer',
+    packPaths: [packRoot],
+    enablePackExtensions: true,
+    projectRoot: project,
+  });
+  assert.ok(withExtensions.resolution.selected.some((module) => module.id === 'approved-dev-pack-review-prompt-module'));
+  assert.ok(withExtensions.operations.some((op) => op.dest?.endsWith('.agents/prompts/review-prompt.md')));
+});
+
 test('planner composes pack-local profiles and apply records pack provenance', () => {
   const project = tmpProject();
   const packRoot = path.join(FIXTURES, 'packs/valid-pack');
@@ -621,6 +662,24 @@ test('planner composes pack-local profiles and apply records pack provenance', (
   assert.equal(state.source.packs[0].digest, calculatePackDigest(packRoot).digest);
   assert.equal(state.source.packs[0].root, packRoot);
   assert.equal(state.source.packs[0].source, null);
+});
+
+test('CLI dry-run applies shared-approved extensions only with explicit opt-in', () => {
+  const project = tmpProject();
+  const packRoot = path.join(FIXTURES, 'packs/shared-approved-extension');
+  const out = execFileSync('node', [
+    CLI, 'apply', '--dry-run',
+    '--target', 'codex',
+    '--profile', 'developer',
+    '--pack', packRoot,
+    '--enable-pack-extensions',
+    '--project', project,
+  ], { encoding: 'utf8' });
+
+  assert.match(out, /pack extensions: enabled/);
+  assert.match(out, /approved-dev-pack-review-prompt-module/);
+  assert.match(out, /\.agents\/prompts\/review-prompt\.md/);
+  assert.ok(!fs.existsSync(path.join(project, '.agents/prompts/review-prompt.md')), 'dry-run wrote nothing');
 });
 
 test('CLI dry-run accepts --pack and prints pack operations', () => {

@@ -1112,6 +1112,44 @@ SDD mode: lite (기존 pack planner/apply 구조 안에서 provenance 신뢰성 
 
 ---
 
+### 4.21 Asset Pack Phase 3: shared-approved profile extension opt-in
+
+대상 파일:
+
+```text
+agent-deploy/src/cli.js
+agent-deploy/src/planner.js
+agent-deploy/src/packs/pack-composer.js
+agent-deploy/test/smoke.test.js
+agent-deploy/test/fixtures/packs/shared-approved-extension/
+agent-deploy/test/fixtures/packs/project-local-extension/
+agent-deploy/docs/ASSET_PACKS.md
+docs/specs/external-shared-asset-packs/design.md
+docs/specs/external-shared-asset-packs/tasks.md
+docs/specs/external-shared-asset-packs/review.md
+TODO.md
+```
+
+구현 내용:
+
+- [x] CLI `--enable-pack-extensions` 옵션 추가.
+- [x] shared-approved pack의 `defaultProfileExtensions`를 opt-in 시에만 builtin base profile에 적용.
+- [x] extension 대상 profile은 bundled base profile로 제한.
+- [x] `project-local`/`candidate` pack의 `defaultProfileExtensions` 선언을 validator에서 금지.
+- [x] opt-in 미사용 시 approved pack extension module이 선택되지 않는 smoke test 추가.
+- [x] opt-in 사용 시 developer profile에 approved pack module이 추가되는 planner/CLI dry-run smoke test 추가.
+
+검증 결과:
+
+```text
+npm --prefix agent-deploy test
+  → 39개 smoke test 전체 통과
+```
+
+SDD mode: full (profile resolution, trust policy, CLI 옵션, 테스트/문서에 걸친 governance성 변경).
+
+---
+
 ## 5. 아직 완료가 아닌 것
 
 다음은 아직 완료되지 않았다. 자세한 순서는 `TODO.md` 참고.
@@ -1183,6 +1221,10 @@ SDD mode: lite (기존 pack planner/apply 구조 안에서 provenance 신뢰성 
 - external/shared asset pack Phase 3 provenance 시작
   - pack digest 계산 및 install-state `source.packs[].digest` 기록
   - `.git/`, OS metadata, editor temp/backup 파일 제외 및 정규화 digest smoke test 추가
+- external/shared asset pack Phase 3 profile extension opt-in 구현
+  - CLI `--enable-pack-extensions` 옵션 추가
+  - shared-approved pack만 builtin profile 확장 허용
+  - candidate/project-local pack의 builtin profile 확장 금지 테스트 추가
 ```
 
 아직 남은 핵심은 SETUP_WIZARD.md 기반 flow 검증과 파일럿 운영 수준의 bundle/lifecycle 구현이다.

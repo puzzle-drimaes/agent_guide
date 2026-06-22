@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "profiles": {
+    "approved-dev": [
+      "approved-dev-pack-review-prompt-module"
+    ]
+  }
+}

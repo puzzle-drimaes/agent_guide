@@ -88,5 +88,13 @@ Remaining risk: conflict resolution is still fail-closed only. Interactive `keep
 - `install-state.schema.json` now models `source.packs[]` with `id`, `version`, `packType`, `digest`, `source`, and `root`.
 - Smoke tests cover digest shape, ignored temp files, and install-state provenance recording.
 
-Remaining Phase 3 risk: builtin profile extension is still explicit profile/module only. `--enable-pack-extensions`
-for `shared-approved` packs remains a follow-up task.
+## Phase 3 profile extension implementation review
+
+- CLI `plan`/`apply` now accepts `--enable-pack-extensions`.
+- The planner passes the opt-in flag to pack composition; pack logic remains outside target adapters.
+- `pack-composer` appends `defaultProfileExtensions` to existing bundled profiles only when the flag is enabled.
+- Non-`shared-approved` packs cannot declare `defaultProfileExtensions`; validator tests cover `project-local` and `candidate`.
+- Smoke tests cover opt-in behavior, no-extension default behavior, and CLI dry-run output.
+
+Remaining Phase 3 risk: governance approval workflow is still documented at a high level only. The next task should
+define shared-approved approval criteria, candidate promotion, and conflict-resolution decision records.

@@ -201,7 +201,7 @@ npm --prefix agent-deploy run validate
   → manifest/rule-drift/entry-parity/asset-schema/catalog-parity validation 통과
 
 npm --prefix agent-deploy test
-  → 36개 smoke test 전체 통과
+  → 39개 smoke test 전체 통과
 ```
 
 ### 2.1-A 최우선 전략 문서화
@@ -259,7 +259,7 @@ docs/specs/external-shared-asset-packs/
    - `.git/`, OS metadata, editor temp/backup 파일 digest 제외
    - install-state `source.packs[].digest/root/source/packType` 기록
    - digest 안정성 및 apply provenance smoke test
-9. [ ] shared-approved profile extension opt-in 구현
+9. [x] shared-approved profile extension opt-in 구현
    - `--enable-pack-extensions` 옵션 추가
    - `shared-approved` pack만 builtin profile 확장 허용
    - `candidate`/`project-local` builtin profile 확장 금지
@@ -806,7 +806,7 @@ agent-deploy/install.bat
 check-asset-schema.js는 closed schema(unknown key error) + 타입 검사 + name 일치(agent=파일명, skill=디렉터리명)를 검증한다.
 frontmatter 파서는 zero-dependency(라이브러리 없음)로 `key: scalar`와 `key: ["a","b"]` 형태만 지원한다.
 rule은 frontmatter가 optional이며 present 시 paths(string[])만 허용한다.
-npm run validate가 5종 가드(manifest/rule-drift/entry-parity/asset-schema/catalog-parity)로 확장됐고, smoke test는 26개다.
+npm run validate가 5종 가드(manifest/rule-drift/entry-parity/asset-schema/catalog-parity)로 확장됐고, 이후 asset pack 보강까지 포함해 smoke test는 39개다.
 새 frontmatter 키를 추가하려면 SCHEMAS를 함께 갱신해야 한다(의도된 리뷰 포인트).
 catalog parity는 catalog entry의 실제 파일 존재 여부, module/profile 참조, module path 포함 관계, frontmatter 일치 여부를 검증한다.
 ```

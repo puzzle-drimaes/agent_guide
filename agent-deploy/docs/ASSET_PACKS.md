@@ -124,6 +124,25 @@ pack inspect / validate
   → install-state records pack provenance
 ```
 
+## Profile extension opt-in
+
+Pack modules and pack-local profiles remain explicit by default. A `shared-approved` pack may additionally declare
+`defaultProfileExtensions` in `pack.json`, but those extensions only apply when the user passes
+`--enable-pack-extensions`.
+
+Example:
+
+```text
+node src/cli.js plan --target codex --profile developer --pack ./packs/frontend --enable-pack-extensions
+```
+
+Rules:
+
+- only `shared-approved` packs may declare/apply `defaultProfileExtensions`
+- extension targets must be existing bundled base profiles such as `developer`, `product`, or `business`
+- `project-local` and `candidate` packs are rejected if they declare `defaultProfileExtensions`
+- without `--enable-pack-extensions`, approved pack modules still require explicit `--modules` or pack-local profile selection
+
 ## Pack digest provenance
 
 `agent-deploy` calculates a normalized SHA-256 digest for every requested pack and records it in
@@ -165,9 +184,8 @@ agent-deploy pack validate --pack ./packs/frontend
 agent-deploy pack inspect --externals ./.agent-packs/externals
 agent-deploy plan  --target codex --profile developer --pack ./packs/frontend --modules frontend-team-pack-review-checklist
 agent-deploy apply --target codex --profile developer --pack ./packs/frontend --dry-run
+agent-deploy plan  --target codex --profile developer --pack ./packs/frontend --enable-pack-extensions
 ```
-
-`--enable-pack-extensions` may be added later for approved shared packs only.
 
 ## Phase 1 validation entry point
 
@@ -194,3 +212,15 @@ node src/cli.js apply --target codex --pack ./packs/frontend --profile frontend-
 Pack modules and pack-local profiles must still be selected explicitly. The composed plan keeps the base bundle as the
 base layer, validates pack conflicts before planning, reads pack assets from their own `assets/` root, and records
 `source.packs` provenance, including normalized pack digests, when applied.
+
+## Phase 3 provenance/governance entry point
+
+Implemented profile extension opt-in:
+
+```text
+node src/cli.js plan  --target codex --profile developer --pack ./packs/frontend --enable-pack-extensions
+node src/cli.js apply --target codex --profile developer --pack ./packs/frontend --enable-pack-extensions --dry-run
+```
+
+Only `shared-approved` pack extensions are applied. Candidate and project-local packs can still be used explicitly,
+but they cannot mutate builtin profile defaults.

@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "modules": [
+    {
+      "id": "project-extension-pack-note-module",
+      "description": "Invalid project-local extension note",
+      "paths": ["prompts/note.md"],
+      "targets": ["claude", "cursor", "codex", "gemini"],
+      "dependencies": [],
+      "cost": "light",
+      "stability": "beta"
+    }
+  ]
+}

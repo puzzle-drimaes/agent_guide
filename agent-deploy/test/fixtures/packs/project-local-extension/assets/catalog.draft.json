@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "agentdeploy.assetCatalog.v1",
+  "generatedAt": null,
+  "assets": [
+    {
+      "id": "project-extension-pack-note",
+      "assetType": "prompt",
+      "title": "Project Extension Note",
+      "description": "Invalid project-local extension fixture.",
+      "path": "prompts/note.md",
+      "moduleIds": ["project-extension-pack-note-module"],
+      "profiles": [],
+      "audience": ["project"],
+      "stability": "beta",
+      "owner": "project-team",
+      "reviewStatus": "reviewing"
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "schemaVersion": "agentdeploy.assetCatalog.v1",
+  "generatedAt": null,
+  "assets": [
+    {
+      "id": "approved-dev-pack-review-prompt",
+      "assetType": "prompt",
+      "title": "Approved Review Prompt",
+      "description": "Governance-approved review prompt for developer profile extension.",
+      "path": "prompts/review-prompt.md",
+      "moduleIds": [
+        "approved-dev-pack-review-prompt-module"
+      ],
+      "profiles": [
+        "approved-dev"
+      ],
+      "audience": [
+        "developer"
+      ],
+      "stability": "stable",
+      "owner": "platform-team",
+      "tags": [
+        "review"
+      ],
+      "reviewStatus": "approved"
+    }
+  ]
+}

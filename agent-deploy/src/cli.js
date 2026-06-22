@@ -41,6 +41,7 @@ function buildRequest(args) {
     profile: args.profile || null,
     moduleIds: args.modules ? String(args.modules).split(',').map((s) => s.trim()).filter(Boolean) : [],
     packPaths: args.pack ? String(args.pack).split(',').map((s) => path.resolve(s.trim())).filter(Boolean) : [],
+    enablePackExtensions: Boolean(args['enable-pack-extensions']),
     scope,
     projectRoot: path.resolve(args.project || process.cwd()),
     homeDir: args.home ? path.resolve(args.home) : undefined,
@@ -57,6 +58,7 @@ function printPlan(plan, asJson) {
   console.log(`root:     ${plan.targetRoot}`);
   if (plan.packs.length) {
     console.log(`packs:    ${plan.packs.map((p) => `${p.id}@${p.version}`).join(', ')}`);
+    if (plan.request.enablePackExtensions) console.log('pack extensions: enabled');
   }
   console.log(`modules:  ${plan.resolution.selected.map((m) => m.id).join(', ') || '(none)'}`);
   if (plan.resolution.skipped.length) {
@@ -93,10 +95,11 @@ function main() {
   try {
     if (!cmd || cmd === 'help' || args.help) {
       console.log('usage: agent-deploy <list|plan|apply> [--target T] [--profile P] [--modules a,b]\n'
-        + '       [--pack DIR[,DIR]] [--scope project|home] [--global] [--home DIR] [--project DIR] [--dry-run] [--json]\n'
+        + '       [--pack DIR[,DIR]] [--enable-pack-extensions] [--scope project|home] [--global] [--home DIR] [--project DIR] [--dry-run] [--json]\n'
         + '  scope project (default): install into a repo (.claude, .cursor … under --project)\n'
         + '  --global / --scope home: install into the user-global config dir (~/.claude, ~/.codex …)\n'
-        + '  --pack: compose validated asset pack manifests into the plan; modules/profiles remain explicit');
+        + '  --pack: compose validated asset pack manifests into the plan; modules/profiles remain explicit\n'
+        + '  --enable-pack-extensions: opt in to shared-approved pack defaultProfileExtensions');
       return;
     }
     if (cmd === 'list') return cmdList();

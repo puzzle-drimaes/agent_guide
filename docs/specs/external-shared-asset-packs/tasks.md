@@ -48,7 +48,7 @@ Implementation notes:
 - [x] Extend `install-state.schema.json` with `source.packs`.
 - [x] Compute deterministic pack digest.
 - [x] Record pack id/version/source/digest/root in install-state.
-- [ ] Add `shared-approved` profile extension opt-in.
+- [x] Add `shared-approved` profile extension opt-in.
 - [ ] Document approval workflow for shared packs.
 
 Implementation notes:
@@ -57,6 +57,8 @@ Implementation notes:
 - Text line endings are normalized to LF, and the absolute pack root path is excluded from the digest.
 - `.git/`, other VCS metadata, OS metadata files, and editor temp/backup files are excluded.
 - `source.packs[]` now records `id`, `version`, `packType`, `digest`, `source`, and `root`.
+- CLI `--enable-pack-extensions` applies `defaultProfileExtensions` only from `shared-approved` packs.
+- Extension targets must be bundled base profiles; `project-local` and `candidate` packs cannot mutate builtin profiles.
 
 ## Phase 4 — Production hardening
 

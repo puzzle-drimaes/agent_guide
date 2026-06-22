@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "agentdeploy.assetPack.v1",
+  "id": "approved-dev-pack",
+  "title": "Approved Developer Pack",
+  "version": "1.0.0",
+  "owner": "platform-team",
+  "stability": "stable",
+  "reviewStatus": "approved",
+  "packType": "shared-approved",
+  "source": "git+ssh://example.internal/company/approved-dev-pack",
+  "license": "Internal-Use-Only",
+  "defaultProfileExtensions": {
+    "developer": ["approved-dev-pack-review-prompt-module"]
+  }
+}

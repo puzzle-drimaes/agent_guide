@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "modules": [
+    {
+      "id": "approved-dev-pack-review-prompt-module",
+      "description": "Approved developer profile extension prompt",
+      "paths": ["prompts/review-prompt.md"],
+      "targets": ["claude", "cursor", "codex", "gemini"],
+      "dependencies": [],
+      "cost": "light",
+      "stability": "stable"
+    }
+  ]
+}

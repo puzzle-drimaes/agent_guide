@@ -7,12 +7,15 @@ import { loadComposedManifests } from './packs/pack-composer.js';
 
 function loadRequestManifests(request) {
   if (request.packPaths && request.packPaths.length) {
-    return loadComposedManifests({ packPaths: request.packPaths });
+    return loadComposedManifests({
+      packPaths: request.packPaths,
+      enablePackExtensions: Boolean(request.enablePackExtensions),
+    });
   }
   return loadManifests();
 }
 
-// request: { target, profile?, moduleIds?, packPaths?, scope?, projectRoot?, homeDir? }
+// request: { target, profile?, moduleIds?, packPaths?, enablePackExtensions?, scope?, projectRoot?, homeDir? }
 //   scope: 'home' (user-global config dir) | 'project' (a repo). Library default
 //   is 'project' for safety; the CLI defaults to 'home'.
 export function buildPlan(request) {

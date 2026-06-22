@@ -147,8 +147,10 @@ Packs may define pack-local profiles:
 Builtin profile mutation is not allowed. Instead:
 
 - v1 CLI supports explicit pack modules/profiles.
-- future shared-approved packs may expose `defaultProfileExtensions` in `pack.json`.
-- `defaultProfileExtensions` are opt-in at CLI level, e.g. `--enable-pack-extensions`.
+- shared-approved packs may expose `defaultProfileExtensions` in `pack.json`.
+- `defaultProfileExtensions` are opt-in at CLI level via `--enable-pack-extensions`.
+- profile extension targets must already exist in the bundled base profiles.
+- `project-local` and `candidate` packs cannot declare or apply `defaultProfileExtensions`.
 
 This keeps project-local/candidate packs from silently changing company defaults.
 
