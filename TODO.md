@@ -821,7 +821,7 @@ agent-deploy/install.bat
 
 추가:
 
-- [ ] install-state schema runtime validation
+- [x] install-state schema runtime validation (`state.js` assertValidInstallState; apply/read/write 전 fail-closed, `7fe05e6`)
 - [ ] unicode safety scan
 - [ ] secret scan
 - [ ] workflow security validation
