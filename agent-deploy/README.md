@@ -69,6 +69,28 @@ node scripts/validate-manifests.js                     # CI 불변식 검증
 node --test                                            # plan→apply 라운드트립 테스트
 ```
 
+### 배포본 빌드(bundle build, 메인테이너용)
+
+OS 공통 zip + SHA-256 체크섬을 생성합니다(의존성 0 · 재현 가능 빌드).
+
+```bash
+npm run bundle                                         # dist/ 에 zip + .sha256 생성
+```
+
+산출물(버전 포함 정식본 + 고정 alias, 동일 바이트):
+
+```text
+dist/company-agent-kit-<version>.zip        dist/company-agent-kit-<version>.zip.sha256
+dist/company-agent-kit.zip                  dist/company-agent-kit.zip.sha256
+```
+
+zip 내부 최상위 폴더는 `company-agent-kit/`로 고정이며, 압축 해제 후 그 안에서 `./install.sh`를
+실행합니다. 배포 채널에 올리기 전/내려받은 뒤 체크섬을 검증하세요.
+
+```bash
+sha256sum -c company-agent-kit-<version>.zip.sha256    # 무결성 확인
+```
+
 ### 설치 범위(scope)
 - **project (기본)**: repo 내 `.claude/`, `.cursor/`, `.mcp.json` — 레포 단위 커밋·공유.
 - **home/global (`--global`)**: 사용자 전역 `~/.claude/`, `~/.claude.json` — 어떤 IDE/CLI·프로젝트에서나 공유.

@@ -7,3 +7,6 @@
 .codex/
 .gemini/
 .cursor/
+
+# Bundle build artifacts (regenerable via `npm run bundle`)
+agent-deploy/dist/

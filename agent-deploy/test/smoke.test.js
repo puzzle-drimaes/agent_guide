@@ -6,6 +6,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
+import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { buildPlan } from '../src/planner.js';
 import { applyPlan } from '../src/apply.js';
@@ -20,6 +21,7 @@ import { validatePackRoot } from '../src/packs/pack-validator.js';
 import { calculatePackDigest } from '../src/packs/digest.js';
 
 const CLI = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../src/cli.js');
+const BUILD_BUNDLE = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../scripts/build-bundle.js');
 const FIXTURES = path.resolve(path.dirname(fileURLToPath(import.meta.url)), 'fixtures');
 
 function tmpProject() {
@@ -651,6 +653,55 @@ test('uninstall rejects missing state and non-dry-run execution', () => {
     ], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }),
     /uninstall currently supports --dry-run only/,
   );
+});
+
+test('build-bundle produces versioned + alias zips with matching sha256 sidecars', () => {
+  const out = tmpProject();
+  const pkg = JSON.parse(fs.readFileSync(path.resolve(path.dirname(BUILD_BUNDLE), '../package.json'), 'utf8'));
+  execFileSync('node', [BUILD_BUNDLE, '--out', out], { encoding: 'utf8' });
+
+  const versioned = path.join(out, `company-agent-kit-${pkg.version}.zip`);
+  const alias = path.join(out, 'company-agent-kit.zip');
+  for (const zip of [versioned, alias]) {
+    assert.ok(fs.existsSync(zip), `${path.basename(zip)} should exist`);
+    assert.ok(fs.existsSync(`${zip}.sha256`), `${path.basename(zip)}.sha256 should exist`);
+
+    const buf = fs.readFileSync(zip);
+    // local file header signature "PK\x03\x04"
+    assert.deepEqual([...buf.subarray(0, 4)], [0x50, 0x4b, 0x03, 0x04]);
+
+    const digest = crypto.createHash('sha256').update(buf).digest('hex');
+    const sidecar = fs.readFileSync(`${zip}.sha256`, 'utf8');
+    assert.equal(sidecar, `${digest}  ${path.basename(zip)}\n`);
+  }
+
+  // versioned + alias are identical bytes
+  assert.ok(fs.readFileSync(versioned).equals(fs.readFileSync(alias)));
+});
+
+test('build-bundle is deterministic and includes runtime-required members', () => {
+  const a = tmpProject();
+  const b = tmpProject();
+  execFileSync('node', [BUILD_BUNDLE, '--out', a], { encoding: 'utf8' });
+  execFileSync('node', [BUILD_BUNDLE, '--out', b], { encoding: 'utf8' });
+
+  const zipA = fs.readFileSync(path.join(a, 'company-agent-kit.zip'));
+  const zipB = fs.readFileSync(path.join(b, 'company-agent-kit.zip'));
+  assert.ok(zipA.equals(zipB), 'identical contents must produce byte-identical archives');
+
+  // members the CLI needs at runtime must be present (filenames are stored
+  // uncompressed in the zip headers, so a byte search is sufficient here).
+  for (const member of [
+    'company-agent-kit/src/cli.js',
+    'company-agent-kit/package.json',
+    'company-agent-kit/schemas/install-state.schema.json',
+    'company-agent-kit/scripts/check-asset-schema.js',
+    'company-agent-kit/scripts/check-catalog-parity.js',
+    'company-agent-kit/install.sh',
+    'company-agent-kit/SETUP_WIZARD.md',
+  ]) {
+    assert.ok(zipA.includes(Buffer.from(member)), `bundle must include ${member}`);
+  }
 });
 
 test('home scope installs into the user-global config dir (fake home)', () => {
