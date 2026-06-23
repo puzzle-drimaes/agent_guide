@@ -823,9 +823,9 @@ agent-deploy/install.bat
 추가:
 
 - [x] install-state schema runtime validation (`state.js` assertValidInstallState; apply/read/write 전 fail-closed, `7fe05e6`)
-- [ ] unicode safety scan
-- [ ] secret scan
-- [ ] workflow security validation
+- [x] unicode safety scan (`scripts/check-unicode-safety.js`, validate에 통합 — invisible/bidi/Tag block(ASCII smuggling)/zero-width filler codepoint 탐지, 선행 BOM 허용)
+- [x] secret scan (`scripts/check-secret-scan.js`, validate에 통합 — 고신호 credential 패턴(private key/AWS/GitHub/Slack/Google/OpenAI/Anthropic), `${ENV}` placeholder·`secret-scan:allow` marker 허용)
+- [ ] workflow security validation (보류: agent-deploy 번들은 자산 배포본이라 GitHub Actions가 없음. 저장소 루트에 GHA 도입 시 ECC `validate-workflow-security` 차용 — `references/ECC/scripts/ci/validate-workflow-security.js`)
 
 구현 메모(2026-06-18):
 

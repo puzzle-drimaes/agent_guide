@@ -17,6 +17,8 @@ import { runDoctor } from '../src/doctor.js';
 import { validateInstallState } from '../src/state.js';
 import { checkAssetSchemas } from '../scripts/check-asset-schema.js';
 import { checkCatalogParity } from '../scripts/check-catalog-parity.js';
+import { checkUnicodeSafety } from '../scripts/check-unicode-safety.js';
+import { checkSecretScan } from '../scripts/check-secret-scan.js';
 import { scanExternals } from '../src/packs/externals-scanner.js';
 import { validatePackRoot } from '../src/packs/pack-validator.js';
 import { calculatePackDigest } from '../src/packs/digest.js';
@@ -1055,6 +1057,54 @@ test('catalog parity guard catches catalog/module/profile drift', () => {
   assert.match(errorText, /unknown module 'wrong-module'/);
   assert.match(errorText, /unknown profile 'ghost'/);
   assert.match(warnings.join('\n'), /has no draft frontmatter to compare/);
+});
+
+test('unicode safety guard passes for all shipped assets', () => {
+  const { errors, checked } = checkUnicodeSafety();
+  assert.deepEqual(errors, [], `unexpected unicode findings:\n${errors.join('\n')}`);
+  assert.ok(checked >= 30, `expected to scan shipped text assets, got ${checked}`);
+});
+
+test('unicode safety guard catches invisible/bidi characters but allows a leading BOM', () => {
+  const root = tmpProject();
+  fs.mkdirSync(path.join(root, 'rules/common'), { recursive: true });
+  // bidi override (U+202E) and zero-width space (U+200B) hidden in otherwise normal text
+  fs.writeFileSync(path.join(root, 'rules/common/sneaky.md'), '# Title\n\nNormal ‮INVISIBLE‬ and ​zero-width.\n');
+  // Tag-block (ASCII smuggling) char
+  fs.writeFileSync(path.join(root, 'rules/common/tagged.md'), 'hello\u{E0041}world\n');
+  // A leading BOM must NOT be flagged
+  fs.writeFileSync(path.join(root, 'rules/common/bom.md'), '﻿# clean with leading BOM\n');
+
+  const { errors } = checkUnicodeSafety(root);
+  const joined = errors.join('\n');
+  assert.match(joined, /sneaky\.md:3:\d+: dangerous Unicode U\+202E/);
+  assert.match(joined, /sneaky\.md:.*U\+200B/);
+  assert.match(joined, /tagged\.md:.*U\+E0041 \(Unicode Tag block/);
+  assert.ok(!/bom\.md/.test(joined), `leading BOM should be allowed:\n${joined}`);
+});
+
+test('secret scan guard passes for all shipped assets', () => {
+  const { errors, checked } = checkSecretScan();
+  assert.deepEqual(errors, [], `unexpected secret findings:\n${errors.join('\n')}`);
+  assert.ok(checked >= 30, `expected to scan shipped text assets, got ${checked}`);
+});
+
+test('secret scan guard catches hardcoded credentials, allows ${ENV} placeholders and allow-markers', () => {
+  const root = tmpProject();
+  fs.mkdirSync(path.join(root, 'mcp'), { recursive: true });
+  // hardcoded AWS key + GitHub token -> flagged
+  fs.writeFileSync(path.join(root, 'mcp/leak.md'), 'key AKIAIOSFODNN7EXAMPLE and token ghp_0123456789abcdefghijklmnopqrstuvwxyz\n');
+  // ${ENV} placeholder is the approved form -> not flagged
+  fs.writeFileSync(path.join(root, 'mcp/ok.json'), '{ "env": { "MCP_TOKEN": "${COMPANY_MCP_TOKEN}" } }\n');
+  // documentation example opted out with an allow marker -> not flagged
+  fs.writeFileSync(path.join(root, 'mcp/doc.md'), 'Example only: AKIAIOSFODNN7EXAMPLE <!-- secret-scan:allow -->\n');
+
+  const { errors } = checkSecretScan(root);
+  const joined = errors.join('\n');
+  assert.match(joined, /leak\.md:1: possible hardcoded secret \(AWS access key id\)/);
+  assert.match(joined, /leak\.md:1: possible hardcoded secret \(GitHub token\)/);
+  assert.ok(!/ok\.json/.test(joined), `\${ENV} placeholder must be allowed:\n${joined}`);
+  assert.ok(!/doc\.md/.test(joined), `allow-marker line must be skipped:\n${joined}`);
 });
 
 test('asset pack validator accepts a normal project-local pack', () => {
