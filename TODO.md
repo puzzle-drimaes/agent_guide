@@ -866,7 +866,7 @@ agent-deploy만으로 전부 커버하지 않는 영역이다. 별도 automation
 
 ### 8.1 1 PR = 1 노하우
 
-- [ ] PR template에 AI 노하우 섹션 추가
+- [x] AI 노하우 후보 승격은 PR/MR template 없이 후보 branch commit + Drive 운영 메모 기준으로 정리
 - [ ] merge 시 누락 reminder GitHub Action 설계
 - [ ] Notion/GitHub DB append 자동화 검토
 
@@ -874,7 +874,7 @@ agent-deploy만으로 전부 커버하지 않는 영역이다. 별도 automation
 
 2026-06-22 방침 변경: 회고/노하우 기록을 강제·추적하지 않는다. 공유 폴더 운영을 먼저 한다.
 
-- [ ] 공유 폴더(Google Drive) 구조/업로드·적용 안내 마련
+- [x] 공유 폴더(Google Drive) 구조/업로드·적용 안내 마련 (`SHARED_FOLDER_GUIDE.md` / `GITHUB_BRANCH_POLICY.md`)
 - [ ] 신규 .md 업로드 시 `#ai-knowhow` 가벼운 알림(선택)
 - [ ] `#ai-knowhow` 주간 리마인더(가벼운 권유, 제출률 추적 없음)
 - [ ] (보류) 매주 금 자동 발송 / 계정 담당자 mention / 제출 현황 기록 — 강제하지 않음(D12 참고지표 강등)

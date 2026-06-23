@@ -65,6 +65,20 @@ GitHub prompts/skills: 사원 공유 후보를 모으는 수집 공간
 - 헷갈리면: "절차/도구 사용"이면 skills, "한 번 붙여넣어 쓰는 문장"이면 prompts.
 ```
 
+GitHub 후보 branch에 남길 때의 최소 경로는 다음이다.
+
+```text
+prompts branch → uploads/prompts/<name>.md
+skills branch  → uploads/skills/<skill-name>/SKILL.md
+```
+
+예시는 다음처럼 쓴다.
+
+```text
+uploads/prompts/customer-faq-draft.md
+uploads/skills/meeting-followup/SKILL.md
+```
+
 ## 2. 파일명 규칙 (권장)
 
 ```text
@@ -144,10 +158,14 @@ name 은 폴더명과 같게 한다(skills/code-review-checklist/SKILL.md).
    - 기존 파일명과 충돌하면 overwrite하지 않고 더 구체적인 이름 제안
 3. Google Drive의 skills/ 또는 prompts/ 에 `.md`를 업로드한다.
 4. GitHub에도 남긴다.
-   - prompt면 `prompts` branch에 commit/push
-   - skill이면 `skills` branch에 commit/push
+   - prompt면 `prompts` branch의 `uploads/prompts/<name>.md`에 commit/push
+     예: `uploads/prompts/customer-faq-draft.md`
+   - skill이면 `skills` branch의 `uploads/skills/<skill-name>/SKILL.md`에 commit/push
+     예: `uploads/skills/meeting-followup/SKILL.md`
+   - 후보 branch 안에서는 위 `uploads/...` 경로를 최소 규칙으로 사용한다
    - 후보 asset은 `main`보다 `prompts`/`skills` branch에 남기는 것을 권장한다
    - 단, 현재 WIP 기간에는 운영 문서/설정 정리를 위해 `main` 직접 push를 차단하지 않는다
+   - `main` 승격 또는 공식 반영 검토는 PR/MR template 없이 운영자가 후보 branch commit과 Drive 운영 메모를 기준으로 수동 판단한다
 ```
 
 쓰는 쪽(사원 B):

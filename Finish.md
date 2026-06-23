@@ -25,6 +25,16 @@
 - [x] 작업 진행 중에는 `main` 직접 push가 막히지 않도록 GitHub main 보호 ruleset enforcement를 `disabled`로 변경.
 - [x] 운영 문서에 현재 WIP 기간은 `main` direct push 허용, 안정화 후 protected merge 전환으로 정리.
 
+### 0.3 Drive + uploads 후보 등록 flow 정리
+
+반영일: 2026-06-23
+
+- [x] `prompt-asset` / `prompt-db-curation` skill을 Drive + GitHub 후보 branch 우선 정책으로 갱신.
+- [x] 후보 branch 최소 등록 경로를 `uploads/prompts/<name>.md`, `uploads/skills/<skill-name>/SKILL.md`로 명시.
+- [x] `SHARED_FOLDER_GUIDE.md`와 `GITHUB_BRANCH_POLICY.md`에 후보 등록 예시를 보강.
+- [x] `SETUP_WIZARD.md`에서 공유 후보 등록 flow와 관련 문서로 안내하도록 연결.
+- [x] PR/MR template은 만들지 않고, 후보 branch commit + Drive 운영 메모를 기준으로 운영자 수동 승격하도록 정리.
+
 ---
 
 ## 1. 분석 완료

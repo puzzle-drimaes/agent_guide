@@ -12,9 +12,11 @@ main
 
 prompts
   prompt 후보 수집 branch. 사원 agent가 정제한 `.md` 후보를 commit/push 가능.
+  최소 등록 경로: uploads/prompts/<name>.md
 
 skills
   skill 후보 수집 branch. 사원 agent가 정제한 `SKILL.md` 또는 `.md` 후보를 commit/push 가능.
+  최소 등록 경로: uploads/skills/<skill-name>/SKILL.md
 ```
 
 ## 권한 원칙
@@ -65,19 +67,42 @@ git push origin HEAD:main
 git push --force origin main
 ```
 
+## 후보 branch 최소 등록 경로
+
+후보 branch는 공식 배포본이 아니므로 `agent-deploy/assets/...`에 바로 넣지 않는다.
+먼저 업로드/수집 공간임이 드러나는 `uploads/...` 아래에 둔다.
+
+```text
+prompts branch:
+  uploads/prompts/<name>.md
+
+skills branch:
+  uploads/skills/<skill-name>/SKILL.md
+```
+
 허용되는 후보 등록 예시는 다음과 같다.
 
 ```bash
+# prompt 후보: prompts branch
+# 예: uploads/prompts/customer-faq-draft.md
 git switch prompts
-git add agent-deploy/assets/prompts/<domain>/<name>.md
+mkdir -p uploads/prompts
+cp /path/to/customer-faq-draft.md uploads/prompts/customer-faq-draft.md
+git add uploads/prompts/customer-faq-draft.md
 git commit -m "[docs] prompt 후보 등록"
 git push origin prompts
 
+# skill 후보: skills branch
+# 예: uploads/skills/meeting-followup/SKILL.md
 git switch skills
-git add agent-deploy/assets/skills/<skill-id>/SKILL.md
+mkdir -p uploads/skills/meeting-followup
+cp /path/to/SKILL.md uploads/skills/meeting-followup/SKILL.md
+git add uploads/skills/meeting-followup/SKILL.md
 git commit -m "[docs] skill 후보 등록"
 git push origin skills
 ```
+
+`main` 승격 또는 공식 반영 검토는 agent가 PR/MR을 만들지 않고, 운영자가 후보 branch commit과 Drive 운영 메모를 기준으로 수동 판단한다. 후보 branch 등록 자체에도 PR/MR을 요구하지 않는다.
 
 작업 branch를 따로 만드는 경우에는 작업 branch로 push할 수 있다. 현재 WIP 기간에는 필요 시 `main` 직접 push도 허용한다.
 

@@ -142,7 +142,9 @@ Agent는 아래 원칙을 지킵니다.
 ```
 
 초보자가 "다른 사람이 준 md 파일을 적용하고 싶다"고 말하면, 바로 기존 rule/doc에 복사하지 말고
-아래 폴더에 넣도록 안내합니다.
+아래 폴더에 넣도록 안내합니다. Google Drive 업로드와 GitHub 후보 branch 등록 flow는
+`docs/SHARED_FOLDER_GUIDE.md`의 "검토 / 선택 적용 흐름"과 `docs/GITHUB_BRANCH_POLICY.md`의
+"후보 branch 최소 등록 경로"를 기준으로 합니다.
 
 ```text
 <repo>/.agent-packs/externals/
@@ -197,7 +199,16 @@ business:
 ```
 
 숙련자가 공유 문서 공유를 원하면 이번 bundle에서는 바로 설치 명령을 만들기보다,
-먼저 해당 `*.md`를 asset 후보로 정리하도록 안내합니다.
+먼저 해당 `*.md`를 asset 후보로 정리하도록 안내합니다. 후보는 Google Drive `AI-Knowhow`에
+업로드하고, GitHub에는 아래 최소 경로로 남깁니다.
+
+```text
+prompt/template → prompts branch: uploads/prompts/<name>.md
+skill/workflow  → skills branch:  uploads/skills/<skill-name>/SKILL.md
+```
+
+자세한 등록 예시는 `docs/SHARED_FOLDER_GUIDE.md`, `docs/GITHUB_BRANCH_POLICY.md`를 참고합니다.
+공식 반영 검토는 agent가 PR/MR을 만들지 않고, 운영자가 후보 branch commit과 Drive 운영 메모를 기준으로 수동 판단합니다.
 
 ```text
 shared document asset 후보에 필요한 정보:
