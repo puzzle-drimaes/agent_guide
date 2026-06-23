@@ -1406,7 +1406,13 @@ SDD mode: full (security/profile/adapter/validation/test/spec에 걸친 governan
   - zip 내부 구조 확정: 최상위 `company-agent-kit/` 고정, 실제 런타임 레이아웃(src/cli.js 엔트리), install.sh exec bit 보존
   - 배포본 누락 버그 수정: planner→pack-composer→pack-validator가 import 시 `scripts/check-asset-schema.js`/`check-catalog-parity.js`를 eager-load하므로 package.json `files`에 `scripts/` 추가(없으면 배포본 CLI 기동 실패). schemas/·package.json도 필수 멤버
   - dist/ gitignore, build/checksum 검증 smoke test 추가, README 배포본 빌드 섹션 추가
-  - 후속: src/가 scripts/를 참조하지 않도록 분리 리팩토링, release manifest, 배포 채널 checksum 검증 안내
+  - 후속: src/가 scripts/를 참조하지 않도록 분리 리팩토링
+- agent-deploy release manifest/checksum 검증 안내 추가
+  - `scripts/build-bundle.js`가 `release-manifest.json`과 `release-manifest.json.sha256`을 생성하도록 보강
+  - manifest schemaVersion은 `agentdeploy.release-manifest.v1`, package/version, zip 내부 top-level directory, artifact role/sizeBytes/SHA-256/sidecar 경로를 기록
+  - zip과 manifest 모두 `sha256sum -c` 호환 sidecar 제공, manifest도 deterministic output으로 유지
+  - README에 메인테이너용 빌드 산출물/검증 절차 추가, SETUP_WIZARD에 사용자 다운로드 전 검증 절차(macOS/Linux/Git Bash, PowerShell) 추가
+  - D14 artifact signing 결정은 Pilot checksum+manifest 제공, 서명 정책은 전사 rollout 전 검토로 정리
 - agent-deploy Windows / setup wizard 보강
   - `agent-deploy doctor` 서브커맨드 추가: Node 버전(>=18)·번들 무결성(src/cli.js·schemas·scripts·manifests·package.json type:module·assets)·설치 대상 폴더 쓰기 권한 진단, 실패 시 exit 1 + 항목별 조치 안내
   - path with spaces 버그 수정: install.sh passthrough가 공백 경로를 분해하던 문제를 POSIX set-- 재구성 + `"$@"` 큰따옴표로 해결(`--project "/a b/c"` 정상), install.bat은 per-arg 재인용
@@ -1428,7 +1434,7 @@ SDD mode: full (security/profile/adapter/validation/test/spec에 걸친 governan
   - workflow security validation은 보류(번들에 GitHub Actions 없음); MCP governance는 4.25에서 1차 구현 완료
 ```
 
-아직 남은 핵심은 repair/uninstall 실제 write 보강, release manifest와 내부 checksum 검증 안내, Pilot 운영 준비다.
+아직 남은 핵심은 repair/uninstall 실제 write 보강과 Pilot 운영 준비다.
 
 ```text
 agent-deploy를 실제 파일럿 가능한 사내 installer MVP로 계속 확장해야 한다.

@@ -293,7 +293,9 @@ Linux: ~/.config/company-agent-kit/install-state.json
 - [ ] --scope project 기본값 적용
 - [ ] --scope user 선택 옵션 구현
 - [x] Windows installer exe 제외 결정
-- [ ] OS 공통 zip bundle 구조 정의
+- [x] OS 공통 zip bundle 구조 정의
+- [x] release manifest/checksum sidecar 생성
+- [x] 다운로드 전 checksum 검증 안내
 - [x] SETUP_WIZARD.md 기반 agent setup flow 작성
 - [ ] install.bat optional wrapper 여부 결정
 - [ ] project scope install-state 경로 확정

@@ -707,6 +707,27 @@ test('build-bundle produces versioned + alias zips with matching sha256 sidecars
 
   // versioned + alias are identical bytes
   assert.ok(fs.readFileSync(versioned).equals(fs.readFileSync(alias)));
+
+  const manifestPath = path.join(out, 'release-manifest.json');
+  const manifestSidecarPath = `${manifestPath}.sha256`;
+  assert.ok(fs.existsSync(manifestPath), 'release manifest should exist');
+  assert.ok(fs.existsSync(manifestSidecarPath), 'release manifest checksum sidecar should exist');
+
+  const manifestText = fs.readFileSync(manifestPath, 'utf8');
+  const manifest = JSON.parse(manifestText);
+  assert.equal(manifest.schemaVersion, 'agentdeploy.release-manifest.v1');
+  assert.equal(manifest.package.version, pkg.version);
+  assert.equal(manifest.checksum.algorithm, 'sha256');
+  assert.equal(manifest.release.topLevelDirectory, 'company-agent-kit/');
+  assert.ok(manifest.artifacts.some((artifact) => (
+    artifact.file === `company-agent-kit-${pkg.version}.zip`
+      && artifact.sha256 === crypto.createHash('sha256').update(fs.readFileSync(versioned)).digest('hex')
+      && artifact.sha256File === `company-agent-kit-${pkg.version}.zip.sha256`
+  )));
+  assert.ok(manifest.artifacts.some((artifact) => artifact.file === 'company-agent-kit.zip.sha256'));
+
+  const manifestDigest = crypto.createHash('sha256').update(manifestText).digest('hex');
+  assert.equal(fs.readFileSync(manifestSidecarPath, 'utf8'), `${manifestDigest}  release-manifest.json\n`);
 });
 
 test('build-bundle is deterministic and includes runtime-required members', () => {
@@ -718,6 +739,11 @@ test('build-bundle is deterministic and includes runtime-required members', () =
   const zipA = fs.readFileSync(path.join(a, 'company-agent-kit.zip'));
   const zipB = fs.readFileSync(path.join(b, 'company-agent-kit.zip'));
   assert.ok(zipA.equals(zipB), 'identical contents must produce byte-identical archives');
+  assert.equal(
+    fs.readFileSync(path.join(a, 'release-manifest.json'), 'utf8'),
+    fs.readFileSync(path.join(b, 'release-manifest.json'), 'utf8'),
+    'release manifest should also be deterministic',
+  );
 
   // members the CLI needs at runtime must be present (filenames are stored
   // uncompressed in the zip headers, so a byte search is sufficient here).

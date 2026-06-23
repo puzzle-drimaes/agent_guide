@@ -1020,6 +1020,12 @@ installer release 전에 어떤 보안 검사를 필수화할 것인가?
 
 ### D14. artifact signing 여부
 
+상태:
+
+```text
+Accepted
+```
+
 질문:
 
 ```text
@@ -1029,7 +1035,16 @@ zip bundle release artifact에 서명 또는 checksum을 제공할 것인가?
 권장:
 
 ```text
-Pilot에서는 zip checksum을 우선 제공하고, 전사 rollout 전에는 release manifest와 서명 정책을 검토
+Pilot에서는 SHA-256 checksum sidecar와 release manifest를 제공한다.
+서명 정책은 전사 rollout 전 별도 검토한다.
+```
+
+결정:
+
+```text
+zip bundle에는 `*.zip.sha256` sidecar를 제공한다.
+릴리스에는 `release-manifest.json`과 `release-manifest.json.sha256`을 함께 제공한다.
+Windows exe packaging은 제외됐으므로 exe signing은 현재 범위에서 제외한다.
 ```
 
 결정 이유:

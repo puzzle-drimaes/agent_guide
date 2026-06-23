@@ -1,16 +1,17 @@
 #!/usr/bin/env node
 // Bundle build: package the agent-deploy bundle into a reproducible OS-common zip
-// plus a SHA-256 checksum. Pure Node, zero-dependency, deterministic — entry
-// order is sorted and timestamps are fixed, so identical contents always produce
-// an identical archive and checksum.
+// plus SHA-256 checksum files and a release manifest. Pure Node, zero-dependency,
+// deterministic — entry order is sorted and timestamps are fixed, so identical
+// contents always produce an identical archive, checksum, and manifest.
 //
 //   node scripts/build-bundle.js              -> dist/company-agent-kit-<version>.zip
 //   node scripts/build-bundle.js --out DIR    -> write artifacts into DIR instead
 //
 // Outputs (versioned canonical + stable alias, identical bytes, each with a
-// .sha256 sidecar in sha256sum format):
+// .sha256 sidecar in sha256sum format, plus a JSON release manifest):
 //   company-agent-kit-<version>.zip      company-agent-kit-<version>.zip.sha256
 //   company-agent-kit.zip                company-agent-kit.zip.sha256
+//   release-manifest.json                release-manifest.json.sha256
 //
 // Internal layout: everything under a stable top-level `company-agent-kit/`
 // folder, mirroring the runtime layout that install.sh / install.bat / the
@@ -27,6 +28,7 @@ import { fileURLToPath } from 'node:url';
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..');
 const TOP = 'company-agent-kit';
+const RELEASE_MANIFEST = 'release-manifest.json';
 
 const BUNDLE_DIRS = ['src', 'scripts', 'manifests', 'schemas', 'docs', 'assets'];
 const BUNDLE_FILES = ['package.json', 'README.md', 'SETUP_WIZARD.md', 'install.sh', 'install.bat', 'install.ps1'];
@@ -51,6 +53,10 @@ function crc32(buf) {
     crc = (CRC_TABLE[(crc ^ buf[i]) & 0xff] ^ (crc >>> 8)) >>> 0;
   }
   return (crc ^ 0xffffffff) >>> 0;
+}
+
+function sha256Hex(data) {
+  return crypto.createHash('sha256').update(data).digest('hex');
 }
 
 function collectEntries() {
@@ -175,21 +181,73 @@ function buildBundle({ out } = {}) {
 
   const entries = collectEntries();
   const zipBuf = buildZip(entries);
-  const digest = crypto.createHash('sha256').update(zipBuf).digest('hex');
+  const digest = sha256Hex(zipBuf);
 
   fs.rmSync(distDir, { recursive: true, force: true });
   fs.mkdirSync(distDir, { recursive: true });
 
   const versioned = `${TOP}-${version}.zip`;
   const alias = `${TOP}.zip`;
+  const artifacts = [];
   for (const name of [versioned, alias]) {
     const zipPath = path.join(distDir, name);
+    const sidecarName = `${name}.sha256`;
+    const sidecarText = `${digest}  ${name}\n`;
     fs.writeFileSync(zipPath, zipBuf);
-    fs.writeFileSync(`${zipPath}.sha256`, `${digest}  ${name}\n`);
+    fs.writeFileSync(`${zipPath}.sha256`, sidecarText);
+    artifacts.push({
+      file: name,
+      role: name === versioned ? 'versioned-bundle' : 'bundle-alias',
+      mediaType: 'application/zip',
+      sizeBytes: zipBuf.length,
+      sha256: digest,
+      sha256File: sidecarName,
+    });
+    artifacts.push({
+      file: sidecarName,
+      role: 'checksum-sidecar',
+      mediaType: 'text/plain',
+      sizeBytes: Buffer.byteLength(sidecarText),
+      sha256: sha256Hex(sidecarText),
+    });
   }
 
+  const manifest = {
+    schemaVersion: 'agentdeploy.release-manifest.v1',
+    package: {
+      name: pkg.name,
+      version,
+    },
+    release: {
+      artifactBaseName: TOP,
+      topLevelDirectory: `${TOP}/`,
+    },
+    build: {
+      reproducible: true,
+      fixedTimestamp: '1980-01-01T00:00:00Z',
+      entryCount: entries.length,
+    },
+    checksum: {
+      algorithm: 'sha256',
+      sidecarFormat: '<hex>  <filename>\\n',
+    },
+    artifacts,
+  };
+  const manifestText = `${JSON.stringify(manifest, null, 2)}\n`;
+  const manifestDigest = sha256Hex(manifestText);
+  fs.writeFileSync(path.join(distDir, RELEASE_MANIFEST), manifestText);
+  fs.writeFileSync(path.join(distDir, `${RELEASE_MANIFEST}.sha256`), `${manifestDigest}  ${RELEASE_MANIFEST}\n`);
+
   return {
-    version, distDir, versioned, alias, digest, entryCount: entries.length, size: zipBuf.length,
+    version,
+    distDir,
+    versioned,
+    alias,
+    manifest: RELEASE_MANIFEST,
+    digest,
+    manifestDigest,
+    entryCount: entries.length,
+    size: zipBuf.length,
   };
 }
 
@@ -202,7 +260,8 @@ function main() {
   console.log(`  sha256:  ${result.digest}`);
   console.log(`  output:  ${path.relative(ROOT, result.distDir)}/${result.versioned}`);
   console.log(`           ${path.relative(ROOT, result.distDir)}/${result.alias} (alias, identical bytes)`);
-  console.log('           + .sha256 sidecar for each (sha256sum -c compatible)');
+  console.log(`           ${path.relative(ROOT, result.distDir)}/${result.manifest}`);
+  console.log('           + .sha256 sidecar for each zip and manifest (sha256sum -c compatible)');
 }
 
 main();

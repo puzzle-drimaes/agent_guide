@@ -84,12 +84,12 @@ node scripts/validate-manifests.js                     # CI 불변식 검증
 node --test                                            # plan→apply 라운드트립 테스트
 ```
 
-### 배포본 빌드(bundle build, 메인테이너용)
+### 배포본 빌드와 release manifest(bundle build, 메인테이너용)
 
-OS 공통 zip + SHA-256 체크섬을 생성합니다(의존성 0 · 재현 가능 빌드).
+OS 공통 zip + SHA-256 체크섬 + release manifest를 생성합니다(의존성 0 · 재현 가능 빌드).
 
 ```bash
-npm run bundle                                         # dist/ 에 zip + .sha256 생성
+npm run bundle                                         # dist/ 에 zip + .sha256 + manifest 생성
 ```
 
 산출물(버전 포함 정식본 + 고정 alias, 동일 바이트):
@@ -97,13 +97,36 @@ npm run bundle                                         # dist/ 에 zip + .sha256
 ```text
 dist/company-agent-kit-<version>.zip        dist/company-agent-kit-<version>.zip.sha256
 dist/company-agent-kit.zip                  dist/company-agent-kit.zip.sha256
+dist/release-manifest.json                  dist/release-manifest.json.sha256
 ```
 
 zip 내부 최상위 폴더는 `company-agent-kit/`로 고정이며, 압축 해제 후 그 안에서 `./install.sh`를
-실행합니다. 배포 채널에 올리기 전/내려받은 뒤 체크섬을 검증하세요.
+실행합니다. `release-manifest.json`은 아래 정보를 담습니다.
+
+```text
+- schemaVersion: agentdeploy.release-manifest.v1
+- package name/version
+- zip 내부 top-level directory
+- 각 zip/sidecar의 sizeBytes, sha256, role
+- checksum algorithm과 sidecar format
+```
+
+배포 채널에 올리기 전/내려받은 뒤 체크섬을 검증하세요.
 
 ```bash
-sha256sum -c company-agent-kit-<version>.zip.sha256    # 무결성 확인
+cd dist
+sha256sum -c release-manifest.json.sha256              # manifest 무결성 확인
+sha256sum -c company-agent-kit-<version>.zip.sha256    # 버전 zip 무결성 확인
+sha256sum -c company-agent-kit.zip.sha256              # alias zip 무결성 확인
+```
+
+Windows PowerShell에서는 다음처럼 검증합니다.
+
+```powershell
+$zip = "company-agent-kit-<version>.zip"
+$expected = (Get-Content "$zip.sha256").Split(" ")[0]
+$actual = (Get-FileHash $zip -Algorithm SHA256).Hash.ToLower()
+if ($actual -ne $expected) { throw "checksum mismatch: $zip" }
 ```
 
 ### 설치 범위(scope)
