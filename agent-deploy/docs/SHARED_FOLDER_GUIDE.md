@@ -19,7 +19,7 @@
 - 1차 도입: 사용자 공유 채널은 Google Drive 하나로 둔다.
 - Google Drive는 사람이 보고 올리고 내려받는 공유 입구다.
 - GitHub는 이력/중복/수동 병합을 위한 정본 관리 저장소다.
-- PR 운영은 하지 않는다. prompts / skills branch에 후보를 모으고, main으로는 나중에 수동 병합한다.
+- 후보 등록에는 PR을 요구하지 않는다. prompts / skills branch에 후보를 모으고, main으로는 나중에 protected merge로만 반영한다.
 - 예외 없이 지킬 것 두 가지: 보안(금지 데이터 미업로드)과 출처 표기.
 - frontmatter/파일명 규칙은 "권장"이다. 고르고 적용하기 쉽게 하려는 것일 뿐 의무가 아니다.
 ```
@@ -27,13 +27,14 @@
 ## 0. GitHub branch 정책
 
 Google Drive만으로는 변경 이력과 중복 관리가 어렵기 때문에, 공유된 `.md`는 GitHub에도 남긴다. 단, 관리자가 매번 승인하는 PR 흐름은 운영하지 않는다.
+세부 권한 설정과 운영자 체크리스트는 [GITHUB_BRANCH_POLICY.md](GITHUB_BRANCH_POLICY.md)를 기준으로 한다.
 
 ```text
 main
   - 공식 배포본
   - 검증/정리된 prompt, skill만 포함
-  - agent 직접 push 금지
-  - 운영자가 필요할 때 prompts / skills branch에서 수동 병합
+  - protected branch / ruleset으로 agent 직접 push 금지
+  - 운영자가 필요할 때 prompts / skills branch에서 protected merge
 
 prompts
   - prompt 공유 후보 수집 branch
@@ -143,7 +144,7 @@ name 은 폴더명과 같게 한다(skills/code-review-checklist/SKILL.md).
 4. GitHub에도 남긴다.
    - prompt면 `prompts` branch에 commit/push
    - skill이면 `skills` branch에 commit/push
-   - `main`에는 직접 push하지 않는다
+   - `main`에는 직접 push하지 않는다. agent가 작업 branch를 만들더라도 `main` 직접 push는 금지한다
 ```
 
 쓰는 쪽(사원 B):
@@ -176,10 +177,10 @@ name 은 폴더명과 같게 한다(skills/code-review-checklist/SKILL.md).
 ```text
 - prompts / skills branch는 후보 수집 공간이다.
 - 운영자는 주기적으로 후보를 훑어 중복/저품질/오래된 파일을 정리한다.
-- 여러 사람이 반복해서 잘 쓰는 프롬프트나 스킬만 main으로 수동 병합한다.
+- 여러 사람이 반복해서 잘 쓰는 프롬프트나 스킬만 main으로 protected merge한다.
 - 검증되면 company-* asset(skill/prompt)으로 승격한다.
 - 승격 시에는 전체 frontmatter와 승인 체크리스트(ASSET_PACKS.md)를 충족해야 한다.
-- 공유 폴더와 후보 branch 단계는 강제가 없지만, main 병합/승격 단계는 보안/출처/리뷰 게이트를 거친다.
+- 공유 폴더와 후보 branch 단계는 강제가 없지만, protected main 병합/승격 단계는 보안/출처/리뷰 게이트를 거친다.
 ```
 
 ## 7. Google Drive 연동과 운영 주의점 (선택)

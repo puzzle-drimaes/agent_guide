@@ -7,6 +7,19 @@
 
 ---
 
+## 0. 최근 운영 반영
+
+### 0.1 GitHub prompts/skills 후보 branch 및 main 보호 운영
+
+반영일: 2026-06-23
+
+- [x] GitHub `prompts` / `skills` branch를 실제 후보 수집 branch로 운영하는 기준을 문서화.
+- [x] `main`은 공식 배포본이며 agent 직접 push 금지, protected merge 전용으로 명시.
+- [x] 후보 branch는 PR 없이 commit/push 가능하지만, `main` 반영은 운영자 검증 후 진행하도록 정리.
+- [x] 세부 운영/권한 체크리스트를 `agent-deploy/docs/GITHUB_BRANCH_POLICY.md`에 추가.
+
+---
+
 ## 1. 분석 완료
 
 ### 1.1 ECC 분석

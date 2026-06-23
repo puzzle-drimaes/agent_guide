@@ -49,7 +49,8 @@ First-rollout storage rule:
 ```text
 - Upload the sanitized `.md` to Google Drive AI-Knowhow/prompts/.
 - Commit/push prompt candidates to the GitHub `prompts` branch only.
-- Do not push to `main`; main is updated later by manual merge.
+- Do not push to `main`; main is protected and updated later by an operator merge.
+- If the reusable asset is a skill rather than a prompt, use the GitHub `skills` branch instead.
 ```
 
 ```text
@@ -72,7 +73,7 @@ AI 도구:          # Claude / Codex / Gemini ...
 
 A candidate graduates to `main` or a shared asset only after it is proven (reused
 across people or tasks, stable wording). When proposing promotion, state the target
-and rationale — do not create the asset in `main` unilaterally:
+and rationale — do not push or create the asset in `main` unilaterally:
 
 ```text
 - skill:  assets/skills/company-<name>/SKILL.md   (workflow with steps + output)

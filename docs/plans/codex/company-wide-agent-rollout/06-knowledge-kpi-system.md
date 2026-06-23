@@ -24,10 +24,10 @@ AI 사용 노하우가 개인 대화창 안에 갇히지 않고 회사 지식으
    - 정해진 양식 강제 없음. 단, agent가 업로드 전 최소 정제는 돕는다.
    - 올리기 전 민감정보 / credential / 고객 데이터만 제거한다.
 2. 이력과 중복 관리는 GitHub branch로 한다.
-   - `main`: 공식 배포본. agent 직접 push 금지.
+   - `main`: 공식 배포본. protected branch로 운영하며 agent 직접 push 금지.
    - `prompts`: prompt 후보 수집 branch. 사원 agent가 정제 후 push 가능.
    - `skills`: skill 후보 수집 branch. 사원 agent가 정제 후 push 가능.
-   - PR은 운영하지 않고, 운영자가 필요할 때 수동으로 `main`에 병합한다.
+   - 후보 등록에는 PR을 요구하지 않는다. `main` 반영은 운영자가 필요할 때 protected merge로만 수행한다.
 3. 사원들은 필요한 `.md`를 선택해 자기 프로젝트에 적용한다.
    - 기본은 `main` 기준으로 추천받는다.
    - `prompts` / `skills` branch 후보는 "검증 전 공유본"으로 표시하고 사용자 컨펌 후 적용한다.
@@ -37,7 +37,8 @@ AI 사용 노하우가 개인 대화창 안에 갇히지 않고 회사 지식으
      (15-prompt-db-operations.md). 처음부터 강제하지 않는다.
 ```
 
-파일명/frontmatter/검토·적용 흐름의 운영 기준은 `agent-deploy/docs/SHARED_FOLDER_GUIDE.md`에 정리돼 있다.
+파일명/frontmatter/검토·적용 흐름의 운영 기준은 `agent-deploy/docs/SHARED_FOLDER_GUIDE.md`에,
+GitHub branch 권한 기준은 `agent-deploy/docs/GITHUB_BRANCH_POLICY.md`에 정리돼 있다.
 
 ### 운영 평가 (2026-06-23)
 
@@ -46,11 +47,12 @@ AI 사용 노하우가 개인 대화창 안에 갇히지 않고 회사 지식으
 개선 원칙:
 
 ```text
-- 3단계로 분리한다: Drive 자유 공유 → GitHub prompts/skills 후보 축적 → main/company-* 승인 배포.
+- 3단계로 분리한다: Drive 자유 공유 → GitHub prompts/skills 후보 축적 → protected main/company-* 승인 배포.
 - 공유 폴더와 후보 branch 단계에서는 양식/기록/KPI를 강제하지 않는다.
+- `main`은 branch protection/ruleset으로 직접 push를 막고, 후보 branch에서 검증된 변경만 운영자 merge로 반영한다.
 - 계정 담당자와 governance는 감시자가 아니라 마중물·큐레이터 역할을 한다.
 - KPI는 개인/팀 순위가 아니라 운영 건강도와 개선 후보를 보는 신호로만 사용한다.
-- 강제 게이트는 보안, 출처, main 병합, company-* 승격에만 둔다.
+- 강제 게이트는 보안, 출처, protected main 병합, company-* 승격에만 둔다.
 ```
 
 이 공유 문화가 자리 잡은 뒤에 아래의 회고 / 데모 / 거버넌스 루틴을 **권장 수준**으로 얹는다.
