@@ -9,6 +9,16 @@
 
 ## 0. 최근 운영 반영
 
+### 0.7 전사 Agent Bundle 베타 runbook 정리
+
+반영일: 2026-06-23
+
+- [x] 폐쇄형 5명 Pilot 대신 전사 베타 배포 방식으로 1차 실행 방향을 정리.
+- [x] 참가자별 OS/target/profile 배정과 D0/D+7/D+14 일정표는 1차 버전에서 제외.
+- [x] 운영자 Windows/Linux 알파 리허설 범위를 `dry-run → apply → doctor → update --dry-run → repair --dry-run → uninstall --dry-run`으로 문서화.
+- [x] 사용 후 피드백은 agent가 `.md`로 정리해 Google Drive `AI-Knowhow/feedback/` 업로드를 유도하는 방식으로 확정.
+- [x] 실행용 문서 `docs/pilot-runbook.md`를 추가하고, 기존 `10-pilot.md`는 전사 베타 기준으로 연결/정리.
+
 ### 0.6 Agent 기반 Google Drive 피드백 업로드 유도
 
 반영일: 2026-06-23
