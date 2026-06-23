@@ -18,6 +18,13 @@
 - [x] 후보 branch는 PR 없이 commit/push 가능하지만, `main` 반영은 운영자 검증 후 진행하도록 정리.
 - [x] 세부 운영/권한 체크리스트를 `agent-deploy/docs/GITHUB_BRANCH_POLICY.md`에 추가.
 
+### 0.2 WIP 기간 main push 차단 비활성화
+
+반영일: 2026-06-23
+
+- [x] 작업 진행 중에는 `main` 직접 push가 막히지 않도록 GitHub main 보호 ruleset enforcement를 `disabled`로 변경.
+- [x] 운영 문서에 현재 WIP 기간은 `main` direct push 허용, 안정화 후 protected merge 전환으로 정리.
+
 ---
 
 ## 1. 분석 완료
