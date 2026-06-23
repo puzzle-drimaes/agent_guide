@@ -2,13 +2,15 @@
   "version": 1,
   "profiles": {
     "minimal": [
-      "baseline-rules"
+      "baseline-rules",
+      "agent-bundle-feedback-skill"
     ],
     "core": [
       "baseline-rules",
       "review-agent",
       "prompt-asset-skill",
       "external-doc-asset-skill",
+      "agent-bundle-feedback-skill",
       "prompt-library"
     ],
     "sdd": [
@@ -16,12 +18,14 @@
       "harness-engineering-rules",
       "spec-driven-development-rules",
       "spec-mode-selector-skill",
-      "harness-parity-review-skill"
+      "harness-parity-review-skill",
+      "agent-bundle-feedback-skill"
     ],
     "business": [
       "baseline-rules",
       "prompt-asset-skill",
       "external-doc-asset-skill",
+      "agent-bundle-feedback-skill",
       "prompt-library",
       "business-prompts",
       "meeting-summary-skill",
@@ -31,6 +35,7 @@
       "baseline-rules",
       "prompt-asset-skill",
       "external-doc-asset-skill",
+      "agent-bundle-feedback-skill",
       "prompt-library",
       "product-prompts",
       "meeting-summary-skill",
@@ -40,6 +45,7 @@
       "baseline-rules",
       "prompt-asset-skill",
       "external-doc-asset-skill",
+      "agent-bundle-feedback-skill",
       "prompt-library",
       "kpi-report-skill",
       "quarterly-review-skill",
@@ -63,6 +69,7 @@
       "spec-writing-skill",
       "prompt-asset-skill",
       "external-doc-asset-skill",
+      "agent-bundle-feedback-skill",
       "prompt-library",
       "planning-command",
       "mcp-baseline"
@@ -85,6 +92,7 @@
       "spec-writing-skill",
       "prompt-asset-skill",
       "external-doc-asset-skill",
+      "agent-bundle-feedback-skill",
       "prompt-library",
       "product-prompts",
       "business-prompts",

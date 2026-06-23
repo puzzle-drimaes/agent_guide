@@ -308,6 +308,24 @@
       "stability": "stable"
     },
     {
+      "id": "agent-bundle-feedback-skill",
+      "description": "Consent-based Q&A skill for Agent Bundle beta feedback Markdown reports",
+      "paths": [
+        "skills/agent-bundle-feedback"
+      ],
+      "targets": [
+        "claude",
+        "cursor",
+        "codex",
+        "gemini"
+      ],
+      "dependencies": [
+        "baseline-rules"
+      ],
+      "cost": "light",
+      "stability": "stable"
+    },
+    {
       "id": "prompt-library",
       "description": "Starter prompt templates (dev/doc/comparison/research) following the company skeleton",
       "paths": [

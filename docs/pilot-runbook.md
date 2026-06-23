@@ -54,10 +54,11 @@ Codex, Claude, Gemini 같은 target과 developer/product/business/governance pro
 
 ### 3.3 피드백은 agent가 Markdown으로 정리
 
-사용자는 별도 설문을 먼저 작성하지 않는다. 사용 후 본인이 쓰는 agent에게 피드백 정리 프롬프트를 실행하게 하고, 결과 `.md`를 Google Drive `AI-Knowhow/feedback/`에 올린다.
+사용자는 별도 설문이나 긴 프롬프트를 먼저 작성하지 않는다. 사용 후 본인이 쓰는 agent에게 `피드백 해줘`라고 말하면, agent가 동의를 받고 짧은 Q&A로 결과 `.md`를 만들어 Google Drive `AI-Knowhow/feedback/` 업로드를 돕는다.
 
 ```text
-- Drive 커넥터가 있으면 agent가 업로드까지 돕는다.
+- 환경정보(OS, AI 도구, 설치 scope 등)는 사용자 동의를 받은 뒤 피드백에 포함한다.
+- Drive 커넥터가 있으면 업로드 전 파일명/본문 확인을 받은 뒤 agent가 업로드까지 돕는다.
 - Drive 커넥터가 없으면 agent가 업로드용 .md 본문을 만들고, 사용자가 Drive 웹에서 올린다.
 - 민감정보, token, credential, 고객 개인정보, 내부 기밀 원문은 피드백에 포함하지 않는다.
 ```
@@ -222,7 +223,7 @@ node src\cli.js uninstall `
 4. agent가 제안한 명령 중 `dry-run`을 먼저 실행해 어떤 파일이 생기는지 확인합니다.
 5. 문제가 없으면 `apply`를 실행합니다.
 6. 설치 후 실제 업무에서 prompt, skill, rule을 사용해 봅니다.
-7. 사용 후 아래 "피드백 정리 프롬프트"를 agent에게 실행해 결과를 `.md`로 정리합니다.
+7. 사용 후 agent에게 `피드백 해줘`라고 말해 Q&A 방식으로 결과를 `.md`로 정리합니다.
 8. 정리된 `.md`를 Google Drive `AI-Knowhow/feedback/` 폴더에 업로드합니다.
 
 ## 피드백 요청
@@ -247,76 +248,49 @@ node src\cli.js uninstall `
 - 문의 경로: `<메일/게시판/Drive 운영 메모 등>`
 ```
 
-## 6. 사용자용 피드백 정리 프롬프트
+## 6. 사용자용 피드백 수집 방식
 
-전사 공지에 아래 프롬프트를 함께 넣는다. 사용자는 설치 또는 실제 사용 후 본인이 쓰는 agent에게 그대로 붙여넣는다.
+사용자에게 긴 피드백 프롬프트를 복사/입력하게 하지 않는다. bundle에는 `agent-bundle-feedback` skill을 포함하고, 사용자는 설치 또는 실제 사용 후 agent에게 짧게 말한다.
 
-```md
-아래 항목에 따라 이번 Agent Bundle 사용 경험을 `.md` 문서로 정리해줘.
+```text
+피드백 해줘
+```
 
-중요:
-- 고객 개인정보, credential, token, private key, 비밀번호, 세션 쿠키는 포함하지 마.
-- 내부 기밀 원문은 그대로 넣지 말고 요약하거나 `<프로젝트명>`, `<고객명>` 같은 placeholder로 바꿔줘.
-- 외부 자료를 사용한 내용이 있으면 출처를 남겨줘.
-- 마지막에 Google Drive `AI-Knowhow/feedback/` 폴더에 올릴 파일명도 제안해줘.
+그러면 agent는 설치된 `agent-bundle-feedback` skill을 사용해 짧은 질의응답으로 필요한 정보를 수집하고, 업로드 가능한 피드백 `.md`를 만든다.
 
-## 1. 기본 정보
+### 6.1 Agent 동작 기준
 
-- 작성일:
-- OS:
-- 사용한 AI 도구:
-- 설치한 프로젝트 경로 또는 설명:
-- 설치 scope: project / user-global / 모르겠음
-- 사용한 target/profile을 알면 적어줘:
+```text
+1. 먼저 환경정보 수집 동의를 받는다.
+   - OS, 사용한 AI 도구, 설치 scope, 실행 명령/출력 요약을 피드백에 포함해도 되는지 확인한다.
+   - 사용자가 거절한 항목은 `미제공`으로 둔다.
 
-## 2. 설치 결과
+2. 한 번에 1~3개씩만 질문한다.
+   - 사용자가 모르면 `모르겠음`으로 답할 수 있게 한다.
+   - 이미 대화에 나온 정보는 다시 묻지 않는다.
 
-- 설치 시도 여부:
-- dry-run 성공 여부:
-- apply 성공 여부:
-- doctor 실행 여부와 결과:
-- update --dry-run / repair --dry-run / uninstall --dry-run을 실행했다면 결과:
-- 대략 소요 시간:
-- 막힌 단계:
-- 해결 방법 또는 아직 막힌 점:
+3. 민감정보를 차단한다.
+   - 고객 개인정보, credential, token, private key, 비밀번호, 세션 쿠키는 받지 않는다.
+   - 내부 기밀 원문은 placeholder로 바꾸거나 요약한다.
 
-## 3. 실제 사용 사례
+4. 설치/사용 결과를 구조화한다.
+   - dry-run / apply / doctor / update --dry-run / repair --dry-run / uninstall --dry-run
+   - 실제 사용한 prompt / skill / rule
+   - 헷갈린 용어, 비개발자 UX, target/profile/scope 혼선
+   - 공유 가능한 .md 후보와 개선 요청
 
-- 어떤 업무에 사용했나:
-- 사용한 prompt / skill / rule:
-- 결과물이 실제 업무에 도움이 되었나:
-- 다시 쓰고 싶은 부분:
-- 불편하거나 과한 부분:
+5. 업로드 전 확인을 받는다.
+   - Drive 커넥터가 있더라도 파일명과 본문을 먼저 보여준다.
+   - 사용자가 확인한 뒤 `AI-Knowhow/feedback/` 업로드를 진행한다.
+   - Drive 커넥터가 없으면 Drive 웹 업로드용 파일명과 본문을 제공한다.
+```
 
-## 4. 이해도와 사용성
+### 6.2 사용자에게 안내할 최소 문구
 
-- SETUP_WIZARD 안내가 이해됐나:
-- 비개발자도 이해하기 어려운 표현이 있었나:
-- target/profile/프로젝트 scope 중 헷갈린 개념이 있었나:
-- AI가 안내를 잘못했거나 불필요하게 복잡하게 만든 부분:
+전사 공지에는 아래 한 줄만 넣어도 된다.
 
-## 5. 도구별 의미 동등성
-
-- 같은 rule/prompt인데 Codex, Claude, Gemini 등에서 다르게 동작한 사례가 있나:
-- 있다면 어떤 도구에서 무엇이 달랐나:
-- 회사 표준 방식이 응답에 잘 반영됐나:
-
-## 6. 공유/재사용 후보
-
-- 공유해도 되는 `.md` 산출물이 있나:
-- 다른 팀도 쓸 수 있을 것 같은 prompt/skill/rule 아이디어:
-- Google Drive 또는 GitHub 후보 branch에 올리고 싶은 항목:
-- 공유 전에 제거해야 할 민감정보 또는 출처 보강 필요 여부:
-
-## 7. 개선 요청
-
-- 가장 먼저 고쳐야 할 문제 1개:
-- 없어도 되는 복잡한 절차:
-- 추가되면 좋을 prompt/skill/template:
-- 전사 확대 전에 운영자가 알아야 할 리스크:
-
-위 내용을 바탕으로 업로드 가능한 Markdown 문서를 만들어줘.
-파일명은 `YYYY-MM-DD_agent-bundle-feedback_<간단한-주제>.md` 형식으로 제안해줘.
+```text
+사용 후 본인이 쓰는 agent에게 "피드백 해줘"라고 말하면, agent가 동의를 받고 짧은 질문으로 피드백 .md를 만들어 줍니다.
 ```
 
 ## 7. 운영자 취합 체크리스트

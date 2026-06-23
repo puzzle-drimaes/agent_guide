@@ -85,13 +85,14 @@ test('claude developer profile installs rules, architecture assets, agent, comma
   assert.ok(state.operations.every((o) => o.scope === 'project'));
 });
 
-test('minimal profile installs common core rules but NOT developer assets', () => {
+test('minimal profile installs common core rules and feedback skill but NOT developer assets', () => {
   const project = tmpProject();
   applyPlan(buildPlan({ target: 'claude', profile: 'minimal', projectRoot: project }));
   assertCommonCoreRules(path.join(project, '.claude'));
   assert.ok(!fs.existsSync(path.join(project, '.claude/rules/developer/architecture.md')), 'architecture scoped out of minimal');
   assert.ok(!fs.existsSync(path.join(project, '.claude/rules/developer/spec-driven-development.md')), 'SDD scoped out of minimal');
-  assert.ok(!fs.existsSync(path.join(project, '.claude/skills')), 'no skills in minimal');
+  assert.ok(fs.existsSync(path.join(project, '.claude/skills/agent-bundle-feedback/SKILL.md')), 'feedback skill is available in minimal');
+  assert.ok(!fs.existsSync(path.join(project, '.claude/skills/architecture-review/SKILL.md')), 'developer skills scoped out of minimal');
 });
 
 test('codex minimal profile installs AGENTS.md, project rules, and shared install-state', () => {
@@ -758,7 +759,7 @@ test('uninstall removes managed files, reverts shared block, deletes state, and 
   });
 
   assert.equal(result.uninstalled, true);
-  assert.equal(result.deleted, 4);
+  assert.equal(result.deleted, 5);
   assert.equal(result.reverted, 1);
   assert.equal(fs.existsSync(path.join(project, '.agent-deploy/install-state.json')), false);
   assert.equal(fs.existsSync(path.join(project, '.agents')), false);
@@ -795,7 +796,7 @@ test('uninstall --on-user-modified skip preserves modified files and backs up ch
     backup: true,
   });
 
-  assert.equal(result.deleted, 3);
+  assert.equal(result.deleted, 4);
   assert.equal(result.reverted, 1);
   assert.equal(result.skipped.length, 1);
   assert.ok(fs.existsSync(securityPath), 'skip policy should preserve modified managed file');

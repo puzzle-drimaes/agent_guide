@@ -127,6 +127,20 @@
       "owner": "ai-governance",
       "tags": ["external-doc", "knowledge-sharing", "promotion", "skill"],
       "reviewStatus": "approved"
+    },
+    {
+      "id": "agent-bundle-feedback-workflow",
+      "assetType": "skill",
+      "title": "Agent Bundle 베타 피드백 수집 스킬",
+      "description": "사용자가 '피드백 해줘'라고 요청하면 동의 기반 Q&A로 설치/사용 피드백을 수집하고 업로드 가능한 Markdown으로 정리합니다.",
+      "path": "skills/agent-bundle-feedback/SKILL.md",
+      "moduleIds": ["agent-bundle-feedback-skill"],
+      "profiles": ["minimal", "core", "sdd", "developer", "product", "business", "governance", "full"],
+      "audience": ["all"],
+      "stability": "stable",
+      "owner": "ai-governance",
+      "tags": ["feedback", "beta", "knowledge-sharing", "skill"],
+      "reviewStatus": "approved"
     }
   ]
 }
