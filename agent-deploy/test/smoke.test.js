@@ -11,7 +11,7 @@ import { fileURLToPath } from 'node:url';
 import { buildPlan } from '../src/planner.js';
 import { applyPlan } from '../src/apply.js';
 import { applyUpdate } from '../src/update.js';
-import { buildRepairDryRun } from '../src/repair.js';
+import { applyRepair, buildRepairDryRun } from '../src/repair.js';
 import { buildUninstallDryRun } from '../src/uninstall.js';
 import { runDoctor } from '../src/doctor.js';
 import { validateInstallState } from '../src/state.js';
@@ -563,6 +563,8 @@ test('repair --dry-run reports zero missing for an intact install', () => {
   assert.ok(!report.summary.missing, 'intact install has no missing files');
   assert.ok(report.summary.present >= 1);
   assert.ok(report.items.every((item) => item.status === 'present'));
+  const state = JSON.parse(fs.readFileSync(path.join(project, '.agent-deploy/install-state.json'), 'utf8'));
+  assert.ok(state.operations.some((op) => op.kind === 'copy-file' && /^sha256:[a-f0-9]{64}$/.test(op.contentHash)));
 });
 
 test('repair --dry-run --json detects a deleted managed file and writes nothing', () => {
@@ -587,7 +589,62 @@ test('repair --dry-run --json detects a deleted managed file and writes nothing'
   assert.ok(!fs.existsSync(securityPath), 'dry-run restored nothing');
 });
 
-test('repair rejects missing state and non-dry-run execution', () => {
+test('repair detects hash drift and fails closed by default', () => {
+  const project = tmpProject();
+  applyPlan(buildPlan({ target: 'codex', profile: 'minimal', projectRoot: project }), {
+    installedAt: '2026-01-01T00:00:00Z',
+  });
+  const securityPath = path.join(project, '.agents/rules/common/security.md');
+  fs.appendFileSync(securityPath, '\nTampered managed rule.\n');
+
+  const report = buildRepairDryRun({ target: 'codex', projectRoot: project });
+  assert.ok(report.summary.drifted >= 1);
+  assert.ok(report.items.some((item) => (
+    item.status === 'drifted'
+      && item.dest.endsWith('.agents/rules/common/security.md')
+      && /^sha256:[a-f0-9]{64}$/.test(item.expectedHash)
+      && /^sha256:[a-f0-9]{64}$/.test(item.actualHash)
+  )));
+
+  assert.throws(
+    () => applyRepair({ target: 'codex', projectRoot: project }, { installedAt: '2026-02-01T00:00:00Z' }),
+    /repair refused: .* drifted from install-state/,
+  );
+  assert.match(fs.readFileSync(securityPath, 'utf8'), /Tampered managed rule/);
+});
+
+test('repair restores missing files and can overwrite drifted managed content with backup', () => {
+  const project = tmpProject();
+  applyPlan(buildPlan({ target: 'codex', profile: 'minimal', projectRoot: project }), {
+    installedAt: '2026-01-01T00:00:00Z',
+  });
+  const securityPath = path.join(project, '.agents/rules/common/security.md');
+  const sourcePath = path.resolve(path.dirname(CLI), '../assets/rules/common/security.md');
+  const canonical = fs.readFileSync(sourcePath, 'utf8');
+
+  fs.rmSync(path.join(project, '.agents/rules/common/source-attribution.md'));
+  fs.appendFileSync(securityPath, '\nTampered managed rule.\n');
+
+  const result = applyRepair({ target: 'codex', projectRoot: project }, {
+    installedAt: '2026-02-01T00:00:00Z',
+    onDrift: 'overwrite',
+    backup: true,
+  });
+
+  assert.equal(result.repaired, true);
+  assert.equal(result.operations, 2);
+  assert.equal(fs.readFileSync(securityPath, 'utf8'), canonical);
+  assert.ok(fs.existsSync(path.join(project, '.agents/rules/common/source-attribution.md')));
+  assert.ok(fs.existsSync(path.join(result.backup.root, '.agents/rules/common/security.md')));
+  assert.match(fs.readFileSync(path.join(result.backup.root, '.agents/rules/common/security.md'), 'utf8'), /Tampered/);
+
+  const state = JSON.parse(fs.readFileSync(path.join(project, '.agent-deploy/install-state.json'), 'utf8'));
+  assert.equal(state.installedAt, '2026-02-01T00:00:00Z');
+  assert.deepEqual(validateInstallState(state), []);
+  assert.ok(buildRepairDryRun({ target: 'codex', projectRoot: project }).summary.drifted === undefined);
+});
+
+test('repair rejects missing state and unknown drift policy', () => {
   const project = tmpProject();
 
   assert.throws(
@@ -601,10 +658,10 @@ test('repair rejects missing state and non-dry-run execution', () => {
   applyPlan(buildPlan({ target: 'codex', profile: 'minimal', projectRoot: project }));
   assert.throws(
     () => execFileSync('node', [
-      CLI, 'repair',
+      CLI, 'repair', '--on-drift', 'bogus',
       '--target', 'codex', '--project', project,
     ], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }),
-    /repair currently supports --dry-run only/,
+    /--on-drift must be one of/,
   );
 });
 

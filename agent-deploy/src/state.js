@@ -3,6 +3,7 @@
 // reproducible: which repo version/commit, which manifest version, which
 // modules were selected vs skipped, and exactly which files were written.
 import { execSync } from 'node:child_process';
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -120,6 +121,49 @@ function repoVersion() {
   }
 }
 
+function sha256Text(value) {
+  return `sha256:${crypto.createHash('sha256').update(String(value), 'utf8').digest('hex')}`;
+}
+
+function sha256Json(value) {
+  return sha256Text(JSON.stringify(value));
+}
+
+function sourceHash(sourcePath) {
+  if (!sourcePath || !fs.existsSync(sourcePath) || !fs.statSync(sourcePath).isFile()) return null;
+  return `sha256:${crypto.createHash('sha256').update(fs.readFileSync(sourcePath)).digest('hex')}`;
+}
+
+function managedContentHash(operation) {
+  if (operation.kind === 'copy-file') return sourceHash(operation.sourcePath);
+  if (operation.kind === 'append-markdown' && operation.markerId && operation.content !== undefined) {
+    const start = `<!-- agent-deploy:${operation.markerId}:start -->`;
+    const end = `<!-- agent-deploy:${operation.markerId}:end -->`;
+    return sha256Text(`${start}\n${String(operation.content).trim()}\n${end}`);
+  }
+  if ((operation.kind === 'merge-json' || operation.kind === 'merge-toml') && operation.mergePayload !== undefined) {
+    return sha256Json(operation.mergePayload);
+  }
+  return null;
+}
+
+function stateOperation(operation) {
+  const hash = managedContentHash(operation);
+  return {
+    kind: operation.kind,
+    moduleId: operation.moduleId,
+    sourceRel: operation.sourceRel ?? null,
+    dest: operation.dest ?? null,
+    strategy: operation.strategy,
+    scope: operation.scope,
+    ...(operation.reason !== undefined ? { reason: operation.reason } : {}),
+    ...(operation.markerId !== undefined ? { markerId: operation.markerId } : {}),
+    ...(operation.content !== undefined ? { content: operation.content } : {}),
+    ...(operation.mergePayload !== undefined ? { mergePayload: operation.mergePayload } : {}),
+    ...(hash ? { contentHash: hash } : {}),
+  };
+}
+
 export function buildState({
   adapter,
   input,
@@ -178,15 +222,7 @@ export function buildState({
         reason: decision.reason,
       })),
     },
-    operations: operations.map((o) => ({
-      kind: o.kind,
-      moduleId: o.moduleId,
-      sourceRel: o.sourceRel ?? null,
-      dest: o.dest ?? null,
-      strategy: o.strategy,
-      scope: o.scope,
-      ...(o.reason !== undefined ? { reason: o.reason } : {}),
-    })),
+    operations: operations.map(stateOperation),
   };
 }
 

@@ -1297,7 +1297,8 @@ SDD mode: full (security/profile/adapter/validation/test/spec에 걸친 governan
 - [x] OS 공통 zip bundle build 1차 구현.
 - [x] update 실제 적용 구현.
 - [x] repair/uninstall dry-run 1차 구현.
-- [ ] repair hash drift/write와 uninstall 실제 write.
+- [x] repair hash drift/write.
+- [ ] uninstall 실제 write.
 - [x] backup/conflict policy 1차 구현.
 - [x] MCP governance 1차 구현.
 - [ ] Prompt DB/Slack/GitHub governance automation.
@@ -1432,9 +1433,18 @@ SDD mode: full (security/profile/adapter/validation/test/spec에 걸친 governan
   - 둘 다 기존 `checkX(root)→{errors,warnings,checked}` + CLI wrapper 패턴, `npm run validate` 체인에 통합(자산 40개 통과)
   - pass-on-shipped + catches-violation 스모크 테스트 각 2건 추가
   - workflow security validation은 보류(번들에 GitHub Actions 없음); MCP governance는 4.25에서 1차 구현 완료
+- agent-deploy `repair` 실제 write + hash drift detection 구현
+  - install-state operation에 managed content hash(`contentHash`)와 replay payload(`markerId`/`content`/`mergePayload`)를 기록하도록 확장
+  - `repair --dry-run`이 present/missing뿐 아니라 hash 기반 `drifted` 상태와 expected/actual hash를 리포트
+  - `repair` 실제 실행은 missing managed operation을 복원하고 install-state를 재작성
+  - hash drift는 기본 fail-closed, `--on-drift skip|overwrite`로 명시 정책 선택
+  - `--backup` 연동: drift overwrite 전 기존 파일과 install-state를 `.agent-deploy/backups/<timestamp>/`에 보존
+  - copy-file은 canonical source로 복원, append/merge 계열은 recorded payload를 재적용해 managed content만 복구
+  - path-safety/symlink guard와 runtime install-state schema validation 재사용
+  - smoke test는 80개로 확장, `npm test`와 `npm run validate` 통과
 ```
 
-아직 남은 핵심은 repair/uninstall 실제 write 보강과 Pilot 운영 준비다.
+아직 남은 핵심은 uninstall 실제 write 보강과 Pilot 운영 준비다.
 
 ```text
 agent-deploy를 실제 파일럿 가능한 사내 installer MVP로 계속 확장해야 한다.

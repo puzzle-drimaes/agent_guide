@@ -146,7 +146,14 @@
           "dest": { "type": ["string", "null"] },
           "strategy": { "type": "string" },
           "scope": { "enum": ["project", "home"] },
-          "reason": { "type": "string" }
+          "reason": { "type": "string" },
+          "markerId": { "type": "string" },
+          "content": { "type": "string" },
+          "mergePayload": { "type": "object" },
+          "contentHash": {
+            "type": "string",
+            "pattern": "^sha256:[a-f0-9]{64}$"
+          }
         }
       }
     }

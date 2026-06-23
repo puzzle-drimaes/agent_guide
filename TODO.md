@@ -790,9 +790,9 @@ agent-deploy/install.bat
 
 - [x] install-state 기반 누락 파일 감지 (dry-run, 존재 여부 기반)
 - [x] dry-run repair 지원 (`agent-deploy repair --dry-run`)
-- [ ] hash 기반 drift detection (content 변조 감지)
-- [ ] repair 실제 write (누락 파일 복원)
-- [ ] `agent-deploy repair --scope project --project .`
+- [x] hash 기반 drift detection (content 변조 감지)
+- [x] repair 실제 write (누락 파일 복원, hash drift 기본 fail-closed)
+- [x] `agent-deploy repair --scope project --project .`
 
 ### 6.4 uninstall
 
@@ -1032,7 +1032,7 @@ docs/plans/codex/company-wide-agent-rollout/13-governance-and-roadmap.md
 가장 추천하는 실제 순서:
 
 ```text
-1. repair hash drift/write 및 uninstall 실제 write 보강
+1. uninstall 실제 write 보강
 2. Pilot 대상 확정 및 2주 진행
 3. Prompt DB/Slack/GitHub governance 자동화
 4. 전사 rollout
@@ -1050,7 +1050,7 @@ docs/plans/codex/company-wide-agent-rollout/13-governance-and-roadmap.md
 - user/global scope는 옵션이다.
 - OS 공통 zip bundle이 기본 배포 방식이며 Windows exe packaging은 제외한다.
 - SETUP_WIZARD.md가 첫 agent 대화용 setup wizard이며, install.sh는 bootstrap/안내와 고급 사용자용 direct wrapper 역할만 담당한다.
-- P0/P1 결정, capability matrix, Pilot 기본 profile smoke test, setup wizard flow, OS 공통 zip bundle 1차 구현, MCP governance 1차 구현은 완료됐고, 다음 최우선은 repair/uninstall 실제 write와 release manifest 보강이다.
+- P0/P1 결정, capability matrix, Pilot 기본 profile smoke test, setup wizard flow, OS 공통 zip bundle 1차 구현, MCP governance 1차 구현, repair 실제 write/hash drift는 완료됐고, 다음 최우선은 uninstall 실제 write와 Pilot 운영 준비다.
 - 회사 개발 룰은 agent asset으로 1차 배포됐으며, 이후에는 직무별/운영별 asset을 점진 확장한다.
 - commit convention에는 Jira 링크가 필수다.
 - governance는 agent-deploy만으로 끝나지 않는다.

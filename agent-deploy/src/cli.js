@@ -14,7 +14,7 @@ import { applyPlan } from './apply.js';
 import { readConflictResolutionsFile } from './packs/conflict-resolutions.js';
 import { resolveConflictPolicy } from './conflict-policy.js';
 import { buildUpdateDryRun, applyUpdate } from './update.js';
-import { buildRepairDryRun } from './repair.js';
+import { applyRepair, buildRepairDryRun } from './repair.js';
 import { buildUninstallDryRun } from './uninstall.js';
 import { runDoctor } from './doctor.js';
 
@@ -179,6 +179,34 @@ function printRepairReport(report, asJson) {
   }
 }
 
+function printRepairResult(result, asJson) {
+  if (asJson) {
+    process.stdout.write(`${JSON.stringify({
+      repaired: true,
+      operations: result.operations,
+      statePath: result.statePath,
+      onDrift: result.onDrift,
+      missing: result.missing.map((item) => item.dest),
+      drifted: result.drifted.map((item) => item.dest),
+      backup: {
+        enabled: result.backup.enabled,
+        root: result.backup.root,
+        entries: result.backup.entries.length,
+      },
+    }, null, 2)}\n`);
+    return;
+  }
+
+  console.log(`repaired ${result.operations} operation(s).`);
+  console.log(`state:  ${result.statePath}`);
+  console.log(`drift policy: ${result.onDrift}`);
+  if (result.missing.length) console.log(`missing restored: ${result.missing.length} file(s)`);
+  if (result.drifted.length) console.log(`drifted detected: ${result.drifted.length} file(s)`);
+  if (result.backup.enabled) {
+    console.log(`backup: ${result.backup.root} (${result.backup.entries.length} file(s))`);
+  }
+}
+
 function printUninstallReport(report, asJson) {
   if (asJson) {
     process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
@@ -235,9 +263,11 @@ function main() {
         + '  --backup: copy existing write targets into a timestamped backup directory before apply\n'
         + '  --conflict-policy: managed-overwrite (default), skip, append, merge-json, merge-toml, conflict-error\n'
         + '  --on-user-modified: fail (default), skip, overwrite — how update treats drifted managed files\n'
+        + '  --on-drift: fail (default), skip, overwrite — how repair treats hash-drifted managed files\n'
         + '  update --dry-run: reads install-state and prints a managed-file diff (no writes)\n'
         + '  update: refreshes managed files from install-state; fail-closed on user-modified drift\n'
-        + '  repair --dry-run: reads install-state and reports missing managed files (no writes)\n'
+        + '  repair --dry-run: reads install-state and reports missing/drifted managed files (no writes)\n'
+        + '  repair: restores missing managed files; fail-closed on hash drift unless --on-drift is explicit\n'
         + '  uninstall --dry-run: reverse-replays install-state and reports teardown targets (no writes)\n'
         + '  doctor: diagnose Node version, bundle integrity, and target-dir writability (no writes)');
       return;
@@ -306,11 +336,16 @@ function main() {
     }
 
     if (cmd === 'repair') {
-      if (!args['dry-run']) {
-        throw new Error('repair currently supports --dry-run only');
+      if (args['dry-run']) {
+        const report = buildRepairDryRun(buildRequest(args));
+        printRepairReport(report, Boolean(args.json));
+        return;
       }
-      const report = buildRepairDryRun(buildRequest(args));
-      printRepairReport(report, Boolean(args.json));
+      const result = applyRepair(buildRequest(args), {
+        backup: Boolean(args.backup),
+        onDrift: args['on-drift'] || 'fail',
+      });
+      printRepairResult(result, Boolean(args.json));
       return;
     }
 
