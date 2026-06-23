@@ -16,9 +16,42 @@
 ## 기본 방침
 
 ```text
-- 1차 도입: 부담 없이 올린다. 정해진 양식을 강제하지 않는다.
+- 1차 도입: 사용자 공유 채널은 Google Drive 하나로 둔다.
+- Google Drive는 사람이 보고 올리고 내려받는 공유 입구다.
+- GitHub는 이력/중복/수동 병합을 위한 정본 관리 저장소다.
+- PR 운영은 하지 않는다. prompts / skills branch에 후보를 모으고, main으로는 나중에 수동 병합한다.
 - 예외 없이 지킬 것 두 가지: 보안(금지 데이터 미업로드)과 출처 표기.
 - frontmatter/파일명 규칙은 "권장"이다. 고르고 적용하기 쉽게 하려는 것일 뿐 의무가 아니다.
+```
+
+## 0. GitHub branch 정책
+
+Google Drive만으로는 변경 이력과 중복 관리가 어렵기 때문에, 공유된 `.md`는 GitHub에도 남긴다. 단, 관리자가 매번 승인하는 PR 흐름은 운영하지 않는다.
+
+```text
+main
+  - 공식 배포본
+  - 검증/정리된 prompt, skill만 포함
+  - agent 직접 push 금지
+  - 운영자가 필요할 때 prompts / skills branch에서 수동 병합
+
+prompts
+  - prompt 공유 후보 수집 branch
+  - 사원 agent가 정제 후 commit/push 가능
+  - 아직 공식 asset 아님
+
+skills
+  - skill 공유 후보 수집 branch
+  - 사원 agent가 정제 후 commit/push 가능
+  - 아직 공식 asset 아님
+```
+
+브랜치 의미:
+
+```text
+Google Drive: 사람이 접근하는 공유 채널
+GitHub main: 공식 배포본
+GitHub prompts/skills: 사원 공유 후보를 모으는 수집 공간
 ```
 
 ## 1. 무엇을 어디에 올리나
@@ -96,22 +129,39 @@ name 은 폴더명과 같게 한다(skills/code-review-checklist/SKILL.md).
 
 ## 5. 검토 / 선택 적용 흐름
 
-올리는 쪽:
+올리는 쪽(사원 A):
 
 ```text
-1. skills/ 또는 prompts/ 에 .md 업로드
-2. (선택) frontmatter 또는 한 줄 설명 추가
+1. agent에게 "이 prompt/skill을 공유해줘"라고 명시하거나, scheduler가 공유 후보를 제안한다.
+2. agent가 공유 전 정제를 수행한다.
+   - prompt / skill 분류
+   - 민감정보·credential·고객 데이터 제거 또는 placeholder 치환
+   - 출처/라이선스 보강
+   - frontmatter 또는 한 줄 설명 보강
+   - 기존 파일명과 충돌하면 overwrite하지 않고 더 구체적인 이름 제안
+3. Google Drive의 skills/ 또는 prompts/ 에 `.md`를 업로드한다.
+4. GitHub에도 남긴다.
+   - prompt면 `prompts` branch에 commit/push
+   - skill이면 `skills` branch에 commit/push
+   - `main`에는 직접 push하지 않는다
 ```
 
-쓰는 쪽:
+쓰는 쪽(사원 B):
 
 ```text
-1. 폴더에서 필요한 .md 를 선택해 내려받는다.
-2. 내 프로젝트의 아래 위치에 넣는다.
+1. 기본은 GitHub main 또는 Drive의 공식/정리본 기준으로 추천받는다.
+2. 사용자가 원하면 prompts / skills branch의 후보도 조회할 수 있다.
+3. 후보 branch 자료는 반드시 "검증 전 공유본"이라고 표시한다.
+4. agent가 적용 전 아래를 보여준다.
+   - 무엇을 하는 asset인지 요약
+   - 내 프로젝트 어디에 들어갈지
+   - 기존 파일과 충돌 여부
+   - 보안/출처 문제 여부
+   - 적용 diff 또는 파일 목록
+5. 사용자가 컨펌하면 내 프로젝트의 아래 위치에 넣는다.
      <repo>/.agent-packs/externals/skills/    (스킬)
      <repo>/.agent-packs/externals/prompts/   (프롬프트)
-3. AI 대화창에 "externals 파일을 검토하고 내 프로젝트에 맞게 배치해줘" 라고 요청한다.
-4. agent가 하는 일:
+6. agent가 프로젝트에 맞게 검토/배치한다.
    - 민감정보 포함 여부 확인
    - frontmatter 없으면 draft frontmatter 제안(원본 룰/문서는 함부로 바꾸지 않음)
    - 기존 문서와 충돌하면 keep-existing / add-namespaced / rename-proposed / replace-existing
@@ -121,14 +171,15 @@ name 은 폴더명과 같게 한다(skills/code-review-checklist/SKILL.md).
 
 상세 규칙(conflict 정책, target별 배치 경로, 안전 규칙)은 [ASSET_PACKS.md](ASSET_PACKS.md) 참고.
 
-## 6. 승격 (선택)
+## 6. 수동 병합 / 승격 (선택)
 
 ```text
-- 여러 사람이 반복해서 잘 쓰는 프롬프트는 Prompt DB에 등록한다
-  (docs/plans/codex/company-wide-agent-rollout/15-prompt-db-operations.md).
+- prompts / skills branch는 후보 수집 공간이다.
+- 운영자는 주기적으로 후보를 훑어 중복/저품질/오래된 파일을 정리한다.
+- 여러 사람이 반복해서 잘 쓰는 프롬프트나 스킬만 main으로 수동 병합한다.
 - 검증되면 company-* asset(skill/prompt)으로 승격한다.
 - 승격 시에는 전체 frontmatter와 승인 체크리스트(ASSET_PACKS.md)를 충족해야 한다.
-- 공유 폴더 단계는 강제가 없지만, 승격 단계는 보안/출처/리뷰 게이트를 거친다.
+- 공유 폴더와 후보 branch 단계는 강제가 없지만, main 병합/승격 단계는 보안/출처/리뷰 게이트를 거친다.
 ```
 
 ## 7. Google Drive 연동과 운영 주의점 (선택)

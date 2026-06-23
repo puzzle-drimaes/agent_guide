@@ -1,14 +1,15 @@
 ---
 name: prompt-asset
-description: Capture a reusable prompt as a Prompt DB entry and decide whether to promote it to a shared skill/agent asset. Triggers on "save this prompt", "prompt 자산화", "register prompt", "make this reusable".
+description: Capture a reusable prompt as a Drive/GitHub candidate and decide whether to promote it to a shared skill/agent asset. Triggers on "save this prompt", "prompt 자산화", "register prompt", "make this reusable".
 argument-hint: "[the prompt or workflow to capture]"
 ---
 
 # Prompt Asset (Knowledge Capture)
 
 Use this skill when a prompt or procedure worked well and should not stay trapped in
-one chat. Turns a one-off prompt into a Prompt DB entry, and flags genuinely reusable
-ones for promotion to a shared asset.
+one chat. In the first rollout, turn it into a Google Drive upload plus a GitHub
+`prompts` branch candidate; flag genuinely reusable ones for later main merge or
+promotion to a shared asset.
 
 ## Required context
 
@@ -28,10 +29,11 @@ Capture when **all** hold: the prompt is reusable, it produced a good result, an
 result is generalizable (not tied to one-off data). Do not capture sensitive data,
 secrets, or customer-identifying content — strip or placeholder it first.
 
-## Prompt DB entry
+## Candidate entry
 
-Produce these fields (Notion Prompt DB schema). Write the `프롬프트 본문` field on the
-company prompt skeleton — start from the installed templates and pick the closest one:
+Produce these fields in the `.md` frontmatter or body. They are compatible with the
+later Notion Prompt DB schema, but the first rollout stores them in Google Drive and
+GitHub. Write the `프롬프트 본문` field on the company prompt skeleton — start from the installed templates and pick the closest one:
 
 ```text
 Codex:  .agents/prompts/      (_universal-template.md + task templates)
@@ -41,6 +43,14 @@ Cursor: .cursor/prompts/
 ```
 
 Leave usage/success metrics blank for a new entry; they are filled by operations over time.
+
+First-rollout storage rule:
+
+```text
+- Upload the sanitized `.md` to Google Drive AI-Knowhow/prompts/.
+- Commit/push prompt candidates to the GitHub `prompts` branch only.
+- Do not push to `main`; main is updated later by manual merge.
+```
 
 ```text
 이름:
@@ -60,9 +70,9 @@ AI 도구:          # Claude / Codex / Gemini ...
 
 ## Promotion to a shared asset
 
-A Prompt DB entry graduates to an asset only after it is proven (reused across people
-or tasks, stable wording). When proposing promotion, state the target and rationale —
-do not create the asset unilaterally:
+A candidate graduates to `main` or a shared asset only after it is proven (reused
+across people or tasks, stable wording). When proposing promotion, state the target
+and rationale — do not create the asset in `main` unilaterally:
 
 ```text
 - skill:  assets/skills/company-<name>/SKILL.md   (workflow with steps + output)
@@ -73,6 +83,6 @@ do not create the asset unilaterally:
 
 ```text
 Capture decision: capture | skip (이유)
-Prompt DB entry: <위 필드 채운 결과>
+Candidate entry: <위 필드 채운 결과>
 Promotion: not yet | propose <skill|agent> <name> (이유)
 ```

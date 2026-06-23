@@ -37,11 +37,14 @@
 | Profile/rule 정의 | AI governance | PMO | 각 팀 리드 | 전 직원 |
 | 공용 계정 배분 | PMO | 경영진 | 팀 리드 | 전 직원 |
 | 보안 기준 | 보안/개발 리드 | CTO | PMO | 전 직원 |
-| 주간 회고 운영 | 계정 담당자 | PMO | 팀원 | #ai-knowhow |
+| 주간 회고 마중물/요약 | 계정 담당자 | PMO | 팀원 | Drive 운영 메모 |
 | 데모데이 | PMO | 경영진 | 계정 담당자 | 전 직원 |
 | 분기 리뷰 | PMO | 경영진 | 팀 리드 | 전 직원 |
 
-## KPI 대시보드
+## 운영 건강도 대시보드
+
+아래 지표는 1차 도입에서는 목표/순위/평가 기준이 아니라 운영 건강도와 개선 후보를 확인하는 참고 신호다. 개인별 제출률이나 팀 순위로 사용하지 않는다.
+
 
 ### Adoption
 
@@ -56,15 +59,15 @@
 
 ```text
 - 계정별 active usage
-- 주간 회고 제출률
+- 주간 회고/공유 반응 수(참고)
 - 데모데이 발표 수
-- prompt DB 등록 수
+- prompts/skills branch 후보 등록 수
 ```
 
 ### Quality
 
 ```text
-- PR 공유 문서 작성률
+- PR 공유 문서 작성률(참고)
 - prompt 재사용률
 - 실패 사례 등록 수
 - 출처 표기율
@@ -97,7 +100,7 @@
 ```text
 - Gemini target 추가
 - 비개발자 설치 가이드 완성
-- Prompt DB 운영 시작
+- Google Drive + GitHub prompts/skills branch 운영 시작
 - PR 공유 문서 template 적용
 - 첫 데모데이 진행
 ```
@@ -108,7 +111,7 @@
 - 분기 governance review 진행
 - 계정 재배분
 - profile/rule v2 배포
-- usage dashboard 초안
+- 운영 건강도 dashboard 초안
 - 신규 AI 도구 추가 여부 결정
 ```
 
@@ -117,17 +120,17 @@
 | Risk | 설명 | 대응 |
 |---|---|---|
 | 공용 계정 책임 불명확 | 누가 관리하는지 모름 | 계정별 초기 담당자 지정 |
-| 개인 노하우 은닉 | 좋은 프롬프트가 공유되지 않음 | weekly 회고와 prompt DB KPI |
+| 개인 노하우 은닉 | 좋은 프롬프트가 공유되지 않음 | 공유 폴더 우선, 계정 담당자 마중물, 검증된 것만 main/company-* asset 승격 |
 | 비개발자 설치 실패 | CLI 사용 어려움 | OS별 한 줄 설치, doctor 명령 |
 | 도구별 동작 차이 | Claude/Codex/Gemini가 다르게 행동 | 공통 rule + target adapter |
 | 보안 정보 입력 | 고객정보/credential 입력 위험 | security rule + 교육 + reminder |
-| 프롬프트 DB 오염 | 품질 낮은 prompt 누적 | 월간 정리, 성공률 태깅 |
+| 후보 branch 오염 | 품질 낮은 prompt/skill 누적 | 월간 정리, 성공률 태깅, main 수동 병합 게이트 |
 | 룰 과잉 | 사용자가 부담을 느낌 | 분기 리뷰에서 삭제 가능 |
 | 계정 수 부족 | 20명이 9개 계정 공유 | 계정별 용도 분리, 사용률 기반 재배분 |
 
 ## 완료 기준
 
-- 변경 사항이 `#ai-governance`에 공유된다.
-- manifest/profile/rule 변경 PR이 생성된다.
+- 변경 사항이 Drive 운영 메모 또는 GitHub commit에 남는다.
+- manifest/profile/rule 변경 이력이 GitHub에 남는다.
 - 다음 분기 실험 항목이 정해진다.
 - 30/60/90일 로드맵이 실제 backlog로 연결된다.
