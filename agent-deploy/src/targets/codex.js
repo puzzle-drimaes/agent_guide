@@ -3,10 +3,11 @@
 // shared rules/skills under .agents/, Codex-specific agents/config under
 // .codex/, and install-state under .agent-deploy/.
 import path from 'node:path';
+import { buildGovernedMcpConfig, codexMcpPayload } from '../mcp-governance.js';
 import {
   appendMarkdownOp,
   createAdapter,
-  mergeTomlOp,
+  fileOp,
   mirrorOps,
   skipOp,
 } from './helpers.js';
@@ -46,19 +47,6 @@ This managed block was installed by agent-deploy. Follow the company rules and w
 - Preserve semantic equivalence with other supported harnesses.
 - Do not ignore unsupported capabilities silently; rely on install-state skip reasons.
 - Keep security, source attribution, and architecture rules active for every implementation task.`;
-}
-
-function codexMcpPayload(source) {
-  const servers = {};
-  for (const [name, server] of Object.entries(source.mcpServers || {})) {
-    const next = { enabled: true };
-    if (server.url) next.url = server.url;
-    if (server.command) next.command = server.command;
-    if (server.args) next.args = server.args;
-    if (server.env) next.env = server.env;
-    servers[name] = next;
-  }
-  return { mcp_servers: servers };
 }
 
 export default createAdapter({
@@ -103,14 +91,19 @@ export default createAdapter({
             }));
             break;
           case 'mcp': {
-            const op = mergeTomlOp({
+            const governed = buildGovernedMcpConfig({ assetRoot: moduleAssetRoot });
+            if (Object.keys(governed.mergePayload.mcpServers).length) ops.push(fileOp({
+              kind: 'merge-toml',
               moduleId: module.id,
-              assetRoot: moduleAssetRoot,
-              sourceRel: 'mcp/servers.json',
+              sourceRel: governed.sourceRel,
+              sourcePath: governed.sourcePath,
               dest: path.join(codexRoot, 'config.toml'),
-              convert: codexMcpPayload,
-            });
-            if (op) ops.push(op);
+              strategy: 'merge-toml-add-only+mcp-governance',
+              mergePayload: codexMcpPayload(governed.mergePayload),
+            }));
+            for (const skipped of governed.skipped) {
+              ops.push(skipOp({ moduleId: module.id, sourceRel: skipped.sourceRel, reason: skipped.reason }));
+            }
             break;
           }
           default:

@@ -1,0 +1,7 @@
+{
+  "allowedServers": ["company-docs"],
+  "defaultExcludedServers": ["filesystem"],
+  "envDisableVariable": "DISABLED_MCPS",
+  "requireEnvPlaceholders": true,
+  "requireNpxVersionPin": true
+}

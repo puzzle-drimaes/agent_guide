@@ -19,7 +19,7 @@
     "install.ps1"
   ],
   "scripts": {
-    "validate": "node scripts/validate-manifests.js && node scripts/check-rule-drift.js && node scripts/check-entry-parity.js && node scripts/check-asset-schema.js && node scripts/check-catalog-parity.js && node scripts/check-unicode-safety.js && node scripts/check-secret-scan.js",
+    "validate": "node scripts/validate-manifests.js && node scripts/check-rule-drift.js && node scripts/check-entry-parity.js && node scripts/check-asset-schema.js && node scripts/check-catalog-parity.js && node scripts/check-unicode-safety.js && node scripts/check-secret-scan.js && node scripts/check-mcp-governance.js",
     "test": "node --test",
     "bundle": "node scripts/build-bundle.js"
   },

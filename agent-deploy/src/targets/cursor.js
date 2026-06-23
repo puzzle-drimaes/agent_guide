@@ -5,8 +5,9 @@
 // Same canonical source, different shape -> this is the adapter's whole job.
 import fs from 'node:fs';
 import path from 'node:path';
+import { buildGovernedMcpConfig } from '../mcp-governance.js';
 import {
-  createAdapter, mirrorOps, mergeJsonOp, skipOp, fileOp, walkFiles,
+  createAdapter, mirrorOps, skipOp, fileOp, walkFiles,
 } from './helpers.js';
 
 // Flatten each rules file relative to the `rules/` root:
@@ -68,12 +69,19 @@ export default createAdapter({
             }));
             break;
           case 'mcp': {
-            const op = mergeJsonOp({
-              moduleId: module.id, assetRoot: moduleAssetRoot,
-              sourceRel: 'mcp/servers.json',
+            const governed = buildGovernedMcpConfig({ assetRoot: moduleAssetRoot });
+            if (Object.keys(governed.mergePayload.mcpServers).length) ops.push(fileOp({
+              kind: 'merge-json',
+              moduleId: module.id,
+              sourceRel: governed.sourceRel,
+              sourcePath: governed.sourcePath,
               dest: path.join(root, 'mcp.json'),
-            });
-            if (op) ops.push(op);
+              strategy: 'merge-json+mcp-governance',
+              mergePayload: governed.mergePayload,
+            }));
+            for (const skipped of governed.skipped) {
+              ops.push(skipOp({ moduleId: module.id, sourceRel: skipped.sourceRel, reason: skipped.reason }));
+            }
             break;
           }
           default:

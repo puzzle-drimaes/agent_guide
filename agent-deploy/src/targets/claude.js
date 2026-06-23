@@ -4,7 +4,10 @@
 // (home). Structure is preserved, so module paths may be whole categories
 // ('rules') or subpaths ('rules/developer') or single files ('agents/x.md').
 import path from 'node:path';
-import { createAdapter, mirrorOps, mergeJsonOp } from './helpers.js';
+import { buildGovernedMcpConfig } from '../mcp-governance.js';
+import {
+  createAdapter, fileOp, mirrorOps, skipOp,
+} from './helpers.js';
 
 export default createAdapter({
   id: 'claude',
@@ -26,12 +29,19 @@ export default createAdapter({
       for (const sourceRel of module.paths) {
         const category = sourceRel.split('/')[0];
         if (category === 'mcp') {
-          const op = mergeJsonOp({
-            moduleId: module.id, assetRoot: moduleAssetRoot,
-            sourceRel: 'mcp/servers.json',
+          const governed = buildGovernedMcpConfig({ assetRoot: moduleAssetRoot });
+          if (Object.keys(governed.mergePayload.mcpServers).length) ops.push(fileOp({
+            kind: 'merge-json',
+            moduleId: module.id,
+            sourceRel: governed.sourceRel,
+            sourcePath: governed.sourcePath,
             dest: mcpDest,
-          });
-          if (op) ops.push(op);
+            strategy: 'merge-json+mcp-governance',
+            mergePayload: governed.mergePayload,
+          }));
+          for (const skipped of governed.skipped) {
+            ops.push(skipOp({ moduleId: module.id, sourceRel: skipped.sourceRel, reason: skipped.reason }));
+          }
         } else {
           // rules / agents / commands / skills -> mirror under .claude/
           ops.push(...mirrorOps({ moduleId: module.id, assetRoot: moduleAssetRoot, sourceRel, destRoot: root }));

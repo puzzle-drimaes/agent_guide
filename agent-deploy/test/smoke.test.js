@@ -19,6 +19,7 @@ import { checkAssetSchemas } from '../scripts/check-asset-schema.js';
 import { checkCatalogParity } from '../scripts/check-catalog-parity.js';
 import { checkUnicodeSafety } from '../scripts/check-unicode-safety.js';
 import { checkSecretScan } from '../scripts/check-secret-scan.js';
+import { checkMcpGovernance } from '../scripts/check-mcp-governance.js';
 import { scanExternals } from '../src/packs/externals-scanner.js';
 import { validatePackRoot } from '../src/packs/pack-validator.js';
 import { calculatePackDigest } from '../src/packs/digest.js';
@@ -125,8 +126,7 @@ test('codex developer profile installs skills, agents, mcp toml, and command ski
   const toml = fs.readFileSync(path.join(project, '.codex/config.toml'), 'utf8');
   assert.match(toml, /\[mcp_servers\.company-docs\]/);
   assert.match(toml, /url = "https:\/\/mcp\.internal\.example\.com\/docs"/);
-  assert.match(toml, /\[mcp_servers\.filesystem\]/);
-  assert.match(toml, /command = "npx"/);
+  assert.doesNotMatch(toml, /\[mcp_servers\.filesystem\]/);
 
   const skipOps = plan.operations.filter((o) => o.kind === 'skip');
   assert.ok(skipOps.some((o) => o.sourceRel === 'commands' && /no native slash-command/.test(o.reason)));
@@ -154,7 +154,7 @@ test('codex AGENTS.md managed block and TOML merge are add-only/idempotent', () 
   assert.match(toml, /model = "gpt-5"/);
   assert.match(toml, /url = "https:\/\/custom\.example"/);
   assert.equal((toml.match(/\[mcp_servers\.company-docs\]/g) || []).length, 1);
-  assert.match(toml, /\[mcp_servers\.filesystem\]/);
+  assert.doesNotMatch(toml, /\[mcp_servers\.filesystem\]/);
 });
 
 test('apply --backup preserves existing files and records backup provenance', () => {
@@ -340,7 +340,7 @@ test('merge-json preserves pre-existing user keys', () => {
     path.join(project, '.mcp.json'),
     JSON.stringify({ mcpServers: { 'my-personal': { type: 'stdio', command: 'x' } } }),
   );
-  applyPlan(buildPlan({ target: 'claude', profile: 'core', projectRoot: project }));
+  applyPlan(buildPlan({ target: 'claude', profile: 'developer', projectRoot: project }));
 
   const mcp = JSON.parse(fs.readFileSync(path.join(project, '.mcp.json'), 'utf8'));
   assert.ok(mcp.mcpServers['my-personal'], 'user key preserved');
@@ -352,6 +352,31 @@ test('merge-json preserves pre-existing user keys', () => {
   assert.ok(fs.existsSync(path.join(project, '.claude/prompts/_universal-template.md')));
   assert.ok(fs.existsSync(path.join(project, '.claude/prompts/dev-implementation.md')));
   assert.ok(fs.existsSync(path.join(project, '.claude/prompts/research.md')));
+});
+
+test('core profile does not install MCP by default', () => {
+  const project = tmpProject();
+  applyPlan(buildPlan({ target: 'claude', profile: 'core', projectRoot: project }));
+
+  assert.ok(!fs.existsSync(path.join(project, '.mcp.json')), 'core profile should not write MCP config');
+  assert.ok(fs.existsSync(path.join(project, '.claude/skills/prompt-asset/SKILL.md')));
+  assert.ok(fs.existsSync(path.join(project, '.claude/prompts/research.md')));
+});
+
+test('MCP governance supports DISABLED_MCPS with visible skip reason', () => {
+  const previous = process.env.DISABLED_MCPS;
+  process.env.DISABLED_MCPS = 'company-docs';
+  try {
+    const project = tmpProject();
+    const plan = buildPlan({ target: 'claude', moduleIds: ['mcp-baseline'], projectRoot: project });
+    assert.ok(!plan.operations.some((op) => op.kind === 'merge-json'), 'disabled MCP server should not be merged');
+    assert.ok(plan.operations.some((op) => op.kind === 'skip' && /disabled by DISABLED_MCPS/.test(op.reason)));
+    applyPlan(plan);
+    assert.ok(!fs.existsSync(path.join(project, '.mcp.json')), 'disabled MCP server should not create config file');
+  } finally {
+    if (previous === undefined) delete process.env.DISABLED_MCPS;
+    else process.env.DISABLED_MCPS = previous;
+  }
 });
 
 test('apply --dry-run --json emits valid JSON on stdout (no trailing text)', () => {
@@ -795,7 +820,7 @@ test('install.ps1 passes a --project path with spaces through intact', (t) => {
 
 test('home scope installs into the user-global config dir (fake home)', () => {
   const home = tmpProject(); // a throwaway dir standing in for ~ — never the real home
-  const plan = buildPlan({ target: 'claude', profile: 'core', scope: 'home', homeDir: home });
+  const plan = buildPlan({ target: 'claude', profile: 'developer', scope: 'home', homeDir: home });
   assert.equal(plan.scope, 'home');
   assert.equal(plan.baseRoot, home);
   applyPlan(plan, { installedAt: '2026-01-01T00:00:00Z' });
@@ -1105,6 +1130,47 @@ test('secret scan guard catches hardcoded credentials, allows ${ENV} placeholder
   assert.match(joined, /leak\.md:1: possible hardcoded secret \(GitHub token\)/);
   assert.ok(!/ok\.json/.test(joined), `\${ENV} placeholder must be allowed:\n${joined}`);
   assert.ok(!/doc\.md/.test(joined), `allow-marker line must be skipped:\n${joined}`);
+});
+
+test('MCP governance guard passes for shipped MCP assets', () => {
+  const { errors, checked, allowedServers, defaultExcludedServers } = checkMcpGovernance();
+  assert.deepEqual(errors, [], `unexpected MCP governance errors:\n${errors.join('\n')}`);
+  assert.equal(checked, 1);
+  assert.deepEqual(allowedServers, ['company-docs']);
+  assert.ok(defaultExcludedServers.includes('filesystem'));
+});
+
+test('MCP governance guard blocks unallowlisted, filesystem, unpinned npx, and literal env values', () => {
+  const root = tmpProject();
+  fs.mkdirSync(path.join(root, 'mcp'), { recursive: true });
+  fs.writeFileSync(
+    path.join(root, 'mcp/allowlist.json'),
+    JSON.stringify({
+      allowedServers: ['company-docs', 'filesystem', 'unpinned'],
+      defaultExcludedServers: ['filesystem'],
+      envDisableVariable: 'DISABLED_MCPS',
+      requireEnvPlaceholders: true,
+      requireNpxVersionPin: true,
+    }),
+  );
+  fs.writeFileSync(
+    path.join(root, 'mcp/servers.json'),
+    JSON.stringify({
+      mcpServers: {
+        'company-docs': { type: 'http', url: 'https://example.invalid', env: { MCP_TOKEN: 'literal-token' } },
+        filesystem: { type: 'stdio', command: 'npx', args: ['-y', '@modelcontextprotocol/server-filesystem@1.0.0', '.'] },
+        unpinned: { type: 'stdio', command: 'npx', args: ['-y', '@scope/pkg', '.'] },
+        rogue: { type: 'http', url: 'https://rogue.invalid' },
+      },
+    }),
+  );
+
+  const { errors } = checkMcpGovernance(root);
+  const joined = errors.join('\n');
+  assert.match(joined, /company-docs.*MCP_TOKEN.*placeholder/);
+  assert.match(joined, /filesystem.*default-excluded/);
+  assert.match(joined, /unpinned.*npx without a pinned package version/);
+  assert.match(joined, /rogue.*not in allowlist/);
 });
 
 test('asset pack validator accepts a normal project-local pack', () => {

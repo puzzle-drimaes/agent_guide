@@ -107,7 +107,7 @@ sha256sum -c company-agent-kit-<version>.zip.sha256    # 무결성 확인
 ```
 
 ### 설치 범위(scope)
-- **project (기본)**: repo 내 `.claude/`, `.cursor/`, `.mcp.json` — 레포 단위 커밋·공유.
+- **project (기본)**: repo 내 `.claude/`, `.cursor/`, 선택 MCP config(`.mcp.json` 등) — 레포 단위 커밋·공유.
 - **home/global (`--global`)**: 사용자 전역 `~/.claude/`, `~/.claude.json` — 어떤 IDE/CLI·프로젝트에서나 공유.
 - 안전 경계(path-safety)는 scope의 base root(projectRoot 또는 home)로 적용.
 
@@ -119,16 +119,16 @@ sha256sum -c company-agent-kit-<version>.zip.sha256    # 무결성 확인
 | `assets/skills/<n>/SKILL.md` | `.agents/skills/<n>/SKILL.md` | `.claude/skills/<n>/SKILL.md` | `.gemini/skills/<n>/SKILL.md` (fallback) | `.cursor/skills/<n>/SKILL.md` |
 | `assets/agents/<a>.md` | `.codex/agents/<a>.md` | `.claude/agents/<a>.md` | `.gemini/agents/<a>.md` (fallback) | `.cursor/agents/<a>.md` |
 | `assets/commands/plan.md` | **skip+reason** (Codex adapter엔 슬래시 명령 설치 표면 없음) | `.claude/commands/plan.md` | `.gemini/commands/plan.md` | **skip+reason** (Cursor엔 슬래시 명령 없음 — install-state에 기록) |
-| `assets/mcp/servers.json` | `.codex/config.toml` 에 add-only TOML merge | `.mcp.json`(project)/`~/.claude.json`(home) 에 deepMerge | **skip+reason** (MCP 정책 미확정) | `.cursor/mcp.json` 에 deepMerge |
+| `assets/mcp/servers.json` | allowlist/`DISABLED_MCPS` 필터 후 `.codex/config.toml` 에 add-only TOML merge | allowlist/`DISABLED_MCPS` 필터 후 `.mcp.json`(project)/`~/.claude.json`(home) 에 deepMerge | **skip+reason** (stable project-scope MCP contract 전까지) | allowlist/`DISABLED_MCPS` 필터 후 `.cursor/mcp.json` 에 deepMerge |
 
 > 모듈은 카테고리 전체(`rules`)뿐 아니라 **서브경로(`rules/developer`)·단일 파일(`agents/x.md`)** 도 지정 가능 → 프로파일별 정밀 스코핑(예: architecture 자산은 `developer`에만).
 
 ## 현재 core profiles
 
 - `minimal`: company 공통 룰(`company-ai-principles`, `security`, `source-attribution`, `knowledge-sharing`)만 설치.
-- `core`: `minimal` + code-review agent + prompt/shared document capture skills + prompt library + MCP baseline.
+- `core`: `minimal` + code-review agent + prompt/shared document capture skills + prompt library. MCP는 기본 제외이며 `developer`/`full` 또는 `--module mcp-baseline`에서만 명시적으로 설치.
 - `sdd`: `minimal` + harness engineering / SDD rules + 관련 workflow skills.
-- `developer`: `minimal` + language, architecture, harness engineering, SDD, commit convention rules + review/SDD/harness/commit skills.
+- `developer`: `minimal` + language, architecture, harness engineering, SDD, commit convention rules + review/SDD/harness/commit skills + MCP baseline(allowlist/filter 적용).
 - `product`: `minimal` + product prompt/template + meeting/spec authoring skills.
 - `business`: `minimal` + business prompt/template + meeting/customer-response skills.
 - `governance`: `minimal` + KPI/quarterly review/prompt DB curation + shared document promotion skills.
@@ -254,11 +254,11 @@ project-local pack을 read-only overlay로 합성합니다. 충돌은 자동 병
 - **계층형 매니페스트** — components/modules/profiles를 데이터로 큐레이션(팀별 프로파일).
 - **의존성 해석 + 순환 검출** — 모듈 의존성을 자동 확장, 사이클 차단.
 - **타깃별 모듈 필터** — `targets`에 없는 모듈은 skip하고 provenance에 사유 기록.
-- **비파괴 deepMerge** — 개발자 기존 `.mcp.json`/설정 보존하며 사내 표준만 주입.
+- **MCP governance + 비파괴 merge** — allowlist, filesystem 기본 제외, npx version pin, `${ENV}` placeholder, `DISABLED_MCPS` 필터 적용 후 기존 `.mcp.json`/설정 보존.
 - **계획/적용 분리 + `--dry-run`** — 변경 검토 후 적용.
 - **path-safety + symlink-escape 가드** — 루트 밖/심볼릭 링크 탈출 차단.
 - **provenance(install-state)** — repoVersion/commit/manifestVersion + 선택·스킵 모듈 + 모든 파일 연산 기록 → 재설치/롤백/감사 결정론적.
-- **CI 불변식 검증** — 경로 실존·타깃 유효·의존성·순환·dest 충돌을 머지 전 차단.
+- **CI 불변식 검증** — 경로 실존·타깃 유효·의존성·순환·dest 충돌·MCP governance를 머지 전 차단.
 
 ## 프로덕션 전 보강 포인트 (의도적으로 생략한 것)
 

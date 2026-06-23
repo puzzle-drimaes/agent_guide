@@ -6,11 +6,6 @@
       "env": {
         "MCP_TOKEN": "${COMPANY_MCP_TOKEN}"
       }
-    },
-    "filesystem": {
-      "type": "stdio",
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-filesystem", "."]
     }
   }
 }

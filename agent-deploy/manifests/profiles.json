@@ -9,8 +9,7 @@
       "review-agent",
       "prompt-asset-skill",
       "external-doc-asset-skill",
-      "prompt-library",
-      "mcp-baseline"
+      "prompt-library"
     ],
     "sdd": [
       "baseline-rules",
