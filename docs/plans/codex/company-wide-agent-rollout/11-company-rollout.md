@@ -7,7 +7,7 @@ Pilot에서 검증된 installer와 운영 룰을 전 직원에게 배포한다.
 ## Rollout 순서
 
 ```text
-1. Slack 공지
+1. Drive/사내 게시판 공지
 2. 설치 가이드 배포
 3. 전 직원 교육
 4. 직무별 profile 설치
@@ -16,7 +16,7 @@ Pilot에서 검증된 installer와 운영 룰을 전 직원에게 배포한다.
 7. blocker hotfix
 ```
 
-## Slack 공지 포함 내용
+## 공지 포함 내용
 
 ```text
 - 도입 목적
@@ -45,7 +45,7 @@ Pilot에서 검증된 installer와 운영 룰을 전 직원에게 배포한다.
 
 ```text
 - 매일 10분 triage
-- #ai-help 실시간 대응
+- 담당자 기반 문의 대응
 - 설치 실패 케이스 수집
 - profile별 혼란 지점 정리
 - 필요한 hotfix 배포
@@ -59,7 +59,7 @@ Pilot에서 검증된 installer와 운영 룰을 전 직원에게 배포한다.
 - docs/non-developer-guide.md 배포
 - profile 선택표 배포
 - 9개 계정 담당자 확정
-- Slack 채널 준비
+- Drive 운영 메모와 문의 담당자 준비
 - Prompt DB 오픈
 - weekly 회고 폼 예약
 ```
@@ -71,7 +71,7 @@ Pilot에서 검증된 installer와 운영 룰을 전 직원에게 배포한다.
 - profile별 설치 수
 - OS별 설치 성공률
 - target별 설치 성공률
-- #ai-help 문의 수
+- 문의/지원 요청 수
 - 공유 폴더 .md 수 / 재사용 사례 수 (참고지표, 회고 제출률 대체)
 ```
 

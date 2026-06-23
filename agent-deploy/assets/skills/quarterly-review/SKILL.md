@@ -48,5 +48,5 @@ do not invent numbers or trends.
 ## 후속 PR
 - (manifest / profile / rule 변경 항목)
 
-→ 결론은 #ai-governance 공유 + 변경 PR 생성으로 연결한다.
+→ 결론은 governance 운영 메모 기록 + 변경 PR 생성으로 연결한다.
 ```

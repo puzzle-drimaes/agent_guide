@@ -4,7 +4,7 @@
 
 전사 Agent Installer와 공용 AI 계정 운영을 시작하기 전에 결정해야 할 항목을 한곳에 모은다.
 
-이 문서는 `#ai-governance`에서 관리하는 결정 레지스터다. 모든 결정은 한 번 정하면 영구 고정되는 것이 아니라, 파일럿/분기 리뷰를 통해 변경할 수 있다.
+이 문서는 governance 운영 메모에서 관리하는 결정 레지스터다. 모든 결정은 한 번 정하면 영구 고정되는 것이 아니라, 파일럿/분기 리뷰를 통해 변경할 수 있다.
 
 ## 결정 상태
 
@@ -304,7 +304,7 @@ Accepted
 
 1. Notion
 2. GitHub repo
-3. Slack Canvas
+3. Drive 문서 또는 사내 게시판
 4. Notion + GitHub 병행
 
 권장:
@@ -312,14 +312,14 @@ Accepted
 ```text
 Notion: 프롬프트 DB, 회고, 노하우
 GitHub: installer assets, audit 가능한 변경 이력
-Slack: 알림과 회고 수집 입구
+Drive/사내 게시판: 알림과 회고 수집 입구
 ```
 
 결정:
 
 ```text
-지식 DB는 Notion + GitHub + Slack 조합으로 운영한다.
-Notion은 Prompt DB/회고/노하우의 운영 DB, GitHub는 agent asset과 변경 이력, Slack은 수집/알림/회고 진입점으로 사용한다.
+이번 버전의 지식 DB는 Google Drive + GitHub 조합으로 운영한다.
+Google Drive는 회고/노하우 공유와 수집 입구, GitHub는 agent asset과 변경 이력으로 사용한다. Notion과 실시간 메신저 운영은 이번 버전에서 제외한다.
 ```
 
 결정 시점:
@@ -791,7 +791,7 @@ install-state에 누구/어떤 계정/어떤 머신에서 설치했는지 기록
 ```json
 {
   "actor": {
-    "userId": "slack-or-employee-id",
+    "userId": "employee-or-pseudonymous-id",
     "aiAccountId": "AI-03",
     "track": "developer-or-non-dev",
     "machineLabel": "optional"
@@ -811,7 +811,7 @@ install-state에 누구/어떤 계정/어떤 머신에서 설치했는지 기록
 ```text
 install-state actor에는 track과 aiAccountId를 기본 기록한다.
 machineLabel은 optional로 둔다.
-userId는 Pilot에서는 선택값으로 두며, 필요한 경우 Slack/직원 식별자 자체보다 별도 label 또는 승인된 pseudonymous id를 우선한다.
+userId는 Pilot에서는 선택값으로 두며, 필요한 경우 직원 식별자 자체보다 별도 label 또는 승인된 pseudonymous id를 우선한다.
 민감정보나 credential은 provenance에 기록하지 않는다.
 ```
 
@@ -1184,7 +1184,7 @@ Cursor, OpenCode, Copilot, Windsurf를 언제 추가할 것인가?
 
 ```text
 - 결정 결과를 이 문서에 반영
-- #ai-governance에 변경 요약 공유
+- governance 운영 메모에 변경 요약 기록
 - 필요한 경우 manifests/profile/rules 문서에 반영
 ```
 

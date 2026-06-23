@@ -43,14 +43,14 @@
 | 09 | [교육과 온보딩](company-wide-agent-rollout/09-training-and-onboarding.md) | 전 직원 교육, 직무별 교육, 계정 담당자 교육 |
 | 10 | [Pilot 운영](company-wide-agent-rollout/10-pilot.md) | 2주 파일럿으로 설치·운영 검증 |
 | 11 | [전사 Rollout](company-wide-agent-rollout/11-company-rollout.md) | 전 직원 배포, 첫 주 운영, hotfix 체계 |
-| 12 | [운영 자동화](company-wide-agent-rollout/12-automation.md) | Slack/PR/Notion/GitHub 자동화 |
+| 12 | [운영 자동화](company-wide-agent-rollout/12-automation.md) | Drive/GitHub 중심 운영 자동화 |
 | 13 | [거버넌스와 로드맵](company-wide-agent-rollout/13-governance-and-roadmap.md) | 분기 리뷰, RACI, KPI 대시보드, 30/60/90일 계획 |
 | 14 | [Claude 계획 비교 평가](company-wide-agent-rollout/14-claude-plan-review-and-gaps.md) | Claude 문서의 강점, Codex 문서 보강 백로그 |
 
 ## 바로 다음 액션
 
 1. `01-principles-and-scope.md`를 기준으로 경영/PMO/개발 리드 합의
-2. `00-open-decisions.md`의 P0 결정사항을 #ai-governance에서 확정
+2. `00-open-decisions.md`의 P0 결정사항을 governance 운영 메모에서 확정
 3. `02-profiles-and-assets.md`와 `02b-harness-engineering-principles.md`를 기준으로 `minimal`, `developer`, `product`, `business` profile 초안 작성
 4. `03-installer-mvp.md`와 `08-target-adapters.md`를 기준으로 `agent-deploy`에 Codex target adapter 추가
 5. `05-shared-ai-accounts.md`를 기준으로 9개 AI 계정 초기 담당자 지정

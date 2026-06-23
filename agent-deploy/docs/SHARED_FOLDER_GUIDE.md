@@ -8,7 +8,8 @@
 ```text
 공유 드라이브 "Drive" > AI-Knowhow/
   ├─ skills/    실행 가능한 스킬(.md / SKILL.md)
-  └─ prompts/   재사용 프롬프트(.md)
+  ├─ prompts/   재사용 프롬프트(.md)
+  └─ feedback/  설치/사용 피드백(.md)
 ```
 
 링크: <https://drive.google.com/drive/folders/1krsWm7GBlwAk9M58HfW2kfWmkSuKBqQz>
@@ -18,6 +19,7 @@
 ```text
 - 1차 도입: 사용자 공유 채널은 Google Drive 하나로 둔다.
 - Google Drive는 사람이 보고 올리고 내려받는 공유 입구다.
+- 피드백은 agent가 `.md`로 정리해 Google Drive `AI-Knowhow/feedback/` 업로드를 먼저 제안한다.
 - GitHub는 이력/중복/수동 병합을 위한 정본 관리 저장소다.
 - 후보 등록에는 PR을 요구하지 않는다. prompts / skills branch에 후보를 모은다.
 - 현재 작업 진행(WIP) 기간에는 `main` 직접 push를 GitHub에서 막지 않는다. 안정화 후 protected merge 전용으로 전환한다.
@@ -62,6 +64,7 @@ GitHub prompts/skills: 사원 공유 후보를 모으는 수집 공간
 ```text
 - skills/  : agent가 작업을 수행하는 절차/도구 사용 방식. 예) 코드 리뷰 체크리스트, 회의록 정리 절차.
 - prompts/ : 복사해서 바로 쓰는 프롬프트 문장. 예) 주간 보고 작성, PRD 초안 요청.
+- feedback/: 설치 실패, 사용 불편, 개선 제안, 좋은 사례. 예) pilot-install-windows-codex.md.
 - 헷갈리면: "절차/도구 사용"이면 skills, "한 번 붙여넣어 쓰는 문장"이면 prompts.
 ```
 
@@ -142,6 +145,73 @@ name 은 폴더명과 같게 한다(skills/code-review-checklist/SKILL.md).
   예) <고객명>, <API_KEY>, <사번>
 - 외부 자료 기반이면 출처/라이선스 표기(frontmatter source/license 또는 본문).
 - sensitivity 가 confidential 인 자료는 공유 폴더에 올리지 않는다(개인/팀 범위로만 유지).
+```
+
+## 4-1. 피드백 업로드 흐름
+
+피드백은 대화창에 흩어지지 않게 agent가 `.md` 파일로 정리해 `feedback/` 폴더 업로드를 유도한다. 제출은 강제가 아니며, 사용자가 동의할 때만 업로드한다.
+
+권장 파일명:
+
+```text
+feedback/YYYY-MM-DD-<role>-<target>-<short-topic>.md
+
+예:
+feedback/2026-06-23-business-claude-install-error.md
+feedback/2026-06-23-product-codex-prompt-request.md
+```
+
+권장 템플릿:
+
+```md
+---
+id: feedback-YYYY-MM-DD-short-topic
+asset_type: feedback
+title: 피드백 제목
+audience: ["governance"]
+owner: <작성자 또는 담당자>
+stability: draft
+tags: ["pilot-feedback"]
+sensitivity: internal
+---
+
+# 피드백
+
+## 상황
+- 역할/profile:
+- AI 도구/target:
+- OS:
+- 발생 시점:
+
+## 내용
+- 무엇이 막혔나 / 무엇이 좋았나:
+- 재현 절차 또는 사용 흐름:
+- 기대한 동작:
+- 실제 결과:
+
+## 첨부/근거
+- 오류 메시지 또는 화면 설명:
+- 관련 파일/명령:
+
+## 제안
+- 원하는 개선:
+- 우선순위: 낮음 / 보통 / 높음 / blocker
+
+## 보안 확인
+- 민감정보/credential/고객 개인정보 제거 여부: 예
+- 외부 자료 출처 표기 필요 여부:
+```
+
+agent 동작 기준:
+
+```text
+1. 사용자가 설치 오류, 사용 불편, 개선 제안, 좋은 사례를 말하면 피드백 업로드를 제안한다.
+2. agent는 민감정보/credential/고객 데이터를 제거하거나 placeholder로 바꾼다.
+3. agent는 위 템플릿으로 `.md`를 작성하고 사용자에게 업로드 전 확인을 받는다.
+4. Google Drive 커넥터가 있으면 `AI-Knowhow/feedback/`에 직접 업로드한다.
+   - `.md` 원형 유지를 위해 가능하면 disableConversionToGoogleType: true 를 사용한다.
+5. 커넥터가 없으면 파일 내용을 제공하고 사용자가 Drive 웹에서 업로드하도록 안내한다.
+6. blocker는 운영자가 바로 볼 수 있도록 파일명이나 tags에 `blocker`를 포함한다.
 ```
 
 ## 5. 검토 / 선택 적용 흐름

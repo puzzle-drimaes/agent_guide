@@ -8,11 +8,11 @@
 
 기록을 강제하지 않는다. 부담 없는 공유를 먼저 만들고, 검증된 것만 표준 asset으로 승격한다.
 
-1차 도입에서는 Notion/Slack 운영을 미루고 Google Drive + GitHub branch만 사용한다.
+1차 도입에서는 실시간 메신저/Notion 운영을 제외하고 Google Drive + GitHub branch만 사용한다.
 
 ```text
 Google Drive              →  GitHub prompts/skills branch  →  GitHub main / company-* asset
-사람이 쓰는 공유 채널       후보 수집·이력 관리              공식 배포·승격
+사람/agent 공유 채널        후보 수집·이력 관리              공식 배포·승격
 ```
 
 ## Branch 정책
@@ -43,6 +43,7 @@ skills
 4. prompt는 GitHub `prompts` branch, skill은 `skills` branch에 commit/push한다.
 5. 다른 사람이 후보 branch 자료를 적용할 때는 "검증 전 공유본"이라고 표시하고 사용자 컨펌을 받는다.
 6. 충분히 검증되면 운영자가 `main`으로 수동 병합하거나 company-* asset/skill로 승격한다.
+7. 설치/사용 피드백은 agent가 `.md`로 정리해 Google Drive `AI-Knowhow/feedback/` 업로드를 먼저 제안한다.
 
 ## 단계별 게이트
 
@@ -62,6 +63,7 @@ skills
 
 - 사용자가 원하거나 재사용 가치가 분명할 때만 노하우를 한 줄로 요약 제안한다 (강제 아님).
 - 공유 폴더에 올릴 `.md` 후보가 있으면 민감정보 제거를 돕고 정리한다.
+- 설치 오류, 사용 불편, 개선 제안, 좋은 사례는 사용자 확인 후 피드백 `.md`로 정리해 `feedback/` 업로드를 유도한다.
 - prompt 후보는 `prompts` branch, skill 후보는 `skills` branch에만 commit/push하도록 안내한다.
 - 후보 branch 자료를 적용할 때는 검증 전 공유본임을 알리고 요약/diff/충돌 여부를 제시한다.
 - main 병합 또는 company-* 승격 후보는 보안/출처/owner/reviewer/checklist 충족 여부를 확인한다.

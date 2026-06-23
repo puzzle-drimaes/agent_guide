@@ -10,7 +10,7 @@ argument-hint: "[Drive exports, prompts/skills branch entries, or exported candi
 Use this skill to keep Google Drive `AI-Knowhow` and the GitHub `prompts` / `skills`
 candidate branches from rotting. Where `prompt-asset` captures new prompts or skill
 workflows, this skill reviews the existing set and proposes merge / deprecate /
-promote. Notion/Slack operations are deferred in the first rollout.
+promote. Real-time messenger and Notion operations are excluded from this rollout.
 
 ## Required context
 

@@ -16,7 +16,7 @@
 - profile 선택 방법
 - 보안/출처 표기 원칙
 - 프롬프트 자산화 방법
-- #ai-help / #ai-knowhow / #ai-governance 사용법
+- Drive 운영 메모 / 공유 폴더 / governance 기록 방식
 ```
 
 실습:
@@ -79,7 +79,7 @@ docs/troubleshooting.md
 - 본인 profile을 말할 수 있는가?
 - 설치 명령을 실행했는가?
 - 첫 사용 예시를 수행했는가?
-- #ai-help와 #ai-knowhow 차이를 아는가?
+- 문제 보고와 노하우 공유 기록 위치를 아는가?
 - 재사용 프롬프트를 어디에 등록하는지 아는가?
 ```
 

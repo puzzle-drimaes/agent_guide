@@ -9,6 +9,30 @@
 
 ## 0. 최근 운영 반영
 
+### 0.6 Agent 기반 Google Drive 피드백 업로드 유도
+
+반영일: 2026-06-23
+
+- [x] 피드백 수집을 agent가 `.md`로 정리해 Google Drive `AI-Knowhow/feedback/` 업로드를 유도하는 방식으로 정리.
+- [x] Drive 커넥터가 있으면 agent 직접 업로드, 없으면 agent가 업로드용 `.md` 본문을 만들어 사용자가 웹에서 올리는 fallback을 문서화.
+- [x] `SHARED_FOLDER_GUIDE.md`에 feedback 폴더, 파일명 규칙, 피드백 템플릿, agent 동작 기준을 추가.
+
+### 0.5 이번 버전 실시간 메신저 운영 제외
+
+반영일: 2026-06-23
+
+- [x] 이번 버전의 피드백/공지/회고/거버넌스 흐름에서 실시간 메신저와 `#ai-*` 채널 표현을 제거.
+- [x] 운영 경로를 Drive 운영 메모, 공유 폴더, 사내 게시판, 담당자 문의, GitHub 기록 중심으로 정리.
+- [x] canonical knowledge-sharing rule과 배포 asset rule을 함께 갱신하고 rule drift 검증을 통과.
+
+### 0.4 Pilot 선 배포 후 피드백 반영 방식 정리
+
+반영일: 2026-06-23
+
+- [x] Pilot은 별도 리허설 없이 준비된 bundle/profile을 먼저 배포한 뒤 실제 사용 피드백을 반영하는 방식으로 정리.
+- [x] `10-pilot.md`에 배포 후 피드백 수집 채널, blocker workaround 문서화, 반영/보류 항목 구분 원칙을 추가.
+- [x] Pilot 전 준비 항목은 rehearsal 성격의 검증이 아니라 필수 경로 확인 중심으로 표현을 조정.
+
 ### 0.1 GitHub prompts/skills 후보 branch 및 main 보호 운영
 
 반영일: 2026-06-23
@@ -906,7 +930,7 @@ docs/references_analysis.html
 확정 내용:
 
 - [x] D01 정규 소스 저장 위치: 별도 private repo `company-agent-kit`
-- [x] D05 지식 DB 위치: Notion + GitHub + Slack
+- [x] D05 지식 DB 위치: Google Drive + GitHub (이번 버전에서 실시간 메신저/Notion 제외)
 - [x] D06 공용 계정 매핑 방식: 업무 유형별 계정 배정 + 계정별 초기 담당자 1명 + 공동 사용자 N명
 - [x] D07 민감정보 입력 금지 범위: 고객 개인정보, credential, 미공개 계약 조건, 민감 재무 정보, 법무 검토 전 외부 공개 불가 자료, 사내 계정 credential 입력 금지
 
@@ -1331,7 +1355,7 @@ SDD mode: full (security/profile/adapter/validation/test/spec에 걸친 governan
 - [x] uninstall 실제 write.
 - [x] backup/conflict policy 1차 구현.
 - [x] MCP governance 1차 구현.
-- [ ] Prompt DB/Slack/GitHub governance automation.
+- [ ] Prompt DB/GitHub governance automation.
 - [ ] Pilot 실행.
 - [ ] 전사 rollout.
 
@@ -1459,7 +1483,7 @@ SDD mode: full (security/profile/adapter/validation/test/spec에 걸친 governan
   - install.ps1 정적 내용 테스트(항상 실행) + pwsh 게이트 실행 테스트(pwsh 없으면 skip, ECC resolver 패턴) 추가
 - agent-deploy 자산 보안 스캔 가드 추가 (보안/공급망 6순위 1차)
   - `scripts/check-unicode-safety.js`: 자산의 invisible/bidi/Tag block(ASCII smuggling)/zero-width filler codepoint 탐지(prompt injection·homograph 차단), 선행 BOM만 허용, ECC check-unicode-safety codepoint 범위 차용
-  - `scripts/check-secret-scan.js`: 고신호 credential 패턴(private key block/AWS/GitHub/Slack/Google/OpenAI/Anthropic) 탐지, `${ENV}` placeholder는 비매칭(허용)·`secret-scan:allow` marker로 문서 예시 opt-out
+  - `scripts/check-secret-scan.js`: 고신호 credential 패턴(private key block/AWS/GitHub/Google/OpenAI/Anthropic/채팅 플랫폼 토큰) 탐지, `${ENV}` placeholder는 비매칭(허용)·`secret-scan:allow` marker로 문서 예시 opt-out
   - 둘 다 기존 `checkX(root)→{errors,warnings,checked}` + CLI wrapper 패턴, `npm run validate` 체인에 통합(자산 40개 통과)
   - pass-on-shipped + catches-violation 스모크 테스트 각 2건 추가
   - workflow security validation은 보류(번들에 GitHub Actions 없음); MCP governance는 4.25에서 1차 구현 완료

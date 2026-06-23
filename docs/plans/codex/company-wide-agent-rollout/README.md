@@ -43,7 +43,7 @@
 | 09 | `09-training-and-onboarding.md` | 전 직원/직무별/계정 담당자 교육 |
 | 10 | `10-pilot.md` | 2주 파일럿 계획 |
 | 11 | `11-company-rollout.md` | 전사 배포 절차 |
-| 12 | `12-automation.md` | Slack/PR/Notion 자동화 |
+| 12 | `12-automation.md` | Drive/GitHub 중심 운영 자동화 |
 | 13 | `13-governance-and-roadmap.md` | 분기 리뷰, RACI, KPI, 30/60/90일 |
 | 14 | `14-claude-plan-review-and-gaps.md` | Claude 문서 비교 평가와 Codex 보강 백로그 |
 | 15 | `15-prompt-db-operations.md` | Prompt DB 필드/등록·승격 기준/owner·reviewer 역할 |
@@ -64,5 +64,5 @@
 - 대부분의 구성원이 같은 installer로 환경을 세팅했다.
 - Claude/Codex/Gemini를 써도 기본 workflow가 같다.
 - 공용 AI 계정은 개인 소유가 아니라 회사 지식 축적 장치로 운영된다.
-- 좋은 프롬프트와 실패 사례가 Notion/Slack/PR에 남는다.
+- 좋은 프롬프트와 실패 사례가 Drive/GitHub 기록에 남는다.
 - 비개발자도 profile 기반 AI 업무 방식을 자연스럽게 사용한다.

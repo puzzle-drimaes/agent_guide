@@ -21,12 +21,12 @@
 ## 비개발자 설치 흐름
 
 ```text
-1. 사내 Notion/Slack에서 본인 직무 선택
+1. Drive 안내 문서 또는 사내 게시판에서 본인 직무 선택
 2. OS별 설치 명령 복사
 3. Terminal 또는 PowerShell에 붙여넣기
 4. installer가 target/profile 확인
 5. 설치 완료 후 첫 사용 예시 출력
-6. 문제 발생 시 doctor 결과를 #ai-help에 공유
+6. 문제 발생 시 doctor 결과를 담당자에게 전달하거나 Drive 운영 메모에 기록
 ```
 
 ## OS별 안내
@@ -66,7 +66,7 @@ npx agent-deploy apply --target claude --profile business --yes
 3. 프롬프트 자산화:
    "이 프롬프트가 반복 사용 가능하면 Notion 템플릿으로 정리해줘"
 
-문제가 있으면 아래 결과를 #ai-help에 공유하세요:
+문제가 있으면 아래 결과를 담당자에게 전달하거나 Drive 운영 메모에 기록하세요:
 agent-deploy doctor --target claude
 ```
 

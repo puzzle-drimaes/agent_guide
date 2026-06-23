@@ -14,7 +14,7 @@ GitHub prompts: prompt 후보 수집 branch
 GitHub skills: skill 후보 수집 branch
 ```
 
-Notion Prompt DB와 Slack 회고/알림은 이후 단계로 미룬다. 이 문서에서 말하는 "Prompt DB"는 1차 도입에서는 Notion이 아니라 GitHub `prompts` branch와 관련 catalog/frontmatter를 뜻한다.
+Notion Prompt DB와 실시간 메신저 회고/알림은 이번 버전에서 제외한다. 이 문서에서 말하는 "Prompt DB"는 1차 도입에서는 Notion이 아니라 GitHub `prompts` branch와 관련 catalog/frontmatter를 뜻한다.
 `main`은 공식 배포본이지만 현재 WIP 기간에는 direct push를 GitHub에서 막지 않는다. 안정화 후 protected branch로 전환한다. 실제 GitHub branch와 ruleset 운영 기준은
 `agent-deploy/docs/GITHUB_BRANCH_POLICY.md`를 따른다.
 

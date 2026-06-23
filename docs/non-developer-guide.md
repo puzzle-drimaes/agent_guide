@@ -115,6 +115,7 @@
 
 ```text
 - 설치 오류: SETUP_WIZARD.md "설치가 안 될 때"를 AI에게 보여주고,
-  그래도 안 되면 실행한 명령/화면을 #ai-help 에 공유한다.
-- 그 외 질문: #ai-help / 노하우 가벼운 공유: #ai-knowhow.
+  그래도 안 되면 AI에게 "이 내용을 피드백 .md로 정리해서 Google Drive AI-Knowhow/feedback에 올릴 수 있게 해줘"라고 요청한다.
+- Drive 커넥터가 연결돼 있으면 AI가 직접 업로드를 도와주고, 없으면 업로드할 .md 본문을 만들어 준다.
+- 그 외 질문/노하우도 원하면 AI가 feedback 또는 prompts/skills용 .md로 정리해 공유 폴더 업로드를 도와준다.
 ```
