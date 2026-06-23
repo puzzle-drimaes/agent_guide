@@ -800,8 +800,8 @@ agent-deploy/install.bat
 - [x] managed 파일만 삭제 대상 분류 (copy-file=delete, merge/append=revert)
 - [x] 사용자 생성 파일 삭제 금지 (shared 파일은 삭제 대신 revert)
 - [x] uninstall dry-run 지원 (`agent-deploy uninstall --dry-run`)
-- [ ] uninstall 실제 write (삭제/revert 수행, 사용자 수정 안전장치)
-- [ ] 삭제 후 빈 디렉터리 정리
+- [x] uninstall 실제 write (삭제/revert 수행, 사용자 수정 안전장치)
+- [x] 삭제 후 빈 디렉터리 정리
 
 ---
 
@@ -957,7 +957,7 @@ docs/plans/codex/company-wide-agent-rollout/10-pilot.md
 - [x] global option은 선택으로 동작
 - [x] install-state 기록 정상
 - [x] backup 또는 최소 conflict policy 존재
-- [ ] uninstall 또는 rollback 대응 계획 존재 (backup/update는 구현, uninstall은 dry-run까지만 완료)
+- [x] uninstall 대응 존재 (backup/update/repair/uninstall write 구현, rollback restore는 후속 선택)
 - [x] commit convention rule 배포
 - [x] architecture rule 배포
 - [x] source attribution rule 배포
@@ -1032,10 +1032,9 @@ docs/plans/codex/company-wide-agent-rollout/13-governance-and-roadmap.md
 가장 추천하는 실제 순서:
 
 ```text
-1. uninstall 실제 write 보강
-2. Pilot 대상 확정 및 2주 진행
-3. Prompt DB/Slack/GitHub governance 자동화
-4. 전사 rollout
+1. Pilot 대상 확정 및 2주 진행
+2. Prompt DB/Slack/GitHub governance 자동화
+3. 전사 rollout
 ```
 
 ---
@@ -1050,7 +1049,7 @@ docs/plans/codex/company-wide-agent-rollout/13-governance-and-roadmap.md
 - user/global scope는 옵션이다.
 - OS 공통 zip bundle이 기본 배포 방식이며 Windows exe packaging은 제외한다.
 - SETUP_WIZARD.md가 첫 agent 대화용 setup wizard이며, install.sh는 bootstrap/안내와 고급 사용자용 direct wrapper 역할만 담당한다.
-- P0/P1 결정, capability matrix, Pilot 기본 profile smoke test, setup wizard flow, OS 공통 zip bundle 1차 구현, MCP governance 1차 구현, repair 실제 write/hash drift는 완료됐고, 다음 최우선은 uninstall 실제 write와 Pilot 운영 준비다.
+- P0/P1 결정, capability matrix, Pilot 기본 profile smoke test, setup wizard flow, OS 공통 zip bundle 1차 구현, MCP governance 1차 구현, repair 실제 write/hash drift와 uninstall 실제 write는 완료됐고, 다음 최우선은 Pilot 운영 준비다.
 - 회사 개발 룰은 agent asset으로 1차 배포됐으며, 이후에는 직무별/운영별 asset을 점진 확장한다.
 - commit convention에는 Jira 링크가 필수다.
 - governance는 agent-deploy만으로 끝나지 않는다.

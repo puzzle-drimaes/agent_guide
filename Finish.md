@@ -1298,7 +1298,7 @@ SDD mode: full (security/profile/adapter/validation/test/spec에 걸친 governan
 - [x] update 실제 적용 구현.
 - [x] repair/uninstall dry-run 1차 구현.
 - [x] repair hash drift/write.
-- [ ] uninstall 실제 write.
+- [x] uninstall 실제 write.
 - [x] backup/conflict policy 1차 구현.
 - [x] MCP governance 1차 구현.
 - [ ] Prompt DB/Slack/GitHub governance automation.
@@ -1442,9 +1442,17 @@ SDD mode: full (security/profile/adapter/validation/test/spec에 걸친 governan
   - copy-file은 canonical source로 복원, append/merge 계열은 recorded payload를 재적용해 managed content만 복구
   - path-safety/symlink guard와 runtime install-state schema validation 재사용
   - smoke test는 80개로 확장, `npm test`와 `npm run validate` 통과
+- agent-deploy `uninstall` 실제 write 구현
+  - `uninstall` non-dry-run 경로 추가: install-state 역재생 결과를 실제 삭제/revert로 적용
+  - copy-file은 contentHash 일치 시 삭제, append-markdown/merge-json/merge-toml은 shared 파일을 보존하고 managed block/keys만 제거
+  - 사용자 수정 감지 기본 fail-closed, `--on-user-modified skip|force` 정책 추가
+  - `--backup` 연동: 삭제/revert 대상과 install-state를 timestamp backup에 보존
+  - 성공 시 install-state 삭제, 빈 managed 디렉터리 정리
+  - dry-run JSON/리포트 경로는 유지하고 write smoke test 추가
+  - smoke test는 84개로 확장, `npm test`, `npm run validate`, `git diff --check` 통과
 ```
 
-아직 남은 핵심은 uninstall 실제 write 보강과 Pilot 운영 준비다.
+아직 남은 핵심은 Pilot 운영 준비다.
 
 ```text
 agent-deploy를 실제 파일럿 가능한 사내 installer MVP로 계속 확장해야 한다.

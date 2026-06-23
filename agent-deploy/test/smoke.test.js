@@ -12,7 +12,7 @@ import { buildPlan } from '../src/planner.js';
 import { applyPlan } from '../src/apply.js';
 import { applyUpdate } from '../src/update.js';
 import { applyRepair, buildRepairDryRun } from '../src/repair.js';
-import { buildUninstallDryRun } from '../src/uninstall.js';
+import { applyUninstall, buildUninstallDryRun } from '../src/uninstall.js';
 import { runDoctor } from '../src/doctor.js';
 import { validateInstallState } from '../src/state.js';
 import { checkAssetSchemas } from '../scripts/check-asset-schema.js';
@@ -721,7 +721,7 @@ test('uninstall --dry-run --json reports already-absent for a deleted managed fi
   assert.ok(fs.existsSync(path.join(project, '.agent-deploy/install-state.json')));
 });
 
-test('uninstall rejects missing state and non-dry-run execution', () => {
+test('uninstall rejects missing state and unknown user-modified policy', () => {
   const project = tmpProject();
 
   assert.throws(
@@ -735,11 +735,92 @@ test('uninstall rejects missing state and non-dry-run execution', () => {
   applyPlan(buildPlan({ target: 'codex', profile: 'minimal', projectRoot: project }));
   assert.throws(
     () => execFileSync('node', [
-      CLI, 'uninstall',
+      CLI, 'uninstall', '--on-user-modified', 'bogus',
       '--target', 'codex', '--project', project,
     ], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }),
-    /uninstall currently supports --dry-run only/,
+    /--on-user-modified for uninstall must be one of/,
   );
+});
+
+
+test('uninstall removes managed files, reverts shared block, deletes state, and cleans empty dirs', () => {
+  const project = tmpProject();
+  applyPlan(buildPlan({ target: 'codex', profile: 'minimal', projectRoot: project }), {
+    installedAt: '2026-01-01T00:00:00Z',
+  });
+
+  const agentsPath = path.join(project, 'AGENTS.md');
+  const userIntro = '# Local instructions\n\nKeep this user note.\n\n';
+  fs.writeFileSync(agentsPath, `${userIntro}${fs.readFileSync(agentsPath, 'utf8')}`, 'utf8');
+
+  const result = applyUninstall({ target: 'codex', projectRoot: project }, {
+    installedAt: '2026-02-01T00:00:00Z',
+  });
+
+  assert.equal(result.uninstalled, true);
+  assert.equal(result.deleted, 4);
+  assert.equal(result.reverted, 1);
+  assert.equal(fs.existsSync(path.join(project, '.agent-deploy/install-state.json')), false);
+  assert.equal(fs.existsSync(path.join(project, '.agents')), false);
+  assert.ok(fs.existsSync(agentsPath), 'shared AGENTS.md file should be preserved');
+  assert.equal(fs.readFileSync(agentsPath, 'utf8'), userIntro.trimEnd());
+});
+
+test('uninstall fails closed on user-modified managed copy-file by default', () => {
+  const project = tmpProject();
+  applyPlan(buildPlan({ target: 'codex', profile: 'minimal', projectRoot: project }));
+  const securityPath = path.join(project, '.agents/rules/common/security.md');
+  fs.appendFileSync(securityPath, '\nUser modification.\n');
+
+  assert.throws(
+    () => applyUninstall({ target: 'codex', projectRoot: project }),
+    /uninstall refused: 1 managed file\(s\) look user-modified/,
+  );
+
+  assert.ok(fs.existsSync(securityPath));
+  assert.ok(fs.existsSync(path.join(project, '.agent-deploy/install-state.json')));
+});
+
+test('uninstall --on-user-modified skip preserves modified files and backs up changed files', () => {
+  const project = tmpProject();
+  applyPlan(buildPlan({ target: 'codex', profile: 'minimal', projectRoot: project }), {
+    installedAt: '2026-01-01T00:00:00Z',
+  });
+  const securityPath = path.join(project, '.agents/rules/common/security.md');
+  fs.appendFileSync(securityPath, '\nUser modification.\n');
+
+  const result = applyUninstall({ target: 'codex', projectRoot: project }, {
+    installedAt: '2026-02-01T00:00:00Z',
+    onUserModified: 'skip',
+    backup: true,
+  });
+
+  assert.equal(result.deleted, 3);
+  assert.equal(result.reverted, 1);
+  assert.equal(result.skipped.length, 1);
+  assert.ok(fs.existsSync(securityPath), 'skip policy should preserve modified managed file');
+  assert.equal(fs.existsSync(path.join(project, '.agents/rules/common/company-ai-principles.md')), false);
+  assert.equal(fs.existsSync(path.join(project, '.agent-deploy/install-state.json')), false);
+  assert.ok(fs.existsSync(path.join(result.backup.root, 'AGENTS.md')));
+  assert.ok(fs.existsSync(path.join(result.backup.root, '.agent-deploy/install-state.json')));
+});
+
+test('uninstall CLI writes JSON result and force-removes user-modified managed file', () => {
+  const project = tmpProject();
+  applyPlan(buildPlan({ target: 'codex', profile: 'minimal', projectRoot: project }));
+  const securityPath = path.join(project, '.agents/rules/common/security.md');
+  fs.appendFileSync(securityPath, '\nUser modification.\n');
+
+  const out = execFileSync('node', [
+    CLI, 'uninstall', '--json', '--on-user-modified', 'force',
+    '--target', 'codex', '--project', project,
+  ], { encoding: 'utf8' });
+  const parsed = JSON.parse(out);
+
+  assert.equal(parsed.uninstalled, true);
+  assert.equal(parsed.userModified.length, 1);
+  assert.equal(fs.existsSync(securityPath), false);
+  assert.equal(fs.existsSync(path.join(project, '.agent-deploy/install-state.json')), false);
 });
 
 test('build-bundle produces versioned + alias zips with matching sha256 sidecars', () => {

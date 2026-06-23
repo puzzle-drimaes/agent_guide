@@ -28,11 +28,6 @@ git diff --check: pass
 
 ## Notes and follow-ups
 
-- The actual uninstall write is a follow-up: deleting `would-delete` files,
-  reverting `would-revert` files in place (managed block removal / managed key
-  removal), and deleting the install-state file — replayed in reverse order.
-- User-modified safety for deletes is deferred to the write step, mirroring
-  update's `--on-user-modified` (a `copy-file` the user later edited is still
-  reported `would-delete` here; existence-based dry-run cannot see content drift).
-- Empty-directory cleanup after deletion and backup-archive removal remain out of
-  scope.
+- The actual uninstall write follow-up is completed in `docs/specs/install-uninstall-write/`: deleting `would-delete` files, reverting `would-revert` files in place, and deleting the install-state file.
+- User-modified safety for deletes is implemented in the write step via `--on-user-modified fail|skip|force`.
+- Backup-archive restore/removal remains out of scope.

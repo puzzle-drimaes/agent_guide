@@ -15,7 +15,7 @@ import { readConflictResolutionsFile } from './packs/conflict-resolutions.js';
 import { resolveConflictPolicy } from './conflict-policy.js';
 import { buildUpdateDryRun, applyUpdate } from './update.js';
 import { applyRepair, buildRepairDryRun } from './repair.js';
-import { buildUninstallDryRun } from './uninstall.js';
+import { applyUninstall, buildUninstallDryRun } from './uninstall.js';
 import { runDoctor } from './doctor.js';
 
 function parseArgs(argv) {
@@ -207,6 +207,39 @@ function printRepairResult(result, asJson) {
   }
 }
 
+function printUninstallResult(result, asJson) {
+  if (asJson) {
+    process.stdout.write(`${JSON.stringify({
+      uninstalled: true,
+      deleted: result.deleted,
+      reverted: result.reverted,
+      skipped: result.skipped.map((item) => item.dest),
+      userModified: result.userModified.map((item) => item.dest),
+      onUserModified: result.onUserModified,
+      statePath: result.statePath,
+      backup: {
+        enabled: result.backup.enabled,
+        root: result.backup.root,
+        entries: result.backup.entries.length,
+      },
+      removedDirectories: result.removedDirectories,
+    }, null, 2)}\n`);
+    return;
+  }
+
+  console.log(`uninstalled ${result.deleted} file(s), reverted ${result.reverted} shared file(s).`);
+  console.log(`state:  ${result.statePath}`);
+  console.log(`user-modified policy: ${result.onUserModified}`);
+  if (result.skipped.length) console.log(`skipped user-modified: ${result.skipped.length} file(s)`);
+  if (result.userModified.length) console.log(`user-modified detected: ${result.userModified.length} file(s)`);
+  if (result.backup.enabled) {
+    console.log(`backup: ${result.backup.root} (${result.backup.entries.length} file(s))`);
+  }
+  if (result.removedDirectories.length) {
+    console.log(`empty dirs removed: ${result.removedDirectories.length}`);
+  }
+}
+
 function printUninstallReport(report, asJson) {
   if (asJson) {
     process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
@@ -262,13 +295,14 @@ function main() {
         + '  --conflict-resolution: JSON file of reviewed conflict decisions to record in install-state\n'
         + '  --backup: copy existing write targets into a timestamped backup directory before apply\n'
         + '  --conflict-policy: managed-overwrite (default), skip, append, merge-json, merge-toml, conflict-error\n'
-        + '  --on-user-modified: fail (default), skip, overwrite — how update treats drifted managed files\n'
+        + '  --on-user-modified: update uses fail (default), skip, overwrite; uninstall uses fail (default), skip, force\n'
         + '  --on-drift: fail (default), skip, overwrite — how repair treats hash-drifted managed files\n'
         + '  update --dry-run: reads install-state and prints a managed-file diff (no writes)\n'
         + '  update: refreshes managed files from install-state; fail-closed on user-modified drift\n'
         + '  repair --dry-run: reads install-state and reports missing/drifted managed files (no writes)\n'
         + '  repair: restores missing managed files; fail-closed on hash drift unless --on-drift is explicit\n'
         + '  uninstall --dry-run: reverse-replays install-state and reports teardown targets (no writes)\n'
+        + '  uninstall: deletes/reverts managed install-state records; fail-closed on user-modified content\n'
         + '  doctor: diagnose Node version, bundle integrity, and target-dir writability (no writes)');
       return;
     }
@@ -350,11 +384,16 @@ function main() {
     }
 
     if (cmd === 'uninstall') {
-      if (!args['dry-run']) {
-        throw new Error('uninstall currently supports --dry-run only');
+      if (args['dry-run']) {
+        const report = buildUninstallDryRun(buildRequest(args));
+        printUninstallReport(report, Boolean(args.json));
+        return;
       }
-      const report = buildUninstallDryRun(buildRequest(args));
-      printUninstallReport(report, Boolean(args.json));
+      const result = applyUninstall(buildRequest(args), {
+        backup: Boolean(args.backup),
+        onUserModified: args['on-user-modified'] || 'fail',
+      });
+      printUninstallResult(result, Boolean(args.json));
       return;
     }
 
