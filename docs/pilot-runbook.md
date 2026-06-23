@@ -223,8 +223,9 @@ node src\cli.js uninstall `
 4. agent가 제안한 명령 중 `dry-run`을 먼저 실행해 어떤 파일이 생기는지 확인합니다.
 5. 문제가 없으면 `apply`를 실행합니다.
 6. 설치 후 실제 업무에서 prompt, skill, rule을 사용해 봅니다.
-7. 사용 후 agent에게 `피드백 해줘`라고 말해 Q&A 방식으로 결과를 `.md`로 정리합니다.
-8. 정리된 `.md`를 Google Drive `AI-Knowhow/feedback/` 폴더에 업로드합니다.
+7. 공유하고 싶은 prompt/skill이 있으면 agent에게 `공유용으로 정제해줘`라고 말해 민감정보 제거와 출처 표기를 먼저 진행합니다.
+8. 사용 후 agent에게 `피드백 해줘`라고 말해 Q&A 방식으로 결과를 `.md`로 정리합니다.
+9. 정리된 `.md`를 Google Drive `AI-Knowhow/feedback/` 폴더에 업로드합니다.
 
 ## 피드백 요청
 
@@ -293,7 +294,148 @@ node src\cli.js uninstall `
 사용 후 본인이 쓰는 agent에게 "피드백 해줘"라고 말하면, agent가 동의를 받고 짧은 질문으로 피드백 .md를 만들어 줍니다.
 ```
 
-## 7. 운영자 취합 체크리스트
+## 7. 스킬/프롬프트 공유 전 정제 프로세스
+
+사용자가 가진 prompt, skill, template, 업무 절차를 업로드하거나 다른 사람에게 공유하려면 먼저 agent가 공유 가능한 `.md` 후보로 정제한다.
+공유는 강제가 아니며, 사용자가 명시적으로 요청하거나 재사용 가치가 분명할 때만 제안한다.
+
+### 7.1 사용자 트리거 문구
+
+사용자 안내에는 아래처럼 짧은 문구만 제공한다.
+
+```text
+이 prompt/skill을 공유용으로 정제해줘.
+이 절차를 다른 사람도 쓰게 업로드 가능한 .md로 만들어줘.
+이 프롬프트를 Prompt DB 후보로 등록해줘.
+```
+
+agent는 위 요청을 받으면 `prompt-asset` 기준으로 진행한다. 단순 복사본을 바로 올리지 않고, 아래 정제 단계를 먼저 통과해야 한다.
+
+### 7.2 정제 단계
+
+```text
+1. 분류
+   - prompt: 복사해 바로 쓰는 요청문
+   - skill: agent가 따라야 하는 반복 절차 또는 workflow
+   - template: 사용자가 채워 넣는 문서 골격
+   - doc: 체크리스트, 플레이북, 참고 문서
+   - 헷갈리면 "붙여넣는 문장"은 prompt, "수행 절차"는 skill로 둔다.
+
+2. 재사용성 확인
+   - 한 번 쓰고 버릴 내용이면 공유 후보로 만들지 않는다.
+   - 특정 고객/프로젝트/사람에게만 묶인 내용은 일반화하거나 공유하지 않는다.
+   - 좋은 결과를 냈고 다른 사람도 반복 사용 가능할 때만 candidate로 둔다.
+
+3. 민감정보 제거
+   - 고객 개인정보, credential, token, private key, 비밀번호, 세션 쿠키는 삭제한다.
+   - 미공개 계약/재무/법무 자료, 내부 기밀 원문은 그대로 공유하지 않는다.
+   - 필요한 맥락은 <고객명>, <프로젝트명>, <API_KEY> 같은 placeholder로 바꾼다.
+   - confidential 자료는 전사 공유 폴더에 올리지 않는다.
+
+4. 출처/라이선스 보강
+   - 외부 문서, 블로그, 오픈소스, AI 응답, 사내 참고 repo를 기반으로 했으면 출처를 남긴다.
+   - 그대로 복사한 부분과 회사 상황에 맞게 재구성한 부분을 구분한다.
+   - 라이선스나 사용 조건을 알 수 있으면 함께 적는다.
+
+5. 구조화
+   - prompt/template/doc은 asset frontmatter 초안을 붙인다.
+   - skill은 `SKILL.md` 형식의 name/description/argument-hint를 갖춘다.
+   - 목적, 대상 직무, 권장 profile, 입력 예시, 출력 예시를 가능한 범위에서 채운다.
+   - 파일명은 소문자 kebab-case로 제안하고 기존 후보와 충돌하면 더 구체적으로 바꾼다.
+
+6. 검증
+   - 사용자가 제공한 원문과 정제본의 의미가 달라지지 않았는지 확인한다.
+   - placeholder 처리 후에도 사용 방법이 이해되는지 확인한다.
+   - 검증 전 후보임을 표시하고, 공식 표준 asset처럼 안내하지 않는다.
+
+7. 업로드 전 확인
+   - Drive 커넥터가 있어도 파일명, 저장 위치, 본문 전체를 먼저 보여준다.
+   - 사용자가 승인한 뒤에만 업로드 또는 branch commit/push를 진행한다.
+   - 승인 전 자동 업로드, 기존 파일 덮어쓰기, force-push, main 직접 승격은 하지 않는다.
+```
+
+### 7.3 산출물 형식
+
+agent는 업로드 전에 아래 요약과 정제본을 사용자에게 보여준다.
+
+```text
+정제 판단: 공유 가능 | 보류 | 공유 불가
+자산 유형: prompt | template | skill | doc
+권장 파일명:
+Drive 위치:
+GitHub 후보 위치:
+민감정보 처리:
+출처/라이선스:
+주의사항:
+정제본:
+```
+
+prompt/template/doc 후보 frontmatter 예시:
+
+```yaml
+---
+id: weekly-report
+asset_type: prompt
+title: 주간 보고 작성 프롬프트
+description: 주간 업무 로그를 요약/성과/리스크/다음주 계획으로 정리한다.
+audience: ["business"]
+owner: <작성자 또는 팀>
+stability: draft
+tags: ["report", "weekly"]
+sensitivity: internal
+source: internal
+license: internal
+---
+```
+
+skill 후보는 아래 위치와 형식을 따른다.
+
+```text
+AI-Knowhow/skills/<skill-name>/SKILL.md
+GitHub skills branch: uploads/skills/<skill-name>/SKILL.md
+```
+
+```yaml
+---
+name: meeting-followup
+description: 회의록을 결정사항, 액션아이템, 리스크, 후속 질문으로 정리한다.
+argument-hint: "[회의록 또는 녹취 요약]"
+---
+```
+
+### 7.4 저장 위치와 상태
+
+```text
+prompt/template 후보:
+  Drive:  AI-Knowhow/prompts/<name>.md
+  GitHub: prompts branch, uploads/prompts/<name>.md
+
+skill 후보:
+  Drive:  AI-Knowhow/skills/<skill-name>/SKILL.md
+  GitHub: skills branch, uploads/skills/<skill-name>/SKILL.md
+
+feedback:
+  Drive:  AI-Knowhow/feedback/<date>-<role>-<target>-<topic>.md
+```
+
+상태는 기본적으로 `draft` 또는 `candidate`다. 후보 자료는 검증 전 공유본이며, 사용 횟수/사용자 수/성공률/Owner/Reviewer가 확인되기 전까지 `main` 또는 `company-*` 공식 asset으로 승격하지 않는다.
+
+### 7.5 운영자 확인 기준
+
+운영자는 공유 후보를 공식 반영하거나 승격하기 전에 아래를 확인한다.
+
+```text
+- 민감정보와 credential이 제거됐다.
+- 외부 자료 기반이면 출처/라이선스가 있다.
+- 목적, 대상, owner, 사용 예시가 충분히 적혀 있다.
+- 기존 후보와 중복되면 통합 또는 deprecate 방향이 기록됐다.
+- 사용 횟수 ≥ 5, 서로 다른 사용자 ≥ 2명, 성공률 ≥ 80%, 문구 안정 조건을 충족한다.
+- Owner/Reviewer가 확인됐다.
+```
+
+위 조건을 충족하지 못한 후보는 `prompts`/`skills` branch와 Drive 후보 폴더에 남기고 보완 요청, 통합, deprecate 중 하나로 처리한다.
+
+## 8. 운영자 취합 체크리스트
 
 운영자는 개별 사용자를 사전 배정하지 않고, 업로드된 피드백 `.md`와 직접 문의를 기준으로 아래 항목을 취합한다.
 
@@ -308,7 +450,7 @@ node src\cli.js uninstall `
 | 보안 위험 신호 | 민감정보 입력/업로드 언급 | 즉시 governance 담당 확인 |
 | blocker | 설치 실패, target 불일치, 권한 문제 | workaround 유무와 재발 빈도 기록 |
 
-## 8. 피드백 처리 원칙
+## 9. 피드백 처리 원칙
 
 ```text
 1. 모든 피드백은 개인 평가가 아니라 운영 개선 자료로만 쓴다.
@@ -319,7 +461,7 @@ node src\cli.js uninstall `
 6. 검증된 후보만 GitHub prompts/skills branch 또는 main 승격 대상으로 분류한다.
 ```
 
-## 9. 운영자 일일 점검
+## 10. 운영자 일일 점검
 
 스케줄러는 쓰지 않는다. 운영자가 가능한 날에 수동으로 아래만 확인한다.
 
@@ -332,7 +474,7 @@ node src\cli.js uninstall `
 - 전사 공지에 추가 FAQ가 필요한가?
 ```
 
-## 10. 종료 판단
+## 11. 종료 판단
 
 이번 베타는 고정된 D+7/D+14 종료 일정을 두지 않는다. 운영자가 충분한 실제 사례가 모였다고 판단하면 아래 기준으로 다음 단계를 결정한다.
 

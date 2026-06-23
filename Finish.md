@@ -1523,6 +1523,10 @@ SDD mode: full (security/profile/adapter/validation/test/spec에 걸친 governan
   - 성공 시 install-state 삭제, 빈 managed 디렉터리 정리
   - dry-run JSON/리포트 경로는 유지하고 write smoke test 추가
   - smoke test는 84개로 확장, `npm test`, `npm run validate`, `git diff --check` 통과
+- Pilot runbook에 스킬/프롬프트 공유 전 정제 프로세스 추가
+  - 사용자 트리거 문구(`공유용으로 정제해줘`, Prompt DB 후보 등록 등)와 agent 정제 단계 명시
+  - prompt/skill/template/doc 분류, 재사용성 확인, 민감정보 제거, 출처/라이선스 보강, 구조화, 검증, 업로드 전 확인 흐름 정리
+  - Drive/GitHub 후보 위치와 승격 전 운영자 확인 기준(사용 횟수·사용자 수·성공률·Owner/Reviewer)을 runbook에 반영
 ```
 
 아직 남은 핵심은 Pilot 운영 준비다.
