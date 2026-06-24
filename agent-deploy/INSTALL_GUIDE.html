@@ -1,0 +1,458 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>회사 AI 설치 가이드 — 처음 사용자용</title>
+<style>
+  :root{
+    --ink:#1e293b;--muted:#64748b;--line:#e2e8f0;--soft:#f8fafc;
+    --indigo:#4f46e5;--teal:#0d9488;--violet:#7c3aed;--sky:#0ea5e9;
+    --ok:#16a34a;--bad:#dc2626;--warn:#d97706;
+    --easy:#0d9488;--install:#4f46e5;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans KR","Malgun Gothic",sans-serif;
+    color:var(--ink);background:#eef2f7;line-height:1.75;font-size:16.5px;-webkit-font-smoothing:antialiased}
+  a{color:var(--indigo);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:980px;margin:0 auto;padding:0 22px}
+
+  /* ---- hero ---- */
+  header.hero{background:linear-gradient(125deg,#0f172a,#312e81 48%,#0f766e);color:#fff;padding:48px 0 120px}
+  .hero .tag{display:inline-block;background:rgba(255,255,255,.14);color:#e0e7ff;font-size:13.5px;
+    font-weight:600;padding:5px 14px;border-radius:999px;margin-bottom:16px}
+  .hero h1{margin:0 0 12px;font-size:34px;letter-spacing:-.6px;line-height:1.25}
+  .hero p.lead{margin:0;color:#dbeafe;font-size:18px;max-width:640px}
+  .hero .who{margin-top:22px;display:flex;gap:10px;flex-wrap:wrap}
+  .hero .who span{background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.18);
+    border-radius:10px;padding:8px 13px;font-size:14px;color:#eef2ff}
+  .hero-art{margin:26px auto 0;display:block;max-width:560px;width:100%;height:auto}
+
+  /* ---- layout ---- */
+  main{margin-top:-86px;padding-bottom:60px}
+  section{background:#fff;border:1px solid var(--line);border-radius:18px;padding:30px 34px;margin:22px 0;
+    box-shadow:0 4px 18px rgba(15,23,42,.06)}
+  section.flush{padding-top:26px}
+  h2{font-size:23px;margin:0 0 6px;display:flex;align-items:center;gap:12px;letter-spacing:-.3px}
+  h2 .n{background:var(--indigo);color:#fff;font-size:15px;font-weight:700;width:32px;height:32px;border-radius:10px;
+    display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto}
+  h2 .n.teal{background:var(--teal)}
+  h2 + .sub{color:var(--muted);margin:0 0 20px;font-size:15.5px}
+  h3{font-size:17.5px;margin:24px 0 10px;color:#0f172a}
+  p{margin:10px 0}
+  .big{font-size:18px}
+
+  /* quick nav */
+  .nav{display:flex;flex-wrap:wrap;gap:9px;margin:4px 0 2px}
+  .nav a{background:#eef2ff;border:1px solid #e0e7ff;border-radius:999px;padding:7px 15px;font-size:14px;
+    color:#4338ca;font-weight:600}
+  .nav a:hover{background:#e0e7ff;text-decoration:none}
+
+  /* callouts */
+  .callout{border-left:5px solid var(--indigo);background:#f5f3ff;border-radius:0 12px 12px 0;
+    padding:14px 18px;margin:16px 0;font-size:15.5px}
+  .callout.teal{border-color:var(--teal);background:#f0fdfa}
+  .callout.warn{border-color:var(--warn);background:#fffbeb}
+  .callout.ok{border-color:var(--ok);background:#f0fdf4}
+  .callout b{font-weight:700}
+  .callout .ttl{display:flex;align-items:center;gap:9px;font-weight:700;margin-bottom:4px}
+  .callout .ttl svg{flex:0 0 auto}
+
+  /* step list */
+  .steps{counter-reset:step;margin:18px 0 4px;padding:0;list-style:none}
+  .steps>li{position:relative;padding:0 0 22px 64px;border-left:2px dashed #cbd5e1;margin-left:22px}
+  .steps>li:last-child{border-left:2px solid transparent;padding-bottom:4px}
+  .steps>li::before{counter-increment:step;content:counter(step);position:absolute;left:-22px;top:-4px;
+    width:44px;height:44px;border-radius:13px;background:var(--indigo);color:#fff;font-weight:800;font-size:18px;
+    display:flex;align-items:center;justify-content:center;box-shadow:0 3px 8px rgba(79,70,229,.3)}
+  .steps>li h4{margin:2px 0 5px;font-size:17px}
+  .steps>li p{margin:5px 0;font-size:15.5px;color:#334155}
+  .steps .say{display:inline-block;background:#eef2ff;border:1px solid #dbe2ff;color:#312e81;border-radius:10px;
+    padding:7px 13px;margin:6px 0;font-size:15px}
+  .steps .say::before{content:"💬 ";}
+
+  /* flow diagram wrapper */
+  .figure{margin:20px 0;text-align:center}
+  .figure svg{max-width:100%;height:auto}
+  .figcap{color:var(--muted);font-size:13.5px;margin-top:8px}
+
+  /* mini table */
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:15px}
+  th,td{text-align:left;padding:11px 13px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:var(--soft);color:#334155;font-weight:700;font-size:13.5px}
+  tbody tr:hover{background:#fafbff}
+  td .role{font-weight:700}
+  .req{font-weight:700;color:#15803d;white-space:nowrap}
+  .opt{color:#64748b;white-space:nowrap}
+  .chip{display:inline-block;font-size:13px;font-weight:700;padding:2px 9px;border-radius:7px}
+  .chip.pr{background:#e0e7ff;color:#3730a3}
+  .chip.bz{background:#ccfbf1;color:#0f766e}
+  .chip.dv{background:#ede9fe;color:#6d28d9}
+  .chip.mn{background:#e0f2fe;color:#0369a1}
+
+  /* code-ish */
+  code{background:#f1f5f9;border:1px solid var(--line);border-radius:6px;padding:1.5px 7px;font-size:14px;
+    font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;color:#0f172a}
+  .cmd{background:#0f172a;color:#e2e8f0;border-radius:12px;padding:14px 18px;margin:12px 0;
+    font-family:ui-monospace,Menlo,Consolas,monospace;font-size:14px;overflow-x:auto;white-space:pre;line-height:1.7}
+  .cmd .c{color:#94a3b8}.cmd .g{color:#86efac}.cmd .y{color:#fcd34d}
+
+  /* two safety cards */
+  .safety{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:10px 0}
+  @media(max-width:720px){.safety{grid-template-columns:1fr}}
+  .scard{border:1.5px solid #fecaca;background:#fef2f2;border-radius:14px;padding:18px}
+  .scard.attr{border-color:#bfdbfe;background:#eff6ff}
+  .scard .h{display:flex;align-items:center;gap:10px;font-weight:800;font-size:16.5px;margin-bottom:6px}
+  .scard.no .h{color:#b91c1c}.scard.attr .h{color:#1d4ed8}
+  .scard p{font-size:15px;margin:6px 0 0}
+
+  /* faq / trouble */
+  .trouble{border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:14px 0}
+  .trouble .t{display:grid;grid-template-columns:minmax(160px,1fr) 2fr;gap:0;border-bottom:1px solid var(--line)}
+  .trouble .t:last-child{border-bottom:0}
+  .trouble .t>div{padding:12px 15px}
+  .trouble .t .q{background:#fff7ed;color:#9a3412;font-weight:700;font-size:14.5px;border-right:1px solid #fde68a}
+  .trouble .t .a{font-size:14.5px;color:#334155}
+  @media(max-width:620px){.trouble .t{grid-template-columns:1fr}.trouble .t .q{border-right:0;border-bottom:1px solid #fde68a}}
+
+  footer{color:var(--muted);font-size:13px;text-align:center;padding:8px 22px 50px;line-height:1.8}
+  footer .src{display:inline-block;margin-top:6px}
+
+  @media print{
+    body{background:#fff;font-size:12.5px}
+    header.hero{background:#0f172a !important;-webkit-print-color-adjust:exact;print-color-adjust:exact;padding-bottom:40px}
+    main{margin-top:18px}
+    section{box-shadow:none;break-inside:avoid;page-break-inside:avoid}
+    .nav{display:none}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ HERO ============ -->
+<header class="hero">
+  <div class="wrap">
+    <span class="tag">처음 사용자용 · 터미널/코딩 몰라도 됩니다</span>
+    <h1>회사 AI, 이렇게 설치하면 됩니다</h1>
+    <p class="lead">명령어를 외울 필요가 없습니다. 받은 설치 묶음을 풀고 <b>AI에게 말로 시키면</b>
+      AI가 알아서 설정을 설치해 줍니다. 이 안내서는 그 과정을 그림과 함께 천천히 설명합니다.</p>
+    <div class="who">
+      <span>👩‍💼 비개발자</span>
+      <span>🐣 AI 사용 초보자</span>
+      <span>🖱️ 컴퓨터가 익숙하지 않은 분</span>
+    </div>
+
+    <!-- hero illustration -->
+    <svg class="hero-art" viewBox="0 0 560 250" role="img" aria-label="사람이 AI에게 말로 부탁하면 회사 표준 설정이 설치되는 개념도">
+      <defs>
+        <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#a5b4fc"/><stop offset="1" stop-color="#5eead4"/>
+        </linearGradient>
+      </defs>
+      <!-- person -->
+      <circle cx="78" cy="92" r="26" fill="#fbcfe8"/>
+      <circle cx="78" cy="92" r="26" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="2"/>
+      <path d="M44 168 q34 -40 68 0 z" fill="#c7d2fe"/>
+      <!-- speech bubble -->
+      <rect x="120" y="58" width="150" height="58" rx="14" fill="#fff"/>
+      <path d="M132 116 l0 18 l20 -18 z" fill="#fff"/>
+      <text x="135" y="84" font-size="14" fill="#1e293b" font-family="sans-serif">"내 설치를</text>
+      <text x="135" y="104" font-size="14" fill="#1e293b" font-family="sans-serif">도와줘"</text>
+      <!-- arrow -->
+      <path d="M286 92 h44" stroke="#e0e7ff" stroke-width="3" fill="none" marker-end="url(#ah)"/>
+      <defs><marker id="ah" markerWidth="10" markerHeight="10" refX="7" refY="3" orient="auto">
+        <path d="M0 0 L7 3 L0 6 z" fill="#e0e7ff"/></marker></defs>
+      <!-- AI bot -->
+      <rect x="338" y="56" width="80" height="74" rx="18" fill="url(#g1)"/>
+      <circle cx="362" cy="90" r="7" fill="#0f172a"/><circle cx="394" cy="90" r="7" fill="#0f172a"/>
+      <path d="M360 110 q18 14 36 0" stroke="#0f172a" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <rect x="372" y="40" width="12" height="14" rx="4" fill="#a5b4fc"/><circle cx="378" cy="38" r="5" fill="#fff"/>
+      <!-- arrow 2 -->
+      <path d="M428 92 h40" stroke="#5eead4" stroke-width="3" fill="none" marker-end="url(#ah2)"/>
+      <defs><marker id="ah2" markerWidth="10" markerHeight="10" refX="7" refY="3" orient="auto">
+        <path d="M0 0 L7 3 L0 6 z" fill="#5eead4"/></marker></defs>
+      <!-- result doc -->
+      <rect x="474" y="52" width="64" height="80" rx="10" fill="#fff"/>
+      <rect x="486" y="68" width="40" height="6" rx="3" fill="#c7d2fe"/>
+      <rect x="486" y="82" width="40" height="6" rx="3" fill="#c7d2fe"/>
+      <rect x="486" y="96" width="26" height="6" rx="3" fill="#c7d2fe"/>
+      <circle cx="506" cy="118" r="13" fill="#16a34a"/>
+      <path d="M500 118 l4 5 l9 -10" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="200" y="206" font-size="15" fill="#e0e7ff" font-family="sans-serif" text-anchor="middle">말로 부탁</text>
+      <text x="378" y="206" font-size="15" fill="#e0e7ff" font-family="sans-serif" text-anchor="middle">AI가 처리</text>
+      <text x="506" y="206" font-size="15" fill="#a7f3d0" font-family="sans-serif" text-anchor="middle">설치 완료</text>
+    </svg>
+  </div>
+</header>
+
+<main>
+<div class="wrap">
+
+  <!-- ============ 0. 안내서 사용법 + 빠른 이동 ============ -->
+  <section class="flush">
+    <h2><span class="n teal">0</span>먼저, 마음 편히 가지세요</h2>
+    <p class="sub">이 안내서는 받은 설치 묶음(zip)으로 회사 표준 설정을 설치하는 방법을 알려줍니다. 어렵지 않습니다.</p>
+    <p class="big">핵심은 딱 하나입니다 — <b>설치는 사람이 하지 않고, AI에게 부탁하면 AI가 합니다.</b>
+      여러분이 할 일은 “부탁하기”와 “괜찮은지 확인하기”뿐입니다.</p>
+    <div class="callout teal">
+      <div class="ttl">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0d9488" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        외워야 할 명령어는 없습니다
+      </div>
+      혹시 화면에 까만 명령어가 나와도 직접 만들 필요 없습니다. AI가 대신 만들어 줍니다.
+      어디에 넣는지 모르겠으면 AI에게 <b>“이 명령을 어디에 어떻게 입력해?”</b>라고 그대로 물어보면 됩니다.
+    </div>
+
+    <!-- 설치 위치 안내 (상단 명시) -->
+    <div class="callout">
+      <div class="ttl">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        어느 폴더에 설치되나요?
+      </div>
+      zip을 풀면 <code>company-agent-kit</code> 폴더가 생기는데, <b>이 폴더 자체가 아니라</b>
+      여러분이 <b>작업하는 프로젝트 폴더</b>에 설정이 설치됩니다. 헷갈리면 그냥 두세요 —
+      AI가 설치 전에 한 번 더 확인해 줍니다.
+    </div>
+
+    <div class="figure">
+      <svg viewBox="0 0 560 150" role="img" aria-label="설치 위치: 압축 푼 company-agent-kit 폴더가 아니라 그 바깥의 내 프로젝트 폴더에 설치됨">
+        <!-- 내 프로젝트 폴더 (설치 대상) -->
+        <rect x="30" y="34" width="62" height="12" rx="5" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+        <rect x="30" y="44" width="250" height="92" rx="10" fill="#f0fdf4" stroke="#16a34a" stroke-width="2.5"/>
+        <text x="46" y="68" font-size="14" fill="#166534" font-family="sans-serif" font-weight="bold">내 프로젝트 폴더 (작업 폴더)</text>
+        <!-- 안쪽: 압축 푼 번들 폴더 (설치 대상 아님) -->
+        <rect x="52" y="80" width="54" height="11" rx="5" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.5"/>
+        <rect x="52" y="89" width="200" height="34" rx="8" fill="#faf5ff" stroke="#7c3aed" stroke-width="2" stroke-dasharray="5 3"/>
+        <text x="66" y="111" font-size="12.5" fill="#6d28d9" font-family="sans-serif">company-agent-kit (압축 푼 곳)</text>
+        <!-- 연결선 -->
+        <path d="M280 62 h26" stroke="#86efac" stroke-width="2" stroke-dasharray="3 3" fill="none"/>
+        <path d="M252 106 h54" stroke="#fca5a5" stroke-width="2" stroke-dasharray="3 3" fill="none"/>
+        <!-- 범례: 설치됨 -->
+        <circle cx="320" cy="62" r="12" fill="#16a34a"/>
+        <path d="M314 62 l4 5 l9 -10" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <text x="340" y="59" font-size="13.5" fill="#166534" font-family="sans-serif" font-weight="bold">여기에 설치돼요</text>
+        <text x="340" y="76" font-size="12" fill="#15803d" font-family="sans-serif">= 바깥쪽 내 프로젝트 폴더</text>
+        <!-- 범례: 아님 -->
+        <circle cx="320" cy="106" r="12" fill="#dc2626"/>
+        <path d="M315 101 l10 10 M325 101 l-10 10" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/>
+        <text x="340" y="103" font-size="13.5" fill="#b91c1c" font-family="sans-serif" font-weight="bold">이 폴더 아님</text>
+        <text x="340" y="120" font-size="12" fill="#dc2626" font-family="sans-serif">= 압축 푼 company-agent-kit</text>
+      </svg>
+    </div>
+    <div class="nav">
+      <a href="#ready">① 준비물</a>
+      <a href="#install">② 설치하기</a>
+      <a href="#safety">③ 꼭 지킬 것</a>
+      <a href="#help">④ 막히면</a>
+    </div>
+  </section>
+
+  <!-- ============ 1. 준비물 ============ -->
+  <section id="ready">
+    <h2><span class="n">1</span>준비물 확인</h2>
+    <p class="sub">시작 전에 아래 항목이 있는지 가볍게 확인하세요. 없으면 관리자/담당자에게 요청하면 됩니다.</p>
+
+    <div class="figure">
+      <svg viewBox="0 0 600 92" role="img" aria-label="준비물: 설치 묶음, AI 도구, 공유 드라이브">
+        <!-- item 1: zip -->
+        <g>
+          <rect x="20" y="16" width="60" height="60" rx="14" fill="#faf5ff"/>
+          <path d="M36 36 l14 -7 l14 7 v18 l-14 7 l-14 -7 z" fill="none" stroke="#7c3aed" stroke-width="2.5" stroke-linejoin="round"/>
+          <path d="M36 36 l14 7 l14 -7 M50 43 v18" stroke="#7c3aed" stroke-width="2.5" fill="none"/>
+          <text x="50" y="90" font-size="12.5" fill="#334155" text-anchor="middle" font-family="sans-serif">설치 묶음(zip)</text>
+        </g>
+        <!-- item 2: AI tool -->
+        <g>
+          <rect x="230" y="16" width="60" height="60" rx="14" fill="#eef2ff"/>
+          <rect x="246" y="34" width="28" height="22" rx="4" fill="none" stroke="#4f46e5" stroke-width="2.5"/>
+          <circle cx="254" cy="45" r="2.4" fill="#4f46e5"/><circle cx="266" cy="45" r="2.4" fill="#4f46e5"/>
+          <rect x="256" y="28" width="8" height="8" rx="2" fill="#4f46e5"/>
+          <text x="260" y="90" font-size="12.5" fill="#334155" text-anchor="middle" font-family="sans-serif">AI 도구</text>
+        </g>
+        <!-- item 3: drive (optional) -->
+        <g>
+          <rect x="440" y="16" width="60" height="60" rx="14" fill="#f0fdfa"/>
+          <path d="M456 38 h12 l4 5 h18 v18 a3 3 0 0 1 -3 3 h-28 a3 3 0 0 1 -3 -3 z" fill="none" stroke="#0d9488" stroke-width="2.5" stroke-linejoin="round"/>
+          <text x="470" y="90" font-size="12.5" fill="#334155" text-anchor="middle" font-family="sans-serif">공유 드라이브</text>
+        </g>
+      </svg>
+    </div>
+
+    <table>
+      <thead><tr><th>준비물</th><th>설명 / 없을 때</th><th>꼭 필요?</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="role">설치 묶음(zip)</td>
+          <td>담당자가 주는 <code>company-agent-kit.zip</code> 파일. 이걸 풀어서 설치합니다.</td>
+          <td class="req">✅ 필수</td>
+        </tr>
+        <tr>
+          <td class="role">회사 AI 도구</td>
+          <td>설치를 맡길 AI 대화 도구(예: Claude, Codex, Gemini). 로그인돼 있어야 합니다.</td>
+          <td class="req">✅ 필수</td>
+        </tr>
+        <tr>
+          <td class="role">전사 공유 드라이브</td>
+          <td>Google Drive의 <code>AI-Knowhow</code> 폴더. 문제가 생겼을 때 피드백을 올리거나 도움받는 곳입니다.
+            안 보이면 관리자에게 “멤버 추가”를 요청하세요.</td>
+          <td class="opt">선택</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ============ 2. 설치하기 ============ -->
+  <section id="install">
+    <h2><span class="n">2</span>설치하기</h2>
+    <p class="sub">받은 설치 묶음으로 작업 폴더에 회사 표준 설정을 설치합니다. 설치도 “AI에게 시키는” 방식이라 어렵지 않습니다.</p>
+
+    <!-- install flow diagram -->
+    <div class="figure">
+      <svg viewBox="0 0 760 130" role="img" aria-label="설치 흐름: 압축풀기, AI에 붙여넣기, AI가 질문, 미리보기, 설치">
+        <defs><marker id="fa" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 z" fill="#cbd5e1"/></marker></defs>
+        <!-- 1 -->
+        <rect x="8" y="30" width="120" height="66" rx="13" fill="#eef2ff"/>
+        <path d="M52 50 l16 -8 l16 8 v18 l-16 8 l-16 -8 z" fill="none" stroke="#4f46e5" stroke-width="2.3" stroke-linejoin="round"/>
+        <text x="68" y="90" font-size="12" fill="#3730a3" text-anchor="middle" font-family="sans-serif">압축 풀기</text>
+        <path d="M132 63 h22" stroke="#cbd5e1" stroke-width="2.5" marker-end="url(#fa)"/>
+        <!-- 2 -->
+        <rect x="158" y="30" width="120" height="66" rx="13" fill="#eef2ff"/>
+        <rect x="200" y="46" width="36" height="26" rx="5" fill="none" stroke="#4f46e5" stroke-width="2.3"/>
+        <path d="M209 56 h18 M209 62 h12" stroke="#4f46e5" stroke-width="2.3" stroke-linecap="round"/>
+        <text x="218" y="90" font-size="12" fill="#3730a3" text-anchor="middle" font-family="sans-serif">AI에 붙여넣기</text>
+        <path d="M282 63 h22" stroke="#cbd5e1" stroke-width="2.5" marker-end="url(#fa)"/>
+        <!-- 3 -->
+        <rect x="308" y="30" width="120" height="66" rx="13" fill="#eef2ff"/>
+        <circle cx="368" cy="56" r="13" fill="none" stroke="#4f46e5" stroke-width="2.3"/>
+        <text x="368" y="61" font-size="15" fill="#4f46e5" text-anchor="middle" font-family="sans-serif" font-weight="bold">?</text>
+        <text x="368" y="90" font-size="12" fill="#3730a3" text-anchor="middle" font-family="sans-serif">AI가 질문</text>
+        <path d="M432 63 h22" stroke="#cbd5e1" stroke-width="2.5" marker-end="url(#fa)"/>
+        <!-- 4 -->
+        <rect x="458" y="30" width="120" height="66" rx="13" fill="#fffbeb"/>
+        <circle cx="510" cy="56" r="11" fill="none" stroke="#d97706" stroke-width="2.3"/>
+        <path d="M518 64 l9 9" stroke="#d97706" stroke-width="2.3" stroke-linecap="round"/>
+        <text x="518" y="90" font-size="12" fill="#9a3412" text-anchor="middle" font-family="sans-serif">미리보기</text>
+        <path d="M582 63 h22" stroke="#cbd5e1" stroke-width="2.5" marker-end="url(#fa)"/>
+        <!-- 5 -->
+        <rect x="608" y="30" width="120" height="66" rx="13" fill="#f0fdf4"/>
+        <circle cx="668" cy="56" r="14" fill="#16a34a"/>
+        <path d="M661 56 l5 6 l9 -11" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <text x="668" y="90" font-size="12" fill="#15803d" text-anchor="middle" font-family="sans-serif">설치 완료</text>
+      </svg>
+      <div class="figcap">설치 흐름 한눈에 보기 — 미리보기로 먼저 확인한 뒤에만 실제로 설치됩니다.</div>
+    </div>
+
+    <ol class="steps">
+      <li>
+        <h4>설치 묶음(zip)을 풀어서 폴더를 엽니다</h4>
+        <p>담당자가 준 <code>company-agent-kit.zip</code>을 더블클릭해 압축을 풀고, 생긴 폴더를 엽니다.</p>
+      </li>
+      <li>
+        <h4>(선택) 파일이 안전한지 확인합니다</h4>
+        <p>zip과 함께 받은 <code>.sha256</code> 파일로 무결성을 확인할 수 있습니다. 어렵게 느껴지면 건너뛰어도 됩니다 —
+          담당자가 알려주면 그때 하면 됩니다.</p>
+      </li>
+      <li>
+        <h4>AI에게 설치 안내서를 건넵니다</h4>
+        <p>폴더 안의 <code>SETUP_WIZARD.md</code>를 열어 내용을 복사한 뒤, AI 대화창에 붙여넣고 이렇게 말합니다.</p>
+        <span class="say">이걸 읽고 내 설치를 도와줘.</span>
+        <p style="color:#64748b;font-size:14px">파일 첨부가 되는 도구라면 <code>SETUP_WIZARD.md</code>를 그냥 첨부해도 됩니다.</p>
+      </li>
+      <li>
+        <h4>AI의 질문에 답합니다</h4>
+        <p>AI가 <b>직무 · 사용하는 AI 도구 · 설치할 폴더</b>를 물어봅니다. 예: “기획 / Claude / 이 작업 폴더”.
+          폴더가 헷갈리면 AI가 알아서 확인해 주니 걱정하지 마세요.</p>
+      </li>
+      <li>
+        <h4>“미리보기”로 무엇이 생기는지 먼저 봅니다</h4>
+        <p>AI가 먼저 <b>미리보기(dry-run)</b> 명령을 만들어 줍니다. 이건 <b>실제로 아무것도 바꾸지 않고</b>,
+          “이런 파일들이 생길 거예요”라고 목록만 보여줍니다.</p>
+      </li>
+      <li>
+        <h4>괜찮으면 설치(apply)합니다</h4>
+        <p>미리보기 결과가 괜찮으면, AI가 주는 설치 명령을 실행합니다. 이때 실제 설정이 폴더에 설치됩니다.</p>
+        <p style="color:#64748b;font-size:14px">명령을 어디에 넣는지 모르겠으면 →
+          <span class="say" style="margin:4px 0">이 명령을 어디에 어떻게 입력해?</span></p>
+      </li>
+    </ol>
+
+    <!-- dry-run safety callout -->
+    <div class="callout warn">
+      <div class="ttl">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        “미리보기(dry-run)”가 안전장치입니다
+      </div>
+      미리보기는 <b>실제로 파일을 만들지 않습니다.</b> 생길 파일 목록만 보여주므로 마음 놓고 먼저 확인하세요.
+      확인한 다음에만 설치(apply)가 진행됩니다. 잘못 눌러서 망가질 걱정이 없습니다.
+    </div>
+
+    <!-- profile table -->
+    <h3>내 직무에는 어떤 걸 설치하나요?</h3>
+    <p style="margin-top:4px">AI가 알아서 추천하지만, 미리 알아두면 좋습니다. (“profile”은 <b>직무에 맞는 설정 묶음</b>이라는 뜻입니다.)</p>
+    <table>
+      <thead><tr><th>내 직무</th><th>추천 설정(profile)</th><th>이런 걸 도와줍니다</th></tr></thead>
+      <tbody>
+        <tr><td class="role">기획 · PM</td><td><span class="chip pr">product</span></td><td>아이디어 → PRD 초안, 요구사항 정리, 사용자 스토리</td></tr>
+        <tr><td class="role">사업 · 영업 · CS</td><td><span class="chip bz">business</span></td><td>고객 응대 답변, 제안서 메시지, 공지문</td></tr>
+        <tr><td class="role">개발</td><td><span class="chip dv">developer</span></td><td>구현 · 코드 리뷰 · 커밋 메시지 · 설계 도움</td></tr>
+        <tr><td class="role">잘 모르겠음</td><td><span class="chip mn">minimal</span></td><td>회사 공통 AI 사용 규칙(보안 · 출처)만 가볍게</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ============ 3. 꼭 지킬 것 ============ -->
+  <section id="safety">
+    <h2><span class="n">3</span>꼭 지킬 것 — 딱 두 가지</h2>
+    <p class="sub">나머지는 자유입니다. 이 두 가지만 지키면 안전하게 쓸 수 있습니다.</p>
+    <div class="safety">
+      <div class="scard no">
+        <div class="h">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#b91c1c" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M5.6 5.6l12.8 12.8"/></svg>
+          민감정보는 넣지 않기
+        </div>
+        <p>고객 개인정보, 비밀번호·토큰, 미공개 계약·재무 자료는 AI에 입력하지 않습니다.
+          꼭 써야 하면 <code>&lt;고객명&gt;</code>처럼 가려서 씁니다.</p>
+      </div>
+      <div class="scard attr">
+        <div class="h">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 8h10M7 12h7"/><path d="M21 12a9 9 0 1 1-9-9"/><path d="M16 3l5 2-2 5"/></svg>
+          외부 자료는 출처 남기기
+        </div>
+        <p>인터넷 글·문서 등 외부 자료를 가져와 쓰면, 어디서 가져왔는지 출처를 함께 적어 둡니다.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 4. 막히면 ============ -->
+  <section id="help">
+    <h2><span class="n">4</span>막히면 — 이렇게 해결하세요</h2>
+    <p class="sub">대부분의 문제는 AI에게 그대로 보여주면 풀립니다. 자주 나오는 경우만 정리했습니다.</p>
+
+    <div class="trouble">
+      <div class="t"><div class="q">설치가 자꾸 안 돼요</div><div class="a"><code>SETUP_WIZARD.md</code>의 “설치가 안 될 때” 부분을 AI에게 함께 보여주세요. AI가 원인을 짚어 줍니다.</div></div>
+      <div class="t"><div class="q">"node: command not found"</div><div class="a">설치에 필요한 Node.js가 없습니다. <a href="https://nodejs.org" target="_blank" rel="noopener">nodejs.org</a>에서 LTS 버전을 설치한 뒤 다시 시도하세요.</div></div>
+      <div class="t"><div class="q">"permission denied" (권한 오류)</div><div class="a">설치 폴더에 쓰기 권한이 없을 수 있습니다. 회사 관리 PC라면 IT·관리 담당자에게 문의하세요.</div></div>
+      <div class="t"><div class="q">명령을 어디에 넣는지 몰라요</div><div class="a">AI에게 <b>“이 명령을 어디에 어떻게 입력해?”</b>라고 그대로 물어보세요. 단계별로 알려 줍니다.</div></div>
+      <div class="t"><div class="q">그래도 안 풀려요</div><div class="a">AI에게 “이 내용을 피드백 <code>.md</code>로 정리해서 Google Drive <code>AI-Knowhow/feedbacks</code>에 올릴 수 있게 해줘”라고 요청하세요. AI가 정리를 도와줍니다.</div></div>
+    </div>
+
+    <div class="callout teal">
+      <b>막혔을 때 가장 빠른 길:</b> 화면에 나온 오류 메시지를 <b>그대로 복사해서 AI에게 붙여넣고</b> “이거 어떻게 해결해?”라고 물어보세요.
+    </div>
+  </section>
+
+</div>
+</main>
+
+<footer>
+  <div class="wrap">
+    회사 AI 설치 가이드 · 처음 사용자용 — 누구나 · 어떤 OS · 어떤 AI 도구든 같은 방식으로.
+    <br><span class="src">출처: 이 안내서는 번들의 <code>SETUP_WIZARD.md</code>와 <code>docs/non-developer-guide.md</code>를 쉬운 말로 옮긴 것입니다.</span>
+    <br>막히면 담당자 또는 공유 드라이브 <code>AI-Knowhow</code> 운영 메모로 문의하세요.
+  </div>
+</footer>
+
+</body>
+</html>
