@@ -8,11 +8,24 @@ TARGET="${TARGET:-codex}"
 PROFILE="${PROFILE:-developer}"
 SCOPE="${SCOPE:-project}"
 TIMESTAMP="$(date -u +%Y%m%d-%H%M%S)"
+UNAME="$(uname -s 2>/dev/null || echo unknown)"
+case "$UNAME" in
+  MINGW*|MSYS*|CYGWIN*)
+    PLATFORM="windows-gitbash"
+    DEFAULT_RUN_NPM_TEST="0"
+    export LANG="${LANG:-C.UTF-8}"
+    export LC_ALL="${LC_ALL:-$LANG}"
+    ;;
+  *)
+    PLATFORM="linux"
+    DEFAULT_RUN_NPM_TEST="1"
+    ;;
+esac
 RESULT_DIR="${DIST_TEST_RESULT_DIR:-$SCRIPT_DIR/results}"
 PROJECT="${PROJECT:-${TMPDIR:-/tmp}/agent-bundle-dist-test-$TIMESTAMP}"
 KEEP_PROJECT="${DIST_TEST_KEEP_PROJECT:-1}"
-RUN_NPM_TEST="${DIST_TEST_RUN_NPM_TEST:-1}"
-LOG_FILE="$RESULT_DIR/dist-test-linux-$TIMESTAMP.log"
+RUN_NPM_TEST="${DIST_TEST_RUN_NPM_TEST:-$DEFAULT_RUN_NPM_TEST}"
+LOG_FILE="$RESULT_DIR/dist-test-$PLATFORM-$TIMESTAMP.log"
 
 mkdir -p "$RESULT_DIR" "$PROJECT"
 exec > >(tee "$LOG_FILE") 2>&1
@@ -20,7 +33,7 @@ exec > >(tee "$LOG_FILE") 2>&1
 finish() {
   local exit_code=$?
   echo
-if [ "$exit_code" -eq 0 ]; then
+  if [ "$exit_code" -eq 0 ]; then
     echo "DIST TEST PASS"
   else
     echo "DIST TEST FAIL (exit: $exit_code)"

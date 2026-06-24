@@ -9,7 +9,7 @@ The default scenario is `codex` + `developer` + `project` scope.
 ```text
 1. Node.js / npm availability and Node >= 18
 2. agent-deploy manifest and asset validation
-3. agent-deploy smoke tests when the test directory is present
+3. agent-deploy smoke tests when enabled and the test directory is present
 4. doctor
 5. apply --dry-run
 6. apply --backup
@@ -39,37 +39,37 @@ NPM_BIN=npm.cmd ./tests/dist_test.sh
 
 `DIST_TEST_KEEP_PROJECT=0` only removes auto-generated project folders whose name starts with `agent-bundle-dist-test-`.
 
-## Windows PowerShell
+Git Bash on Windows defaults `DIST_TEST_RUN_NPM_TEST` to `0`. The long Node smoke suite includes Windows PowerShell wrapper checks that are noisy on some PCs and are not required for this manager-run distribution test. To force it anyway:
 
-```powershell
-.\tests\dist_test.ps1
-```
-
-Optional overrides:
-
-```powershell
-.\tests\dist_test.ps1 -Target codex -Profile developer -Scope project
-.\tests\dist_test.ps1 -RunNpmTest:$false
-.\tests\dist_test.ps1 -KeepProject:$false
-.\tests\dist_test.ps1 -Project "$env:TEMP\my-agent-bundle-test"
-.\tests\dist_test.ps1 -NpmCommand npm.cmd
-```
-
-`-KeepProject:$false` only removes auto-generated project folders whose name starts with `agent-bundle-dist-test-`.
-
-On some Windows PCs, PowerShell resolves `npm` to `npm.ps1` and execution policy blocks it. The script prefers `npm.cmd` automatically when available. If needed, force it explicitly:
-
-```powershell
-.\tests\dist_test.ps1 -NpmCommand npm.cmd
+```bash
+DIST_TEST_RUN_NPM_TEST=1 ./tests/dist_test.sh
 ```
 
 ## Windows Command Prompt
+
+Use Command Prompt for the Windows distribution test. The PowerShell test wrapper was removed because it caused execution-policy and console-encoding issues on some PCs.
 
 ```bat
 tests\dist_test.bat
 ```
 
-The batch file delegates to `dist_test.ps1` with `ExecutionPolicy Bypass` for this process only.
+Optional overrides:
+
+```bat
+set TARGET=codex
+set PROFILE=developer
+set SCOPE=project
+set PROJECT=%TEMP%\my-agent-bundle-test
+set NPM_BIN=npm.cmd
+tests\dist_test.bat
+```
+
+By default, Windows `.bat` skips `npm test` and runs the distribution path check only. To force the long smoke suite:
+
+```bat
+set DIST_TEST_RUN_NPM_TEST=1
+tests\dist_test.bat
+```
 
 ## Windows-specific checks
 
@@ -77,11 +77,10 @@ When a project manager verifies Windows, record these items with the log file pa
 
 ```text
 Required:
-- Run once from PowerShell with .\tests\dist_test.ps1.
 - Run once from Command Prompt with tests\dist_test.bat.
 - Confirm the final line says DIST TEST PASS.
 - Confirm the process exit code is 0.
-- Confirm tests/results/dist-test-windows-*.log was created.
+- Confirm tests\results\dist-test-windows-*.log was created.
 - Confirm the test project is under %TEMP% by default and not a real work project.
 - Confirm apply --dry-run does not create AGENTS.md or install-state.
 - Confirm apply --backup creates only project-scope files.
@@ -90,30 +89,25 @@ Required:
 
 Also check at least one path with spaces, because Windows path quoting is a common failure point.
 
-```powershell
-.\tests\dist_test.ps1 -Project "$env:TEMP\agent bundle dist test"
-```
-
-If the PowerShell script is blocked by policy, use the batch wrapper first.
-
 ```bat
+set PROJECT=%TEMP%\agent bundle dist test
 tests\dist_test.bat
 ```
 
-Expected policy behavior:
+Expected Windows behavior:
 
 ```text
-- dist_test.bat may use ExecutionPolicy Bypass for this process only.
 - The script must not require Administrator permission.
-- The script must not write outside the repo, tests/results/, or the temporary test project.
+- The script sets code page 65001 to reduce console text corruption.
+- The script prefers npm.cmd when available.
+- The script must not write outside the repo, tests\results\, or the temporary test project.
 ```
 
 Record Windows environment details when reporting the result.
 
-```powershell
-$PSVersionTable
+```bat
 node --version
-npm --version
-Get-ExecutionPolicy
-cmd /c ver
+npm.cmd --version
+chcp
+ver
 ```
