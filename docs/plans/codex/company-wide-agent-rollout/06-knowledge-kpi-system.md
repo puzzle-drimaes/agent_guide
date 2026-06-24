@@ -21,7 +21,7 @@ AI 사용 노하우가 개인 대화창 안에 갇히지 않고 회사 지식으
 ```text
 1. 공유 채널은 Google Drive 지정 폴더 하나로 둔다.
    - 폴더 예: AI-Knowhow/skills/, AI-Knowhow/prompts/
-   - 피드백 폴더 예: AI-Knowhow/feedback/
+   - 피드백 폴더 예: AI-Knowhow/feedbacks/
    - 정해진 양식 강제 없음. 단, agent가 업로드 전 최소 정제는 돕는다.
    - 올리기 전 민감정보 / credential / 고객 데이터만 제거한다.
 2. 이력과 중복 관리는 GitHub branch로 한다.
@@ -36,7 +36,7 @@ AI 사용 노하우가 개인 대화창 안에 갇히지 않고 회사 지식으
      (자세한 흐름: agent-deploy/docs/ASSET_PACKS.md).
 4. 더 다듬어 표준으로 만들고 싶을 때만 수동 병합/승격 흐름으로 옮긴다
      (15-prompt-db-operations.md). 처음부터 강제하지 않는다.
-5. 설치/사용 피드백은 agent가 `.md`로 정리해 Google Drive `AI-Knowhow/feedback/` 업로드를 먼저 제안한다.
+5. 설치/사용 피드백은 agent가 `.md`로 정리해 Google Drive `AI-Knowhow/feedbacks/` 업로드를 먼저 제안한다.
    - Drive 커넥터가 있으면 agent가 직접 업로드를 돕는다.
    - 없으면 agent가 업로드할 `.md` 본문을 만들고 사용자가 Drive 웹에서 올린다.
 ```

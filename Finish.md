@@ -9,6 +9,14 @@
 
 ## 0. 최근 운영 반영
 
+### 0.11 공유 폴더 feedback → feedbacks 통일 + 하위 폴더 직통 링크/ID 명시
+
+반영일: 2026-06-24
+
+- [x] Google Drive AI-Knowhow의 피드백 폴더 실제 이름이 `feedbacks`(복수, skills/prompts와 일관)로 생성됨에 맞춰, 문서의 폴더 경로 `feedback/` → `feedbacks/`로 통일(스킬 디렉터리 `agent-bundle-feedback/`는 정밀 lookbehind로 보존).
+- [x] SHARED_FOLDER_GUIDE 위치 섹션에 skills/prompts/feedbacks 하위 폴더 **직통 링크 + folder ID** 명시. 이름 검색 시 동명 결과가 많은 문제를 막고, agent는 `parentId='<id>'`로 검색을 한정한다(feedbacks id 2026-06-24 생성).
+- [x] 적용 범위: knowledge-sharing rule(canonical+asset, drift 동기화), agent-bundle-feedback SKILL, SETUP_WIZARD, SHARED_FOLDER_GUIDE, non-developer-guide, pilot-runbook/retrospective/alpha-rehearsal-log, plans(06/10/12), TODO.
+
 ### 0.10 배포 산출물 폴더를 release/로 변경
 
 반영일: 2026-06-24

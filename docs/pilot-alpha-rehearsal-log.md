@@ -328,7 +328,7 @@ apply 후 확인된 주요 파일:
 ```text
 1. (완료) Windows 환경에서 `tests\dist_test.bat`로 doctor~uninstall dry-run 및 install.bat smoke를 실행하고 결과를 10장에 기록했다.
 2. (완료) docs/pilot-runbook.md 5장 공지문에 배포 위치(Google Drive AI-Knowhow)·운영 담당·문의 경로를 채워 최종화하고 게시 절차(5.1)를 추가했다.
-3. 실패 사례가 나오면 Google Drive AI-Knowhow/feedback/ 형식의 .md로 별도 남긴다.
+3. 실패 사례가 나오면 Google Drive AI-Knowhow/feedbacks/ 형식의 .md로 별도 남긴다.
 ```
 
 ## 8. 최종 판정

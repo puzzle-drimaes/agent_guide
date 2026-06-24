@@ -9,7 +9,7 @@ argument-hint: "[optional: install output, usage notes, or issue description]"
 
 Use this skill when a user wants to submit feedback about the company Agent Bundle beta.
 Do not make the user paste a long feedback template. Guide the user through short Q&A,
-then produce a sanitized Markdown file for Google Drive `AI-Knowhow/feedback/`.
+then produce a sanitized Markdown file for Google Drive `AI-Knowhow/feedbacks/`.
 
 ## Required rules
 
@@ -33,7 +33,7 @@ Cursor: .cursor/rules/common-*.mdc
 4. **증거 수집** — 사용자가 제공한 설치 명령, dry-run/apply/doctor/update/repair/uninstall 출력은 요약하되 전문에 민감정보가 있을 수 있으면 그대로 싣지 않는다.
 5. **Markdown 생성** — 아래 Output 형식으로 업로드 가능한 `.md`를 만든다.
 6. **업로드 전 확인** — Drive 커넥터가 있더라도 업로드 전에는 파일명과 본문을 보여주고 사용자 확인을 받는다.
-7. **Fallback 안내** — Drive 커넥터가 없으면 사용자가 Drive 웹에서 `AI-Knowhow/feedback/`에 올릴 수 있게 파일명과 본문만 제공한다.
+7. **Fallback 안내** — Drive 커넥터가 없으면 사용자가 Drive 웹에서 `AI-Knowhow/feedbacks/`에 올릴 수 있게 파일명과 본문만 제공한다.
 
 ## Q&A checklist
 

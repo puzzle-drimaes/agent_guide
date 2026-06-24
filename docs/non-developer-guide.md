@@ -61,7 +61,9 @@
 받아 쓰기:
 
 ```text
-1. 공유 드라이브 "Drive" > AI-Knowhow/skills 또는 prompts 를 연다.
+1. 아래 폴더 링크를 직접 연다 (이름으로 검색하면 결과가 많으니 링크로 바로 가기).
+     skills:  https://drive.google.com/drive/folders/1PZx9YNdpPZ2I2LX0zYC1k-XerQ0nEMys
+     prompts: https://drive.google.com/drive/folders/1Cv104mmGpw9fqNQfuAttr_LfQl8Hxqee
 2. 필요한 .md를 선택해 내려받는다.
 3. AI 대화창에 내용을 붙여넣고 내 상황에 맞게 쓴다.
    (개발 프로젝트가 있으면 .agent-packs/externals/ 에 넣고 AI에게 "배치해줘"라고 요청 —
@@ -115,7 +117,7 @@
 
 ```text
 - 설치 오류: SETUP_WIZARD.md "설치가 안 될 때"를 AI에게 보여주고,
-  그래도 안 되면 AI에게 "이 내용을 피드백 .md로 정리해서 Google Drive AI-Knowhow/feedback에 올릴 수 있게 해줘"라고 요청한다.
+  그래도 안 되면 AI에게 "이 내용을 피드백 .md로 정리해서 Google Drive AI-Knowhow/feedbacks에 올릴 수 있게 해줘"라고 요청한다.
 - Drive 커넥터가 연결돼 있으면 AI가 직접 업로드를 도와주고, 없으면 업로드할 .md 본문을 만들어 준다.
-- 그 외 질문/노하우도 원하면 AI가 feedback 또는 prompts/skills용 .md로 정리해 공유 폴더 업로드를 도와준다.
+- 그 외 질문/노하우도 원하면 AI가 feedbacks 또는 prompts/skills용 .md로 정리해 공유 폴더 업로드를 도와준다.
 ```

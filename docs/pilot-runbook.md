@@ -54,7 +54,7 @@ Codex, Claude, Gemini 같은 target과 developer/product/business/governance pro
 
 ### 3.3 피드백은 agent가 Markdown으로 정리
 
-사용자는 별도 설문이나 긴 프롬프트를 먼저 작성하지 않는다. 사용 후 본인이 쓰는 agent에게 `피드백 해줘`라고 말하면, agent가 동의를 받고 짧은 Q&A로 결과 `.md`를 만들어 Google Drive `AI-Knowhow/feedback/` 업로드를 돕는다.
+사용자는 별도 설문이나 긴 프롬프트를 먼저 작성하지 않는다. 사용 후 본인이 쓰는 agent에게 `피드백 해줘`라고 말하면, agent가 동의를 받고 짧은 Q&A로 결과 `.md`를 만들어 Google Drive `AI-Knowhow/feedbacks/` 업로드를 돕는다.
 
 ```text
 - 환경정보(OS, AI 도구, 설치 scope 등)는 사용자 동의를 받은 뒤 피드백에 포함한다.
@@ -226,7 +226,7 @@ node src\cli.js uninstall `
 6. 설치 후 실제 업무에서 prompt, skill, rule을 사용해 봅니다.
 7. 공유하고 싶은 prompt/skill이 있으면 agent에게 `공유용으로 정제해줘`라고 말해 민감정보 제거와 출처 표기를 먼저 진행합니다.
 8. 사용 후 agent에게 `피드백 해줘`라고 말해 Q&A 방식으로 결과를 `.md`로 정리합니다.
-9. 정리된 `.md`를 Google Drive `AI-Knowhow/feedback/` 폴더에 업로드합니다.
+9. 정리된 `.md`를 Google Drive `AI-Knowhow/feedbacks/` 폴더에 업로드합니다.
 
 ## 피드백 요청
 
@@ -234,7 +234,7 @@ node src\cli.js uninstall `
 
 피드백은 아래 방식 중 편한 방법으로 남기면 됩니다.
 
-- Drive 커넥터가 있는 agent: agent에게 `AI-Knowhow/feedback/` 업로드까지 요청
+- Drive 커넥터가 있는 agent: agent에게 `AI-Knowhow/feedbacks/` 업로드까지 요청
 - Drive 커넥터가 없는 agent: agent가 만든 `.md` 내용을 복사해 Drive 웹에서 직접 업로드
 
 ## 꼭 지켜야 할 보안 기준
@@ -298,7 +298,7 @@ node src\cli.js uninstall `
 
 5. 업로드 전 확인을 받는다.
    - Drive 커넥터가 있더라도 파일명과 본문을 먼저 보여준다.
-   - 사용자가 확인한 뒤 `AI-Knowhow/feedback/` 업로드를 진행한다.
+   - 사용자가 확인한 뒤 `AI-Knowhow/feedbacks/` 업로드를 진행한다.
    - Drive 커넥터가 없으면 Drive 웹 업로드용 파일명과 본문을 제공한다.
 ```
 
@@ -431,7 +431,7 @@ skill 후보:
   GitHub: skills branch, uploads/skills/<skill-name>/SKILL.md
 
 feedback:
-  Drive:  AI-Knowhow/feedback/<date>-<role>-<target>-<topic>.md
+  Drive:  AI-Knowhow/feedbacks/<date>-<role>-<target>-<topic>.md
 ```
 
 상태는 기본적으로 `draft` 또는 `candidate`다. 후보 자료는 검증 전 공유본이며, 사용 횟수/사용자 수/성공률/Owner/Reviewer가 확인되기 전까지 `main` 또는 `company-*` 공식 asset으로 승격하지 않는다.
@@ -462,7 +462,7 @@ feedback:
 | project scope 설정 | 설치 결과와 install-state 확인 | user/global scope가 의도치 않게 쓰였는지 확인 |
 | 도구별 의미 동등성 | Codex/Claude/Gemini 차이 사례 | 같은 rule/prompt가 다른 의미로 해석되는지 확인 |
 | 비개발자 이해도 | 헷갈린 표현, wizard 이해도 | target/profile/scope 용어 개선 후보 수집 |
-| 공유 `.md` 업로드 사례 | Drive `AI-Knowhow/feedback/`, 공유 폴더 | 재사용 가능한 prompt/skill/template 후보 식별 |
+| 공유 `.md` 업로드 사례 | Drive `AI-Knowhow/feedbacks/`, 공유 폴더 | 재사용 가능한 prompt/skill/template 후보 식별 |
 | 보안 위험 신호 | 민감정보 입력/업로드 언급 | 즉시 governance 담당 확인 |
 | blocker | 설치 실패, target 불일치, 권한 문제 | workaround 유무와 재발 빈도 기록 |
 

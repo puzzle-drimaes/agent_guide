@@ -19,7 +19,7 @@
 | 자동화 | 설명 |
 |---|---|
 | PR 공유 문서 bot | PR merge 시 AI 노하우 작성 reminder |
-| Feedback upload helper | agent가 설치/사용 피드백을 `.md`로 정리해 Google Drive feedback 폴더 업로드 유도 |
+| Feedback upload helper | agent가 설치/사용 피드백을 `.md`로 정리해 Google Drive feedbacks 폴더 업로드 유도 |
 | Weekly reminder | Drive 운영 메모 기반의 가벼운 회고 권유 |
 | Candidate branch sync | Drive 업로드본을 GitHub prompts/skills branch 후보로 기록 |
 | Installer update check | profile/rule 업데이트 알림 |
@@ -29,7 +29,7 @@
 ## 우선순위 (1차 도입 기준 재정렬)
 
 ```text
-1. Feedback upload helper (agent가 Google Drive `AI-Knowhow/feedback/` 업로드 유도)
+1. Feedback upload helper (agent가 Google Drive `AI-Knowhow/feedbacks/` 업로드 유도)
 2. 공유 폴더 운영 보조 (업로드 안내 / 신규 .md 알림)
 3. Installer update notification
 4. Candidate frontmatter template (반복 사용분 정리용)
@@ -45,8 +45,8 @@
 ```text
 설치 실패 / 사용 불편 / 개선 제안 / 좋은 사례 발생
   → agent가 민감정보 제거 여부를 확인
-  → feedback/YYYY-MM-DD-<role>-<target>-<short-topic>.md 생성
-  → Google Drive AI-Knowhow/feedback/ 업로드 제안
+  → feedbacks/YYYY-MM-DD-<role>-<target>-<short-topic>.md 생성
+  → Google Drive AI-Knowhow/feedbacks/ 업로드 제안
   → Drive 커넥터가 있으면 직접 업로드, 없으면 사용자가 웹에서 올릴 수 있게 본문 제공
   → blocker는 파일명 또는 tags에 blocker 표시
 ```

@@ -875,7 +875,7 @@ agent-deploy만으로 전부 커버하지 않는 영역이다. 별도 automation
 2026-06-22 방침 변경: 회고/노하우 기록을 강제·추적하지 않는다. 공유 폴더 운영을 먼저 한다.
 
 - [x] 공유 폴더(Google Drive) 구조/업로드·적용 안내 마련 (`SHARED_FOLDER_GUIDE.md` / `GITHUB_BRANCH_POLICY.md`)
-- [x] agent가 설치/사용 피드백을 `.md`로 정리해 Google Drive `AI-Knowhow/feedback/` 업로드를 유도하는 흐름 문서화
+- [x] agent가 설치/사용 피드백을 `.md`로 정리해 Google Drive `AI-Knowhow/feedbacks/` 업로드를 유도하는 흐름 문서화
 - [ ] 신규 .md 업로드 시 Drive 운영 메모에 가벼운 알림(선택)
 - [ ] Drive 운영 메모 기반 주간 리마인더(가벼운 권유, 제출률 추적 없음)
 - [ ] (보류) 매주 금 자동 발송 / 계정 담당자 mention / 제출 현황 기록 — 강제하지 않음(D12 참고지표 강등)
