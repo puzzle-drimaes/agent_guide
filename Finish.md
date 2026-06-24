@@ -1494,12 +1494,10 @@ SDD mode: full (security/profile/adapter/validation/test/spec에 걸친 governan
   - SETUP_WIZARD 9.1 Windows 실행 섹션(Node 전제 + install.bat/Git Bash·WSL/node 직접 실행 fallback), 10절 doctor 우선 진단, 7절 복수 target 결정 명시
   - 결정: install.bat 유지(bash 없는 Windows fallback), 복수 target은 target별 명령 유지(--target all 미지원)
   - doctor ok/fail·install.sh 공백 경로 smoke test 추가
-- agent-deploy PowerShell 런처 `install.ps1` 추가
-  - install.bat과 동일 역할의 얇은 wrapper(--global scope, node 체크, doctor 안내), ECC install.ps1 패턴 차용하되 zero-dep(npm bootstrap·symlink chase 제외)
-  - `& node $cli @rest; exit $LASTEXITCODE`: PowerShell 배열 splat으로 공백 경로를 재인용 없이 자연 처리, CLI exit code 전파
-  - execution-policy/다운로드 차단 안내(`-ExecutionPolicy Bypass`, `Unblock-File`)를 스크립트 헤더·SETUP_WIZARD 9.1·README Windows 섹션에 기재
-  - package.json files·build-bundle.js BUNDLE_FILES에 추가, bundle membership 테스트에 install.ps1/install.bat 보강
-  - install.ps1 정적 내용 테스트(항상 실행) + pwsh 게이트 실행 테스트(pwsh 없으면 skip, ECC resolver 패턴) 추가
+- agent-deploy Windows 런처 정책 정리
+  - PowerShell 런처는 Windows 리허설에서 실행 정책·콘솔 인코딩 이슈가 반복되어 제거
+  - install.bat을 bash 없는 Windows fallback으로 유지하고, 필요 시 `node src\cli.js ...` 직접 실행으로 우회
+  - package.json files·build-bundle.js BUNDLE_FILES·bundle membership 테스트를 install.sh/install.bat 기준으로 정리
 - agent-deploy 자산 보안 스캔 가드 추가 (보안/공급망 6순위 1차)
   - `scripts/check-unicode-safety.js`: 자산의 invisible/bidi/Tag block(ASCII smuggling)/zero-width filler codepoint 탐지(prompt injection·homograph 차단), 선행 BOM만 허용, ECC check-unicode-safety codepoint 범위 차용
   - `scripts/check-secret-scan.js`: 고신호 credential 패턴(private key block/AWS/GitHub/Google/OpenAI/Anthropic/채팅 플랫폼 토큰) 탐지, `${ENV}` placeholder는 비매칭(허용)·`secret-scan:allow` marker로 문서 예시 opt-out

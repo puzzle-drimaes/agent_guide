@@ -681,9 +681,9 @@ install.sh는 bootstrap과 wizard 안내, 고급 사용자용 direct wrapper만 
 해야 할 일:
 
 - [x] exe packaging 제외 결정 반영
-- [x] Windows 사용자의 shell 실행 전제와 fallback 안내 작성 (SETUP_WIZARD 9.1: Node 전제 + PowerShell(install.ps1)/cmd(install.bat)/Git Bash·WSL(install.sh)/node 직접 실행)
+- [x] Windows 사용자의 shell 실행 전제와 fallback 안내 작성 (SETUP_WIZARD 9.1: Node 전제 + cmd(install.bat)/Git Bash·WSL(install.sh)/node 직접 실행)
 - [x] install.bat 유지 여부를 wrapper 관점에서 재검토 → 유지 (bash 없는 Windows fallback, 얇은 Node CLI wrapper)
-- [x] PowerShell 런처 `install.ps1` 추가 (얇은 wrapper, `@rest` splat으로 공백 경로 자연 처리, execution-policy 안내, bundle/test 연동)
+- [x] Windows 런처 정책 재정리: PowerShell 런처는 제거하고 cmd(`install.bat`) + node 직접 실행으로 단순화
 
 ### 5.2 OS 공통 zip bundle
 
@@ -930,7 +930,7 @@ docs/plans/codex/company-wide-agent-rollout/10-pilot.md
 - [x] Claude adapter 동작
 - [x] minimal/developer/product/business profile 초안
 - [x] SETUP_WIZARD.md 기반 agent setup flow 검증 (CLI 명령 실동작 확인 + 비개발자 다리/troubleshooting 보강)
-- [x] Windows 사용자의 shell 실행 전제와 fallback 안내 확인 (install.bat/install.ps1/Git Bash·WSL/node 직접 실행 fallback + doctor 안내 반영)
+- [x] Windows 사용자의 shell 실행 전제와 fallback 안내 확인 (install.bat/Git Bash·WSL/node 직접 실행 fallback + doctor 안내 반영)
 - [x] Prompt DB 초안 (docs/plans/codex/company-wide-agent-rollout/15-prompt-db-operations.md)
 - [x] 계정 9개 매핑표 초안 (05-shared-ai-accounts.md 운영/매핑표)
 

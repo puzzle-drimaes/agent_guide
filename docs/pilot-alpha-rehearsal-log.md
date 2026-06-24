@@ -366,7 +366,7 @@ Get-ExecutionPolicy
 
 ```text
 - node --version이 v18 이상이어야 한다.
-- PowerShell 실행 정책 때문에 install.ps1 실행이 막히더라도 이번 리허설은 node src\cli.js 직접 실행으로 진행할 수 있다.
+- Windows 리허설은 install.bat 또는 node src\cli.js 직접 실행으로 진행할 수 있다.
 - 테스트 프로젝트는 반드시 $env:TEMP 아래 새 폴더를 사용한다.
 ```
 

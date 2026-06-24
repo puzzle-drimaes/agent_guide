@@ -47,8 +47,15 @@ function quoteCmdArg(value) {
 
 function spawnPortable(command, args, options) {
   if (process.platform === 'win32' && /\.(cmd|bat)$/i.test(command)) {
-    const commandLine = [quoteCmdArg(command), ...args.map(quoteCmdArg)].join(' ');
-    return spawnSync('cmd.exe', ['/d', '/s', '/c', commandLine], options);
+    // cmd.exe /s strips exactly one outer quote pair, so wrap the whole
+    // already-quoted command line in an extra pair. windowsVerbatimArguments
+    // stops Node from re-escaping the inner quotes into `\"` (which cmd cannot parse).
+    const inner = [quoteCmdArg(command), ...args.map(quoteCmdArg)].join(' ');
+    const commandLine = `"${inner}"`;
+    return spawnSync('cmd.exe', ['/d', '/s', '/c', commandLine], {
+      ...options,
+      windowsVerbatimArguments: true,
+    });
   }
   return spawnSync(command, args, options);
 }
@@ -79,37 +86,37 @@ function assertAbsent(filePath) {
   if (filePath && fs.existsSync(filePath)) throw new Error(`path should not exist after dry-run: ${filePath}`);
 }
 
-function targetPaths() {
+function targetPaths(base = project) {
   if (target === 'codex') {
     return {
-      entry: path.join(project, 'AGENTS.md'),
-      state: path.join(project, '.agent-deploy', 'install-state.json'),
-      feedbackSkill: path.join(project, '.agents', 'skills', 'agent-bundle-feedback', 'SKILL.md'),
-      config: path.join(project, '.codex', 'config.toml'),
+      entry: path.join(base, 'AGENTS.md'),
+      state: path.join(base, '.agent-deploy', 'install-state.json'),
+      feedbackSkill: path.join(base, '.agents', 'skills', 'agent-bundle-feedback', 'SKILL.md'),
+      config: path.join(base, '.codex', 'config.toml'),
     };
   }
   if (target === 'gemini') {
     return {
-      entry: path.join(project, 'GEMINI.md'),
-      state: path.join(project, '.agent-deploy', 'install-state.json'),
-      feedbackSkill: path.join(project, '.gemini', 'skills', 'agent-bundle-feedback', 'SKILL.md'),
+      entry: path.join(base, 'GEMINI.md'),
+      state: path.join(base, '.agent-deploy', 'install-state.json'),
+      feedbackSkill: path.join(base, '.gemini', 'skills', 'agent-bundle-feedback', 'SKILL.md'),
       config: null,
     };
   }
   if (target === 'claude') {
     return {
       entry: null,
-      state: path.join(project, '.claude', 'agent-install-state.json'),
-      feedbackSkill: path.join(project, '.claude', 'skills', 'agent-bundle-feedback', 'SKILL.md'),
-      config: path.join(project, '.mcp.json'),
+      state: path.join(base, '.claude', 'agent-install-state.json'),
+      feedbackSkill: path.join(base, '.claude', 'skills', 'agent-bundle-feedback', 'SKILL.md'),
+      config: path.join(base, '.mcp.json'),
     };
   }
   if (target === 'cursor') {
     return {
       entry: null,
-      state: path.join(project, '.cursor', 'agent-install-state.json'),
-      feedbackSkill: path.join(project, '.cursor', 'skills', 'agent-bundle-feedback', 'SKILL.md'),
-      config: path.join(project, '.cursor', 'mcp.json'),
+      state: path.join(base, '.cursor', 'agent-install-state.json'),
+      feedbackSkill: path.join(base, '.cursor', 'skills', 'agent-bundle-feedback', 'SKILL.md'),
+      config: path.join(base, '.cursor', 'mcp.json'),
     };
   }
   throw new Error(`unsupported TARGET: ${target}`);
@@ -184,6 +191,39 @@ try {
   run('repair dry-run', nodeCommand, [cliJs, 'repair', '--target', target, '--profile', profile, '--scope', scope, '--project', project, '--dry-run']);
   run('uninstall dry-run', nodeCommand, [cliJs, 'uninstall', '--target', target, '--profile', profile, '--scope', scope, '--project', project, '--dry-run']);
   assertExists(paths.state);
+
+  // install.bat smoke: the cli.js steps above never touch the shipped Windows
+  // entry point, so exercise it directly. install.bat uses %CD% as the project
+  // root, so run it from a path WITH SPACES — the most common Windows quoting
+  // failure point — and confirm the bundle lands in that exact path.
+  const installBat = path.join(deployDir, 'install.bat');
+  if (process.platform !== 'win32') {
+    log('');
+    log('install.bat smoke skipped: not win32');
+  } else if (scope !== 'project') {
+    log('');
+    log('install.bat smoke skipped: scope is not project (avoids writing outside the test project)');
+  } else if (!fs.existsSync(installBat)) {
+    log('');
+    log(`install.bat smoke skipped: not found at ${installBat}`);
+  } else {
+    const spaceProject = path.join(os.tmpdir(), `agent bundle install-bat ${timestamp}`);
+    fs.mkdirSync(spaceProject, { recursive: true });
+    const sp = targetPaths(spaceProject);
+    run('install.bat apply (spaces path)', installBat, ['--target', target, '--profile', profile], { cwd: spaceProject });
+    if (sp.entry) assertExists(sp.entry);
+    assertExists(sp.state);
+    assertExists(sp.feedbackSkill);
+    if (sp.config) assertExists(sp.config);
+    run('install.bat uninstall dry-run (spaces path)', nodeCommand, [cliJs, 'uninstall', '--target', target, '--profile', profile, '--scope', scope, '--project', spaceProject, '--dry-run']);
+    assertExists(sp.state);
+    if (!keepProject && path.basename(spaceProject).startsWith('agent bundle install-bat')) {
+      fs.rmSync(spaceProject, { recursive: true, force: true });
+      log('install.bat smoke project cleanup: removed');
+    } else {
+      log(`install.bat smoke project: kept at ${spaceProject}`);
+    }
+  }
 
   log('');
   log('Generated files sample:');

@@ -17,7 +17,12 @@ The default scenario is `codex` + `developer` + `project` scope.
 8. update --dry-run
 9. repair --dry-run
 10. uninstall --dry-run
+11. install.bat smoke on a path with spaces (Windows `.bat` runner only)
 ```
+
+Step 11 runs only on Windows project scope: it invokes the shipped `install.bat`
+from a temp directory whose name contains spaces and confirms the bundle lands in
+that exact path, covering `install.bat`'s own cmd quoting (the cli.js steps do not).
 
 Logs are written to `tests/results/` and ignored by git. Windows `.bat` logs use `dist-test-windows-*.log`.
 
@@ -87,7 +92,8 @@ Required:
 - Confirm uninstall --dry-run prints would-revert / would-delete and does not delete files.
 ```
 
-Also check at least one path with spaces, because Windows path quoting is a common failure point.
+A path-with-spaces case is now covered automatically by step 11 (it runs `install.bat`
+from a spaces directory). To additionally exercise the cli.js path with spaces, run:
 
 ```bat
 set PROJECT=%TEMP%\agent bundle dist test
