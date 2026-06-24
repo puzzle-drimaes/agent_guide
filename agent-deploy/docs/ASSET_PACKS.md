@@ -46,7 +46,7 @@ my-pack/
 Contributors do not need to create a full pack first; they can drop shared `*.md` files here:
 
 ```text
-<repo>/.agent-packs/externals/
+<repo>/.agents/externals/
   skills/
     my-review-skill.md        # or my-review-skill/SKILL.md
   docs/
@@ -99,7 +99,7 @@ The decision should be written to pack provenance, for example:
 {
   "conflictResolutions": [
     {
-      "proposed": ".agent-packs/externals/docs/onboarding-checklist.md",
+      "proposed": ".agents/externals/docs/onboarding-checklist.md",
       "conflictsWith": ".agents/shared/team/onboarding-checklist.md",
       "decision": "add-namespaced",
       "decidedBy": "user",
@@ -255,7 +255,7 @@ Required fields:
 
 ```json
 {
-  "proposed": ".agent-packs/externals/docs/onboarding-checklist.md",
+  "proposed": ".agents/externals/docs/onboarding-checklist.md",
   "conflictsWith": ".agents/shared/team/onboarding-checklist.md",
   "decision": "add-namespaced",
   "decidedBy": "platform-team",
@@ -272,7 +272,7 @@ The same record shape can be passed to `--conflict-resolution` after review:
 {
   "conflictResolutions": [
     {
-      "proposed": ".agent-packs/externals/docs/onboarding-checklist.md",
+      "proposed": ".agents/externals/docs/onboarding-checklist.md",
       "conflictsWith": ".agents/shared/team/onboarding-checklist.md",
       "decision": "add-namespaced",
       "decidedBy": "platform-team",
@@ -360,7 +360,7 @@ Install-state pack provenance includes:
 
 ```text
 agent-deploy pack validate --pack ./packs/frontend
-agent-deploy pack inspect --externals ./.agent-packs/externals
+agent-deploy pack inspect --externals ./.agents/externals
 agent-deploy plan  --target codex --profile developer --pack ./packs/frontend --modules frontend-team-pack-review-checklist
 agent-deploy apply --target codex --profile developer --pack ./packs/frontend --dry-run
 agent-deploy plan  --target codex --profile developer --pack ./packs/frontend --enable-pack-extensions
@@ -373,7 +373,7 @@ Implemented validation-only commands:
 
 ```text
 node scripts/check-pack.js --pack ./packs/frontend
-node scripts/check-pack.js --externals ./.agent-packs/externals
+node scripts/check-pack.js --externals ./.agents/externals
 ```
 
 These commands are read-only. They validate pack structure, module/profile references,

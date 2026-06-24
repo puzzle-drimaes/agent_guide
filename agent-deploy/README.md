@@ -205,7 +205,7 @@ assets/catalog.draft.json
 
 ```text
 1. Import
-   외부에서 받은 *.md를 <repo>/.agent-packs/externals/ 아래에 둔다.
+   외부에서 받은 *.md를 <repo>/.agents/externals/ 아래에 둔다.
 
 2. Inspect / classify
    agent가 prompt/template/skill/doc 중 asset type을 제안하고 frontmatter 초안을 만든다.
@@ -235,7 +235,7 @@ Lifecycle별 책임:
 
 | 단계 | 관리 위치 | 의미 | 기존 rule/doc 영향 |
 |---|---|---|---|
-| 제안 | `.agent-packs/externals/` | 외부에서 가져온 모든 Markdown 후보 | 없음 |
+| 제안 | `.agents/externals/` | 외부에서 가져온 모든 Markdown 후보 | 없음 |
 | 적용 | `<target>/shared/<pack-id>/` | 프로젝트에서 agent가 참고하는 shared asset | 직접 덮어쓰기 없음 |
 | 승격 | `agent-deploy/assets/` + `manifests/` + `catalog` | 회사/팀이 승인한 canonical asset | 리뷰 후 반영 |
 

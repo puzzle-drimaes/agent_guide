@@ -394,6 +394,30 @@
         <tr><td class="role">잘 모르겠음</td><td><span class="chip mn">minimal</span></td><td>회사 공통 AI 사용 규칙(보안 · 출처)만 가볍게</td></tr>
       </tbody>
     </table>
+
+    <!-- advanced: direct CLI (formerly install.sh / install.bat) -->
+    <h3>개발자용 — 직접 명령으로 설치하기</h3>
+    <p style="margin-top:4px">터미널이 익숙하다면 AI를 거치지 않고 <code>node</code> 명령으로 바로 설치할 수 있습니다.
+      예전 <code>install.sh</code> · <code>install.bat</code> 런처가 하던 일과 같습니다. (전제: Node.js LTS ≥ 18)
+      압축을 푼 <code>company-agent-kit</code> 폴더 안에서 실행하고, <code>--project</code>에는 설정을 설치할 실제 프로젝트 경로를 적습니다.</p>
+    <div class="cmd"><span class="c"># 무엇을 설치할 수 있는지 보기 / 환경·번들 진단</span>
+node src/cli.js list
+node src/cli.js doctor --project /path/to/repo
+
+<span class="c"># 미리보기(dry-run) — 실제로는 아무 파일도 쓰지 않고 생길 목록만 보여줌</span>
+node src/cli.js apply --target codex --profile developer --project /path/to/repo --dry-run
+
+<span class="c"># 설치(apply) — 바뀌는 기존 파일은 --backup 으로 사본 보관</span>
+node src/cli.js apply --target codex --profile developer --project /path/to/repo --backup
+
+<span class="c"># 사용자 전역(home/global) 설치 — 모든 프로젝트에서 공유</span>
+node src/cli.js apply --target claude --profile developer --scope home</div>
+    <p style="color:#64748b;font-size:14px">이미 agent 설정이 있는 프로젝트라면 기존 설정을 우선하는 병합 모드를 추천합니다:
+      <code>--conflict-policy preserve-existing --backup</code>.</p>
+    <p style="color:#64748b;font-size:14px">Windows에서는 경로 표기만 cmd 규칙으로 바꾸면 됩니다:
+      <code>node src\cli.js apply --target codex --profile developer --project "%CD%" --dry-run</code>.
+      경로에 공백이 있으면 <code>"C:\My Projects\repo"</code>처럼 큰따옴표로 감쌉니다.
+      더 자세한 내용은 <code>SETUP_WIZARD.md</code> 9장을 참고하세요.</p>
   </section>
 
   <!-- ============ 3. 꼭 지킬 것 ============ -->

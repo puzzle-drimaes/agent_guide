@@ -38,7 +38,7 @@ Mitigation: v1 packs are declarative only; install-time hooks/scripts/postinstal
 
 ### R6. Drop-in files overwrite existing rules or docs
 
-Mitigation: `.agent-packs/externals/` is a candidate area only. Proposed files install under target-specific
+Mitigation: `.agents/externals/` is a candidate area only. Proposed files install under target-specific
 `shared/<pack-id>/` by default. Canonical rule replacement is blocked unless a separate approved rule-change
 workflow is used.
 
@@ -61,7 +61,7 @@ keeps external packs read-only and declarative, and blocks automatic default-pro
 
 - `schemas/asset-pack.schema.json` now captures the required `pack.json` shape, including `packType`, `id`, `version`, `owner`, and `reviewStatus`.
 - `src/packs/pack-validator.js` validates pack structure, module/profile references, path safety, reused asset metadata checks, catalog parity, and base-bundle conflicts.
-- `src/packs/externals-scanner.js` treats `.agent-packs/externals/` style folders as read-only candidate metadata sources.
+- `src/packs/externals-scanner.js` treats `.agents/externals/` style folders as read-only candidate metadata sources.
 - `src/packs/conflicts.js` detects module/profile/asset/destination collisions and exposes the required user decision choices.
 - Smoke fixtures cover a valid pack, missing `pack.json`, path escape, id collision, and externals Markdown scanning.
 

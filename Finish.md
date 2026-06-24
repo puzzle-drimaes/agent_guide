@@ -9,6 +9,15 @@
 
 ## 0. 최근 운영 반영
 
+### 0.19 외부 Markdown 후보 검역 경로를 `.agents/externals/`로 이동
+
+반영일: 2026-06-24
+
+- [x] 공유 Drive/GitHub 등에서 받은 외부 `.md` 후보의 기본 검역 경로를 `.agent-packs/externals/`에서 `.agents/externals/`로 변경.
+- [x] `.agents/externals/{skills,prompts,docs}/` 기본 폴더를 추가하고, 실제 후보 콘텐츠는 검토 전 커밋되지 않도록 `.gitignore`에 보호 규칙 추가.
+- [x] SETUP_WIZARD, README, SHARED_FOLDER_GUIDE, ASSET_PACKS, external-shared-asset-packs spec의 경로 예시를 `.agents/externals/` 기준으로 갱신.
+- [x] externals scanner의 candidate target 목록에 Kiro를 포함해 현재 지원 target과 맞춤.
+
 ### 0.18 Kiro target adapter 및 setup wizard 반영
 
 반영일: 2026-06-24
@@ -24,7 +33,7 @@
 반영일: 2026-06-24
 
 - [x] Google Drive MCP/커넥터가 정상 동작할 때는 큰 `.md`를 base64 문자열이나 대화창 텍스트로 옮기지 않고, 파일을 원형 그대로 직접 다운로드하도록 `SETUP_WIZARD.md` 흐름을 수정.
-- [x] 다운로드한 `.md`는 `.agent-packs/externals/` 검역 위치에 둔 뒤 로컬 파일에서 credential/customer data/민감정보/출처 누락을 검사하는 방식을 기본 추천으로 정리.
+- [x] 다운로드한 `.md`는 `.agents/externals/` 검역 위치에 둔 뒤 로컬 파일에서 credential/customer data/민감정보/출처 누락을 검사하는 방식을 기본 추천으로 정리.
 - [x] `SHARED_FOLDER_GUIDE.md`에도 같은 기준을 반영해 쓰는 쪽 flow와 연결 확인 요청 예시를 "직접 다운로드 후 로컬 보안검사" 중심으로 갱신.
 - [x] 기존에 있던 `agent-deploy/INSTALL_GUIDE.html` 변경은 이번 작업 범위에 포함하지 않고, 커밋/릴리즈 산출물에서도 제외.
 
@@ -50,7 +59,7 @@
 
 반영일: 2026-06-24
 
-- [x] `SETUP_WIZARD.md`에 `.agent-packs/externals/skills|prompts`가 비어 있을 때 Google Drive `AI-Knowhow`에서 공유 `.md`를 가져올지 묻는 Q&A flow 추가.
+- [x] `SETUP_WIZARD.md`에 `.agents/externals/skills|prompts`가 비어 있을 때 Google Drive `AI-Knowhow`에서 공유 `.md`를 가져올지 묻는 Q&A flow 추가.
 - [x] agent가 직접 Drive에서 가져오려면 Google Drive MCP/커넥터 연결과 공유 드라이브 권한이 필요함을 안내하고, 연결이 없으면 Drive 웹 다운로드 fallback으로 안내하도록 정리.
 - [x] 공유 `.md`를 받을 때 `보안 검사 후 받기(추천)`와 `원본 그대로 받기` 선택지를 추가하고, 원본도 canonical에 바로 적용하지 않고 externals 검역 구역에만 두도록 명시.
 - [x] `SHARED_FOLDER_GUIDE.md`에도 동일한 가져오기/연동/보안검사 기준을 연결해 사용자·운영자 문서 간 흐름을 맞춤.

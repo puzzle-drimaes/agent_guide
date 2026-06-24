@@ -250,7 +250,7 @@ docs/specs/external-shared-asset-packs/
    - `schemas/asset-pack.schema.json`
    - `scripts/check-pack.js`
    - pack root 구조/module/profile/path/conflict 검증
-   - `.agent-packs/externals/` Markdown scanner
+   - `.agents/externals/` Markdown scanner
    - fixture + smoke test
 7. [x] asset pack Phase 2 planner/apply 1차 통합
    - CLI `--pack DIR[,DIR]`

@@ -2,7 +2,7 @@
 // Asset pack validation entry point.
 //
 // This is intentionally read-only: it validates a pack root or scans
-// .agent-packs/externals/ into draft candidate metadata without writing files.
+// .agents/externals/ into draft candidate metadata without writing files.
 import { pathToFileURL } from 'node:url';
 import { scanExternals } from '../src/packs/externals-scanner.js';
 import { validatePackRoot } from '../src/packs/pack-validator.js';

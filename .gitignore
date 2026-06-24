@@ -14,3 +14,9 @@
 # Distribution test outputs (local manager-run logs; scripts are tracked)
 tests/results/*
 !tests/results/.gitignore
+
+# Local external Markdown candidates. Keep quarantine folders but do not commit
+# downloaded/shared candidate content before review and promotion.
+.agents/externals/**
+!.agents/externals/**/
+!.agents/externals/**/.gitkeep

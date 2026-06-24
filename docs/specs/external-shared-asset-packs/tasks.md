@@ -12,7 +12,7 @@
 
 - [x] Add `schemas/asset-pack.schema.json`.
 - [x] Add `scripts/check-pack.js` for a single pack root.
-- [x] Add `.agent-packs/externals/` Markdown scanner for drop-in skill/doc proposals.
+- [x] Add `.agents/externals/` Markdown scanner for drop-in skill/doc proposals.
 - [x] Generate candidate pack metadata from externals Markdown files without modifying source files.
 - [x] Detect conflicts with existing docs/rules/assets and present user decision options.
 - [x] Reuse asset frontmatter and catalog parity validators for pack asset roots.

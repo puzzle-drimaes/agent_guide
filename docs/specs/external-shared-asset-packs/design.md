@@ -46,7 +46,7 @@ my-pack/
 agent가 `externals`를 candidate pack으로 해석한다.
 
 ```text
-<repo>/.agent-packs/externals/
+<repo>/.agents/externals/
   skills/
     my-review-skill.md
     my-workflow/SKILL.md
@@ -186,7 +186,7 @@ Resolution provenance:
 {
   "conflictResolutions": [
     {
-      "proposed": ".agent-packs/externals/docs/onboarding-checklist.md",
+      "proposed": ".agents/externals/docs/onboarding-checklist.md",
       "conflictsWith": ".agents/shared/team/onboarding-checklist.md",
       "decision": "add-namespaced",
       "decidedBy": "user",
@@ -210,7 +210,7 @@ a `conflictResolutions` array. Each record uses the same fields and may include 
 ```text
 agent-deploy pack inspect --pack ./packs/frontend
 agent-deploy pack validate --pack ./packs/frontend
-agent-deploy pack inspect --externals ./.agent-packs/externals
+agent-deploy pack inspect --externals ./.agents/externals
 agent-deploy plan  --target codex --profile developer --pack ./packs/frontend --modules frontend-team-pack-review-checklist
 agent-deploy apply --target codex --profile developer --pack ./packs/frontend --dry-run
 agent-deploy apply --target codex --profile developer --pack ./packs/frontend --conflict-resolution ./conflicts.reviewed.json

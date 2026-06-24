@@ -147,7 +147,7 @@ evidence-first verification
 아래 격리 폴더에서 관리합니다.
 
 ```text
-<repo>/.agent-packs/externals/
+<repo>/.agents/externals/
   skills/
   docs/
   prompts/
@@ -157,7 +157,7 @@ evidence-first verification
 
 ```text
 1. Import
-   → 외부에서 받은 *.md를 .agent-packs/externals/ 아래에 둔다.
+   → 외부에서 받은 *.md를 .agents/externals/ 아래에 둔다.
 
 2. Inspect / classify
    → agent가 prompt/template/skill/doc 중 asset type을 제안한다.

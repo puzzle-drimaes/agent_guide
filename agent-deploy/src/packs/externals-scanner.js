@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { assertPackTreeSafe, normalizeRel, slugify, walkMarkdown } from './path-utils.js';
 
-const TARGETS = ['claude', 'cursor', 'codex', 'gemini'];
+const TARGETS = ['claude', 'cursor', 'codex', 'gemini', 'kiro'];
 
 function classifyExternal(rel) {
   const [category] = rel.split('/');

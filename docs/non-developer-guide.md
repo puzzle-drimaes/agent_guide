@@ -66,7 +66,7 @@
      prompts: https://drive.google.com/drive/folders/1Cv104mmGpw9fqNQfuAttr_LfQl8Hxqee
 2. 필요한 .md를 선택해 내려받는다.
 3. AI 대화창에 내용을 붙여넣고 내 상황에 맞게 쓴다.
-   (개발 프로젝트가 있으면 .agent-packs/externals/ 에 넣고 AI에게 "배치해줘"라고 요청 —
+   (개발 프로젝트가 있으면 .agents/externals/ 에 넣고 AI에게 "배치해줘"라고 요청 —
     자세히는 agent-deploy/docs/SHARED_FOLDER_GUIDE.md)
 ```
 

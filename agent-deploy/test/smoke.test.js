@@ -1573,7 +1573,7 @@ test('conflict resolution file is recorded in install-state provenance', () => {
     JSON.stringify({
       conflictResolutions: [
         {
-          proposed: '.agent-packs/externals/docs/onboarding-checklist.md',
+          proposed: '.agents/externals/docs/onboarding-checklist.md',
           conflictsWith: '.agents/shared/team/onboarding-checklist.md',
           decision: 'add-namespaced',
           decidedBy: 'platform-team',
@@ -1599,7 +1599,7 @@ test('conflict resolution file is recorded in install-state provenance', () => {
   const state = JSON.parse(fs.readFileSync(path.join(project, '.claude/agent-install-state.json'), 'utf8'));
   assert.deepEqual(state.source.conflictResolutions, [
     {
-      proposed: '.agent-packs/externals/docs/onboarding-checklist.md',
+      proposed: '.agents/externals/docs/onboarding-checklist.md',
       conflictsWith: '.agents/shared/team/onboarding-checklist.md',
       decision: 'add-namespaced',
       decidedBy: 'platform-team',
