@@ -18,6 +18,8 @@ import { applyRepair, buildRepairDryRun } from './repair.js';
 import { applyUninstall, buildUninstallDryRun } from './uninstall.js';
 import { runDoctor } from './doctor.js';
 
+const KNOWLEDGE_SHARING_NEXT_STEP = 'Before closing the setup conversation, ask whether to fetch shared prompts/skills from Google Drive AI-Knowhow (SETUP_WIZARD.md section 11).';
+
 function parseArgs(argv) {
   const args = { _: [] };
   for (let i = 0; i < argv.length; i += 1) {
@@ -333,6 +335,7 @@ function main() {
           applied: true,
           operations: result.operations,
           statePath: result.statePath,
+          nextStep: KNOWLEDGE_SHARING_NEXT_STEP,
           backup: {
             enabled: result.backup.enabled,
             root: result.backup.root,
@@ -350,6 +353,7 @@ function main() {
         if (result.backup.enabled) {
           console.log(`backup: ${path.relative(plan.baseRoot, result.backup.root)} (${result.backup.entries.length} file(s))`);
         }
+        console.log(`next: ${KNOWLEDGE_SHARING_NEXT_STEP}`);
       }
       return;
     }

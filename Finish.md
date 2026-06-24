@@ -10,6 +10,23 @@
 ## 0. 최근 운영 반영
 
 
+### 0.17 Drive `.md` 수신 기본 경로를 직접 다운로드 + 로컬 보안검사로 정리
+
+반영일: 2026-06-24
+
+- [x] Google Drive MCP/커넥터가 정상 동작할 때는 큰 `.md`를 base64 문자열이나 대화창 텍스트로 옮기지 않고, 파일을 원형 그대로 직접 다운로드하도록 `SETUP_WIZARD.md` 흐름을 수정.
+- [x] 다운로드한 `.md`는 `.agent-packs/externals/` 검역 위치에 둔 뒤 로컬 파일에서 credential/customer data/민감정보/출처 누락을 검사하는 방식을 기본 추천으로 정리.
+- [x] `SHARED_FOLDER_GUIDE.md`에도 같은 기준을 반영해 쓰는 쪽 flow와 연결 확인 요청 예시를 "직접 다운로드 후 로컬 보안검사" 중심으로 갱신.
+
+### 0.16 apply 후 지식공유 handoff 및 release bundle 재생성
+
+반영일: 2026-06-24
+
+- [x] `agent-deploy` CLI의 `apply` 성공 출력에 Google Drive `AI-Knowhow` 공유 prompts/skills 수신 여부를 묻는 다음 단계 안내를 추가.
+- [x] `apply --json` 결과에도 같은 handoff 메시지를 `nextStep`으로 포함해 자동화가 stdout JSON 유효성을 유지하면서 후속 안내를 확인할 수 있게 정리.
+- [x] `SETUP_WIZARD.md`의 install.sh 역할 설명을 "설치 명령 생성 + apply 후 지식공유 Q&A 연결" 범위로 정정해 11장 마무리 Q&A와 충돌하지 않게 정리.
+- [x] 최신 `SETUP_WIZARD.md`와 CLI 변경이 들어가도록 `release/` bundle 재생성 및 zip 내부 section 11 포함 여부 확인.
+
 ### 0.15 README/운영 문서 현재 상태 최신화
 
 반영일: 2026-06-24

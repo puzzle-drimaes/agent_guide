@@ -439,6 +439,18 @@ test('apply --json emits a valid JSON result on stdout', () => {
   const parsed = JSON.parse(out);
   assert.equal(parsed.applied, true);
   assert.ok(parsed.operations >= 1);
+  assert.match(parsed.nextStep, /AI-Knowhow/);
+});
+
+test('apply prints the knowledge-sharing next step for setup wizard handoff', () => {
+  const project = tmpProject();
+  const out = execFileSync('node', [
+    CLI, 'apply',
+    '--target', 'claude', '--profile', 'minimal', '--project', project,
+  ], { encoding: 'utf8' });
+  assert.match(out, /applied/);
+  assert.match(out, /next: .*AI-Knowhow/);
+  assert.match(out, /SETUP_WIZARD\.md section 11/);
 });
 
 test('update --dry-run --json reads install-state and reports possible user modifications', () => {
