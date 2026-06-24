@@ -41,15 +41,28 @@ function resolveCommand(candidates) {
   return null;
 }
 
+function quoteCmdArg(value) {
+  return `"${String(value).replace(/"/g, '\\"')}"`;
+}
+
+function spawnPortable(command, args, options) {
+  if (process.platform === 'win32' && /\.(cmd|bat)$/i.test(command)) {
+    const commandLine = [quoteCmdArg(command), ...args.map(quoteCmdArg)].join(' ');
+    return spawnSync('cmd.exe', ['/d', '/s', '/c', commandLine], options);
+  }
+  return spawnSync(command, args, options);
+}
+
 function run(label, command, args, options = {}) {
   log('');
   log(`==> ${label}`);
-  const result = spawnSync(command, args, {
+  const spawnOptions = {
     cwd: options.cwd || repoRoot,
     encoding: 'utf8',
     shell: false,
     env: { ...process.env, FORCE_COLOR: '0' },
-  });
+  };
+  const result = spawnPortable(command, args, spawnOptions);
   if (result.stdout) fs.appendFileSync(logFile, result.stdout);
   if (result.stderr) fs.appendFileSync(logFile, result.stderr);
   if (result.stdout) process.stdout.write(result.stdout);
