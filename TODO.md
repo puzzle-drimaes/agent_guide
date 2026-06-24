@@ -931,6 +931,7 @@ docs/plans/codex/company-wide-agent-rollout/10-pilot.md
 - [x] minimal/developer/product/business profile 초안
 - [x] SETUP_WIZARD.md 기반 agent setup flow 검증 (CLI 명령 실동작 확인 + 비개발자 다리/troubleshooting 보강)
 - [x] Windows 사용자의 shell 실행 전제와 fallback 안내 확인 (install.bat/Git Bash·WSL/node 직접 실행 fallback + doctor 안내 반영)
+- [x] 운영자 알파 리허설 통과 (Linux/Codex/developer + Windows Command Prompt; doctor~uninstall dry-run 및 install.bat/install.sh smoke — docs/pilot-alpha-rehearsal-log.md)
 - [x] Prompt DB 초안 (docs/plans/codex/company-wide-agent-rollout/15-prompt-db-operations.md)
 - [x] 계정 9개 매핑표 초안 (05-shared-ai-accounts.md 운영/매핑표)
 

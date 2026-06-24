@@ -8,7 +8,7 @@
 
 기준 문서: [`docs/pilot-runbook.md`](pilot-runbook.md) 4장 "운영자 알파 리허설"
 
-이번 기록은 현재 작업 환경에서 실행 가능한 Linux / Codex / developer profile 경로를 우선 확인한 결과다. Windows PowerShell 리허설은 별도 Windows 운영자 환경에서 같은 절차로 추가 기록한다.
+이번 기록은 Linux / Codex / developer profile 경로(3~8장)와 Windows(Command Prompt) 경로(10장)를 모두 확인한 결과다. Windows는 PowerShell wrapper 대신 `tests\dist_test.bat`(Command Prompt) 자동 리허설로 검증했다.
 
 ```text
 목표 경로:
@@ -320,13 +320,13 @@ apply 후 확인된 주요 파일:
 - Linux / Codex / developer / project scope 기준 운영자 알파 리허설은 통과했다.
 - sandboxed test runner에서는 child_process spawn 제약으로 npm test가 실패할 수 있다.
 - 이 경우 운영자 검증 로그에는 sandbox 제약 여부와 승인 실행 결과를 함께 남긴다.
-- Windows PowerShell 리허설은 현재 환경에서 실행하지 못했으므로 별도 기록이 필요하다.
+- Windows(Command Prompt) 리허설은 2026-06-24 `tests\dist_test.bat` 자동 실행으로 통과했다(10장 참조). 초기 install.bat LF 줄바꿈 이슈는 CRLF 전환으로 해결했다.
 ```
 
 ### 7.2 후속 조치
 
 ```text
-1. Windows 운영자 환경에서 docs/pilot-runbook.md 4.3 명령을 실행하고 이 문서에 결과를 추가한다.
+1. (완료) Windows 환경에서 `tests\dist_test.bat`로 doctor~uninstall dry-run 및 install.bat smoke를 실행하고 결과를 10장에 기록했다.
 2. 전사 베타 공지 전 배포 bundle 경로와 담당자/문의 경로를 docs/pilot-runbook.md 5장 공지문에 채운다.
 3. 실패 사례가 나오면 Google Drive AI-Knowhow/feedback/ 형식의 .md로 별도 남긴다.
 ```
@@ -334,15 +334,18 @@ apply 후 확인된 주요 파일:
 ## 8. 최종 판정
 
 ```text
-판정: 조건부 통과
+판정: 통과
 
-Linux / Codex / developer / project scope 리허설은 통과했다.
-전사 베타 공지 전 Windows PowerShell 리허설 결과만 추가 확인하면 된다.
+Linux / Codex / developer / project scope 리허설과 Windows(Command Prompt) 리허설이 모두 통과했다.
+Windows는 `tests\dist_test.bat` 자동 리허설(10장)로 doctor~uninstall dry-run 및 install.bat smoke를 확인했다.
+전사 베타 공지 전 docs/pilot-runbook.md 5장 공지문(배포 경로/담당자)만 채우면 된다.
 ```
 
 ## 9. Windows 테스트 방법
 
-Windows 운영자는 아래 절차를 PowerShell에서 실행하고, 결과를 이 문서의 `10. Windows 리허설 결과` 섹션에 추가한다.
+권장(자동): Command Prompt에서 `tests\dist_test.bat`를 실행하면 doctor~uninstall dry-run과 install.bat smoke까지 한 번에 검증되고 `tests\results\dist-test-windows-*.log`가 남는다. 10장 결과는 이 경로로 기록되었다.
+
+아래 9.1~9.8은 개별 CLI를 수동으로 확인할 때 쓰는 fallback 절차다. PowerShell test wrapper는 execution-policy/console-encoding 이슈로 제거되었으므로 명령은 Command Prompt에서 실행하는 것을 권장한다.
 
 ### 9.1 준비물
 
@@ -521,32 +524,56 @@ Write-Output $PROJECT
 
 ## 10. Windows 리허설 결과
 
-아직 미실행.
+실행 방식: Command Prompt에서 `tests\dist_test.bat` 자동 리허설.
 
-Windows 운영자가 실행 후 아래 템플릿으로 갱신한다.
-
-```text
-실행일:
-Windows 버전:
-PowerShell 버전:
-Node.js:
-agent-deploy 위치:
-테스트 프로젝트:
+| 항목 | 값 |
+|---|---|
+| 실행일 | 2026-06-24 |
+| OS / Shell | Windows / Command Prompt (cmd.exe) |
+| Node.js | v26.3.1 |
+| npm | 11.16.0 (`C:\Program Files\nodejs\npm.cmd`) |
+| repo | `C:\works\repo\agent_guide` |
+| agent-deploy | `C:\works\repo\agent_guide\agent-deploy` |
+| target / profile / scope | codex / developer / project |
+| 테스트 프로젝트 | `%TEMP%\agent-bundle-dist-test-20260624043426` |
+| install.bat smoke 프로젝트 | `%TEMP%\agent bundle install-bat 20260624043426` (공백 포함 경로) |
+| 로그 | `tests\results\dist-test-windows-20260624043426.log` |
 
 사전 검증:
-- npm run validate:
-- npm test:
+
+```text
+- npm run validate: 통과
+- npm test: 생략 (DIST_TEST_RUN_NPM_TEST=0, 배포 경로 점검만 수행)
+```
 
 리허설 결과:
-- doctor before apply:
-- apply --dry-run:
-- apply --backup:
-- doctor after apply:
-- update --dry-run:
-- repair --dry-run:
-- uninstall --dry-run:
 
-최종 판정:
+```text
+- doctor before apply: 통과 (모든 점검 통과)
+- apply --dry-run: 통과 (29 operation(s), 실제 쓰기 없음)
+- apply --backup: 통과 (applied 29 operation(s), install-state 생성)
+- doctor after apply: 통과
+- update --dry-run: 통과 (unchanged 28, skip-record 1)
+- repair --dry-run: 통과 (present 28)
+- uninstall --dry-run: 통과 (would-revert 2, would-delete 26, 실제 삭제 없음)
+- install.bat smoke (공백 경로): 통과 (-> 프로젝트 설치 정상, applied 29 operation(s))
+```
+
+최종 판정: 통과 (DIST TEST PASS)
+
 발견 사항:
+
+```text
+- 초기에 install.bat이 LF 줄바꿈 + goto/label 조합으로 cmd 파서가 깨져 설치가 실패했다.
+  (set "DIR=%~dp0"가 손상되어 cli.js를 cwd 기준으로 잘못 탐색 → Cannot find module)
+- install.bat을 CRLF로 전환하고 chcp 65001을 추가해 해결했으며,
+  .gitattributes(*.bat eol=crlf)로 재발을 방지했다.
+- 공백이 포함된 프로젝트 경로(%TEMP%\agent bundle install-bat ...)에서도 정상 설치됨을 확인했다.
+```
+
 후속 조치:
+
+```text
+- 배포 번들은 CRLF install.bat을 포함한다 (`npm run bundle` 재생성, zip 내부 CRLF 확인 완료).
+- Git Bash 경로는 tests/dist_test.sh의 install.sh smoke로 별도 통과 확인했다 (dist-test-windows-gitbash-20260624-043406.log).
 ```

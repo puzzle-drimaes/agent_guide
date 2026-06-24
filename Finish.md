@@ -1355,6 +1355,42 @@ SDD mode: full (security/profile/adapter/validation/test/spec에 걸친 governan
 
 ---
 
+### 4.26 Windows install.bat 줄바꿈 수정 및 운영자 알파 리허설 완료
+
+반영일: 2026-06-24
+
+대상 파일:
+
+```text
+agent-deploy/install.bat
+.gitattributes
+tests/dist_test_windows.js
+tests/dist_test.sh
+tests/README.md
+docs/pilot-alpha-rehearsal-log.md
+```
+
+구현 내용:
+
+- [x] install.bat이 LF 줄바꿈 + goto/label 조합에서 cmd 파서가 깨져 Windows 설치가 실패하던 문제 수정 (CRLF 전환 + `chcp 65001`). LF 상태에서는 `set "DIR=%~dp0"`가 손상돼 cli.js를 cwd 기준으로 잘못 탐색했다.
+- [x] `.gitattributes` 추가: `*.bat`/`*.cmd`는 `eol=crlf` 강제, `*.sh`는 `eol=lf` 유지(재발 방지, 체크아웃 시 자동 적용).
+- [x] dist 테스트에 installer 진입점 smoke 추가: `dist_test_windows.js`는 공백 경로에서 install.bat을, `dist_test.sh`는 install.sh를 직접 실행해 번들이 해당 경로에 설치되는지 검증(기존에는 cli.js만 직접 호출해 진입점 자체는 미검증).
+- [x] 운영자 알파 리허설을 Windows(Command Prompt)에서 `tests\dist_test.bat`로 실행하고 결과를 `docs/pilot-alpha-rehearsal-log.md` 10장에 기록(최종 판정: 통과).
+- [x] 배포 번들을 재생성하고 zip 내부 install.bat이 CRLF + chcp 상태인지 확인.
+
+검증 결과:
+
+```text
+Windows(cmd):  tests\dist_test.bat  → DIST TEST PASS (install.bat smoke 포함, 공백 경로 설치 정상)
+Git Bash:      tests/dist_test.sh   → DIST TEST PASS (install.sh smoke 포함)
+Linux:         tests/dist_test.sh   → DIST TEST PASS
+번들:          npm run bundle → zip 내부 company-agent-kit/install.bat CRLF=44 + chcp 확인
+```
+
+SDD mode: lite (Windows 줄바꿈/인코딩 버그 수정 + 진입점 smoke 보강 + 리허설 기록).
+
+---
+
 ## 5. 아직 완료가 아닌 것
 
 다음은 아직 완료되지 않았다. 자세한 순서는 `TODO.md` 참고.
