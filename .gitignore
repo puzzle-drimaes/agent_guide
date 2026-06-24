@@ -10,3 +10,7 @@
 
 # Bundle build artifacts (regenerable via `npm run bundle`)
 agent-deploy/dist/
+
+# Distribution test outputs (local manager-run logs; scripts are tracked)
+tests/results/*
+!tests/results/.gitignore
