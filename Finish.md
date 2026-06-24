@@ -17,6 +17,7 @@
 - [x] Google Drive MCP/커넥터가 정상 동작할 때는 큰 `.md`를 base64 문자열이나 대화창 텍스트로 옮기지 않고, 파일을 원형 그대로 직접 다운로드하도록 `SETUP_WIZARD.md` 흐름을 수정.
 - [x] 다운로드한 `.md`는 `.agent-packs/externals/` 검역 위치에 둔 뒤 로컬 파일에서 credential/customer data/민감정보/출처 누락을 검사하는 방식을 기본 추천으로 정리.
 - [x] `SHARED_FOLDER_GUIDE.md`에도 같은 기준을 반영해 쓰는 쪽 flow와 연결 확인 요청 예시를 "직접 다운로드 후 로컬 보안검사" 중심으로 갱신.
+- [x] 기존에 있던 `agent-deploy/INSTALL_GUIDE.html` 변경은 이번 작업 범위에 포함하지 않고, 커밋/릴리즈 산출물에서도 제외.
 
 ### 0.16 apply 후 지식공유 handoff 및 release bundle 재생성
 
