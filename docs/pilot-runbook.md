@@ -256,7 +256,7 @@ node src\cli.js uninstall `
 
 ```text
 1. 빌드: agent-deploy에서 `npm run bundle`
-   → dist/company-agent-kit-0.1.0.zip (+ .sha256, release-manifest.json)
+   → 저장소 루트 release/company-agent-kit-0.1.0.zip (+ .sha256, release-manifest.json)
 2. 검증: sha256sum -c company-agent-kit-0.1.0.zip.sha256
    (Windows는 PowerShell Get-FileHash로 비교). zip 내부 install.bat CRLF는 빌드 시 확인됨.
 3. 업로드: zip과 .sha256을 Google Drive 공유 폴더 AI-Knowhow에 올린다.

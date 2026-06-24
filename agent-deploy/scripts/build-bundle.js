@@ -4,7 +4,7 @@
 // deterministic — entry order is sorted and timestamps are fixed, so identical
 // contents always produce an identical archive, checksum, and manifest.
 //
-//   node scripts/build-bundle.js              -> dist/company-agent-kit-<version>.zip
+//   node scripts/build-bundle.js              -> <repo-root>/release/company-agent-kit-<version>.zip
 //   node scripts/build-bundle.js --out DIR    -> write artifacts into DIR instead
 //
 // Outputs (versioned canonical + stable alias, identical bytes, each with a
@@ -27,6 +27,7 @@ import { fileURLToPath } from 'node:url';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..');
+const REPO_ROOT = path.resolve(ROOT, '..');
 const TOP = 'company-agent-kit';
 const RELEASE_MANIFEST = 'release-manifest.json';
 
@@ -177,20 +178,20 @@ function parseArgs(argv) {
 function buildBundle({ out } = {}) {
   const pkg = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8'));
   const version = pkg.version;
-  const distDir = out ? path.resolve(out) : path.join(ROOT, 'dist');
+  const releaseDir = out ? path.resolve(out) : path.join(REPO_ROOT, 'release');
 
   const entries = collectEntries();
   const zipBuf = buildZip(entries);
   const digest = sha256Hex(zipBuf);
 
-  fs.rmSync(distDir, { recursive: true, force: true });
-  fs.mkdirSync(distDir, { recursive: true });
+  fs.rmSync(releaseDir, { recursive: true, force: true });
+  fs.mkdirSync(releaseDir, { recursive: true });
 
   const versioned = `${TOP}-${version}.zip`;
   const alias = `${TOP}.zip`;
   const artifacts = [];
   for (const name of [versioned, alias]) {
-    const zipPath = path.join(distDir, name);
+    const zipPath = path.join(releaseDir, name);
     const sidecarName = `${name}.sha256`;
     const sidecarText = `${digest}  ${name}\n`;
     fs.writeFileSync(zipPath, zipBuf);
@@ -235,12 +236,12 @@ function buildBundle({ out } = {}) {
   };
   const manifestText = `${JSON.stringify(manifest, null, 2)}\n`;
   const manifestDigest = sha256Hex(manifestText);
-  fs.writeFileSync(path.join(distDir, RELEASE_MANIFEST), manifestText);
-  fs.writeFileSync(path.join(distDir, `${RELEASE_MANIFEST}.sha256`), `${manifestDigest}  ${RELEASE_MANIFEST}\n`);
+  fs.writeFileSync(path.join(releaseDir, RELEASE_MANIFEST), manifestText);
+  fs.writeFileSync(path.join(releaseDir, `${RELEASE_MANIFEST}.sha256`), `${manifestDigest}  ${RELEASE_MANIFEST}\n`);
 
   return {
     version,
-    distDir,
+    releaseDir,
     versioned,
     alias,
     manifest: RELEASE_MANIFEST,
@@ -258,9 +259,9 @@ function main() {
   console.log(`  entries: ${result.entryCount}`);
   console.log(`  size:    ${result.size} bytes`);
   console.log(`  sha256:  ${result.digest}`);
-  console.log(`  output:  ${path.relative(ROOT, result.distDir)}/${result.versioned}`);
-  console.log(`           ${path.relative(ROOT, result.distDir)}/${result.alias} (alias, identical bytes)`);
-  console.log(`           ${path.relative(ROOT, result.distDir)}/${result.manifest}`);
+  console.log(`  output:  ${path.relative(REPO_ROOT, result.releaseDir)}/${result.versioned}`);
+  console.log(`           ${path.relative(REPO_ROOT, result.releaseDir)}/${result.alias} (alias, identical bytes)`);
+  console.log(`           ${path.relative(REPO_ROOT, result.releaseDir)}/${result.manifest}`);
   console.log('           + .sha256 sidecar for each zip and manifest (sha256sum -c compatible)');
 }
 

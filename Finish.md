@@ -9,6 +9,14 @@
 
 ## 0. 최근 운영 반영
 
+### 0.10 배포 산출물 폴더를 release/로 변경
+
+반영일: 2026-06-24
+
+- [x] `npm run bundle` 기본 출력 경로를 `agent-deploy/dist/` → 저장소 루트 `./release/`(`./tests`와 동일 깊이)로 변경. 운영자가 폴더 채로 Google Drive에 올리기 쉽도록 정리(`--out` 오버라이드는 그대로).
+- [x] build-bundle.js(distDir→releaseDir, 기본 경로/주석), `.gitignore`, agent-deploy/README.md, docs/pilot-runbook.md 5.1을 release/ 기준으로 갱신.
+- [x] 재빌드로 release/에 zip+sha256+manifest 생성 확인(zip 내부 install.bat CRLF 유지, 동일 바이트 alias). build-bundle.js/README가 번들에 포함되므로 이번 편집 기준으로 zip sha256은 갱신되며, release/의 .sha256와 자기일치한다.
+
 ### 0.9 베타 공지문 최종화 및 배포(게시) 절차 문서화
 
 반영일: 2026-06-24
