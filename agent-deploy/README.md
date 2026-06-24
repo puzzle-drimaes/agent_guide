@@ -50,6 +50,28 @@ node src/cli.js apply --target codex --profile developer --project /path/to/repo
 node src/cli.js apply --target codex --profile developer --project /path/to/repo
 ```
 
+이미 `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.codex/`, `.claude/`, `.gemini/` 등
+agent 설정이 있는 프로젝트에 처음 적용할 때는 기존 설정을 우선하는 병합 정책을 권장합니다.
+
+```bash
+node src/cli.js apply \
+  --target codex \
+  --profile developer \
+  --project /path/to/repo \
+  --conflict-policy preserve-existing \
+  --dry-run
+
+node src/cli.js apply \
+  --target codex \
+  --profile developer \
+  --project /path/to/repo \
+  --conflict-policy preserve-existing \
+  --backup
+```
+
+`preserve-existing`은 기존 root instruction에는 관리 블록을 append하고, JSON/TOML 설정은
+비파괴 merge하며, 이미 존재하는 복사 대상(rule/skill/prompt 등)은 덮어쓰지 않고 skip으로 기록합니다.
+
 ### 고급 사용자용 wrapper
 
 `install.sh`에 인자를 넘기면 기존 direct apply wrapper처럼 사용할 수 있습니다.

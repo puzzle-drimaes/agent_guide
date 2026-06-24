@@ -268,6 +268,45 @@ test('conflict policy merge-json and merge-toml allow matching merge conflicts',
   assert.ok(tomlResult.state.conflictPolicy.decisions.some((decision) => decision.kind === 'merge-toml'));
 });
 
+test('conflict policy preserve-existing merges non-destructive conflicts and skips copy conflicts', () => {
+  const project = tmpProject();
+  fs.writeFileSync(path.join(project, 'AGENTS.md'), '# Existing project agent rules\n');
+  fs.mkdirSync(path.join(project, '.codex'), { recursive: true });
+  fs.writeFileSync(path.join(project, '.codex/config.toml'), 'model = "gpt-5"\n');
+  fs.mkdirSync(path.join(project, '.agents/rules/common'), { recursive: true });
+  fs.writeFileSync(path.join(project, '.agents/rules/common/security.md'), '# Existing project security rule\n');
+
+  const result = applyPlan(
+    buildPlan({ target: 'codex', profile: 'developer', projectRoot: project }),
+    { installedAt: '2026-01-01T00:00:00Z', conflictPolicy: 'preserve-existing' },
+  );
+
+  assert.match(fs.readFileSync(path.join(project, 'AGENTS.md'), 'utf8'), /Existing project agent rules/);
+  assert.match(fs.readFileSync(path.join(project, 'AGENTS.md'), 'utf8'), /agent-deploy:codex:start/);
+  assert.match(fs.readFileSync(path.join(project, '.codex/config.toml'), 'utf8'), /model = "gpt-5"/);
+  assert.match(fs.readFileSync(path.join(project, '.codex/config.toml'), 'utf8'), /company-docs/);
+  assert.equal(
+    fs.readFileSync(path.join(project, '.agents/rules/common/security.md'), 'utf8'),
+    '# Existing project security rule\n',
+  );
+  assert.equal(result.state.conflictPolicy.policy, 'preserve-existing');
+  assert.ok(result.state.conflictPolicy.decisions.some((decision) => (
+    decision.decision === 'write' && decision.kind === 'append-markdown'
+  )));
+  assert.ok(result.state.conflictPolicy.decisions.some((decision) => (
+    decision.decision === 'write' && decision.kind === 'merge-toml'
+  )));
+  assert.ok(result.state.conflictPolicy.decisions.some((decision) => (
+    decision.decision === 'skip' && decision.kind === 'copy-file'
+  )));
+  assert.ok(result.state.operations.some((op) => (
+    op.kind === 'skip'
+      && op.strategy.endsWith('+conflict-skip')
+      && /preserve-existing/.test(op.reason)
+  )));
+  assert.deepEqual(validateInstallState(result.state), []);
+});
+
 test('gemini minimal profile installs GEMINI.md, project rules, and shared install-state', () => {
   const project = tmpProject();
   applyPlan(buildPlan({ target: 'gemini', profile: 'minimal', projectRoot: project }));

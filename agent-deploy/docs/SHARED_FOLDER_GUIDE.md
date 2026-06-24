@@ -253,16 +253,23 @@ agent 동작 기준:
 1. 기본은 GitHub main 또는 Drive의 공식/정리본 기준으로 추천받는다.
 2. 사용자가 원하면 prompts / skills branch의 후보도 조회할 수 있다.
 3. 후보 branch 자료는 반드시 "검증 전 공유본"이라고 표시한다.
-4. agent가 적용 전 아래를 보여준다.
+4. `.agent-packs/externals/skills` 또는 `.agent-packs/externals/prompts`가 비어 있으면
+   agent가 Google Drive에서 가져올지 묻는다.
+   - agent가 직접 가져오려면 Google Drive MCP/커넥터가 연결돼 있어야 한다.
+   - 연결이 없으면 사용자가 Drive 웹에서 `.md`를 내려받아 externals에 직접 넣는다.
+5. Drive에서 받을 때 agent는 원본 그대로 받을지, 보안 검사 후 받을지 묻는다.
+   - 보안 검사 후 받기(추천): credential/customer data/민감정보/출처 누락을 먼저 점검하고 필요한 경우 redaction/sanitized copy 생성
+   - 원본 그대로 받기: Drive 원문을 externals에만 저장하고, 검증 전 공유본으로 표시
+6. agent가 적용 전 아래를 보여준다.
    - 무엇을 하는 asset인지 요약
    - 내 프로젝트 어디에 들어갈지
    - 기존 파일과 충돌 여부
    - 보안/출처 문제 여부
    - 적용 diff 또는 파일 목록
-5. 사용자가 컨펌하면 내 프로젝트의 아래 위치에 넣는다.
+7. 사용자가 컨펌하면 내 프로젝트의 아래 위치에 넣는다.
      <repo>/.agent-packs/externals/skills/    (스킬)
      <repo>/.agent-packs/externals/prompts/   (프롬프트)
-6. agent가 프로젝트에 맞게 검토/배치한다.
+8. agent가 프로젝트에 맞게 검토/배치한다.
    - 민감정보 포함 여부 확인
    - frontmatter 없으면 draft frontmatter 제안(원본 룰/문서는 함부로 바꾸지 않음)
    - 기존 문서와 충돌하면 keep-existing / add-namespaced / rename-proposed / replace-existing
@@ -306,6 +313,18 @@ agent 동작 기준:
    - 멤버가 아니면 연동해도 이 폴더가 보이지 않는다. 관리자에게 공유 요청.
 3. 연동 후 agent에게 "AI-Knowhow/prompts 의 .md 목록을 보여줘" 같은 요청으로 접근을 확인한다.
 4. 민감정보 입력 금지 규칙은 연동 여부와 무관하게 그대로 적용된다.
+```
+
+설치 wizard에서 externals가 비어 있을 때 agent가 Drive에서 공유 `.md`를 직접 가져오려면 이 연동이 필요하다.
+Drive MCP/커넥터가 없거나 권한이 부족하면, agent는 연결 절차를 안내한 뒤 사용자가 브라우저로 `.md`를
+내려받아 `.agent-packs/externals/`에 넣는 수동 fallback을 안내한다.
+
+연결 확인용 요청 예시는 다음과 같다.
+
+```text
+- AI-Knowhow/prompts 폴더의 .md 목록을 보여줘.
+- AI-Knowhow/skills 폴더의 .md 목록을 보여줘.
+- 이 파일을 원본 그대로 받을지, 보안 검사 후 받을지 선택하게 해줘.
 ```
 
 ### 접근 권한

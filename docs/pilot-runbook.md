@@ -38,6 +38,8 @@ project scope 중심으로 설치·사용·공유할 수 있는지 확인한다.
 - 각 프로젝트에 필요한 AGENTS.md, CLAUDE.md, GEMINI.md, .codex/, .claude/, .gemini/ 등을 설치한다.
 - user/global scope는 고급 사용자 또는 별도 확인이 필요한 선택 옵션으로만 다룬다.
 - 사용자 파일을 덮어쓸 가능성이 있으면 dry-run, backup, conflict policy를 먼저 확인한다.
+- 이미 agent 설정이 있는 프로젝트는 기존 설정을 우선한다. 첫 적용은
+  `--conflict-policy preserve-existing` dry-run으로 확인하고, 승인 후 apply에는 `--backup`을 붙인다.
 ```
 
 ### 3.2 Target/profile은 사전 배정하지 않음
@@ -222,7 +224,9 @@ node src\cli.js uninstall `
 2. bundle 안의 `SETUP_WIZARD.md`를 엽니다.
 3. 본인이 쓰는 AI 도구에 `SETUP_WIZARD.md` 내용을 전달하고, 설치 안내를 요청합니다.
 4. agent가 제안한 명령 중 `dry-run`을 먼저 실행해 어떤 파일이 생기는지 확인합니다.
-5. 문제가 없으면 `apply`를 실행합니다.
+   - 기존 agent 설정이 있는 프로젝트라면 agent에게 “기존 것을 우선해서 병합해줘”라고 말하면 됩니다.
+   - 이 경우 agent는 `--conflict-policy preserve-existing`을 붙여 기존 파일을 우선하고 비파괴 병합만 허용합니다.
+5. 문제가 없으면 `--backup`을 붙인 `apply`를 실행합니다.
 6. 설치 후 실제 업무에서 prompt, skill, rule을 사용해 봅니다.
 7. 공유하고 싶은 prompt/skill이 있으면 agent에게 `공유용으로 정제해줘`라고 말해 민감정보 제거와 출처 표기를 먼저 진행합니다.
 8. 사용 후 agent에게 `피드백 해줘`라고 말해 Q&A 방식으로 결과를 `.md`로 정리합니다.

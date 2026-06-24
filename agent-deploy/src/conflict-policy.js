@@ -6,6 +6,7 @@ import fs from 'node:fs';
 
 export const CONFLICT_POLICIES = [
   'managed-overwrite',
+  'preserve-existing',
   'skip',
   'append',
   'merge-json',
@@ -32,6 +33,9 @@ function skipConflictOp(op, reason) {
 }
 
 function allowMatchingKind(policy, op) {
+  if (policy === 'preserve-existing') {
+    return ['append-markdown', 'merge-json', 'merge-toml'].includes(op.kind);
+  }
   if (policy === 'append') return op.kind === 'append-markdown';
   if (policy === 'merge-json') return op.kind === 'merge-json';
   if (policy === 'merge-toml') return op.kind === 'merge-toml';
@@ -68,13 +72,27 @@ function decisionForConflict(op, policy) {
     };
   }
 
+  if (policy === 'preserve-existing' && !allowMatchingKind(policy, op)) {
+    const reason = `Skipped by conflict policy 'preserve-existing': existing destination takes priority (${op.dest})`;
+    return {
+      operation: skipConflictOp(op, reason),
+      decision: {
+        ...base,
+        decision: 'skip',
+        reason,
+      },
+    };
+  }
+
   if (allowMatchingKind(policy, op)) {
     return {
       operation: op,
       decision: {
         ...base,
         decision: 'write',
-        reason: `${policy} policy allows ${op.kind} for an existing destination`,
+        reason: policy === 'preserve-existing'
+          ? `preserve-existing policy allows non-destructive ${op.kind} for an existing destination`
+          : `${policy} policy allows ${op.kind} for an existing destination`,
       },
     };
   }

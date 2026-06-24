@@ -17,6 +17,7 @@ In scope:
 - Add `--conflict-policy <policy>` for apply.
 - Support a first complete policy set for current operation kinds:
   - `managed-overwrite`
+  - `preserve-existing`
   - `skip`
   - `append`
   - `merge-json`
@@ -41,6 +42,9 @@ Out of scope:
 ### R2. Policy semantics
 
 - `managed-overwrite`: apply all planned operations using their native strategies.
+- `preserve-existing`: existing project-owned files take priority; non-destructive operations
+  (`append-markdown`, `merge-json`, `merge-toml`) are allowed, while conflicting `copy-file`
+  operations are skipped and recorded.
 - `skip`: when a destination exists, skip that write and record a skip reason.
 - `append`: allow only `append-markdown` conflicts; conflicting non-append operations fail.
 - `merge-json`: allow only `merge-json` conflicts; conflicting non-json operations fail.
@@ -61,6 +65,8 @@ Install-state records the selected policy and per-conflict decisions (`write`, `
 
 - CLI help documents `--conflict-policy`.
 - `skip` policy skips existing destinations and writes install-state with skip operations.
+- `preserve-existing` appends/merges existing root or MCP config files but skips existing
+  copied files, and records both write and skip decisions.
 - `conflict-error` fails before writes and does not create backup/state artifacts.
 - `append`, `merge-json`, and `merge-toml` allow only matching operation-kind conflicts.
 - `npm test` passes.

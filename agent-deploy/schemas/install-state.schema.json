@@ -115,7 +115,7 @@
       "required": ["policy", "decisions"],
       "properties": {
         "policy": {
-          "enum": ["managed-overwrite", "skip", "append", "merge-json", "merge-toml", "conflict-error"]
+          "enum": ["managed-overwrite", "preserve-existing", "skip", "append", "merge-json", "merge-toml", "conflict-error"]
         },
         "decisions": {
           "type": "array",

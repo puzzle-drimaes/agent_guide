@@ -294,7 +294,7 @@ function main() {
         + '  --enable-pack-extensions: opt in to shared-approved pack defaultProfileExtensions\n'
         + '  --conflict-resolution: JSON file of reviewed conflict decisions to record in install-state\n'
         + '  --backup: copy existing write targets into a timestamped backup directory before apply\n'
-        + '  --conflict-policy: managed-overwrite (default), skip, append, merge-json, merge-toml, conflict-error\n'
+        + '  --conflict-policy: managed-overwrite (default), preserve-existing, skip, append, merge-json, merge-toml, conflict-error\n'
         + '  --on-user-modified: update uses fail (default), skip, overwrite; uninstall uses fail (default), skip, force\n'
         + '  --on-drift: fail (default), skip, overwrite — how repair treats hash-drifted managed files\n'
         + '  update --dry-run: reads install-state and prints a managed-file diff (no writes)\n'

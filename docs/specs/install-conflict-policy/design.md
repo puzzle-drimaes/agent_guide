@@ -32,6 +32,12 @@ The helper is a domain/policy boundary for apply-time file conflicts. It avoids 
 
 `managed-overwrite` is the compatibility default. It does not imply destructive overwrite for all operation kinds; merge and append operations keep their current non-destructive semantics.
 
+`preserve-existing` is the recommended first-adoption policy for projects that already use an agent. It keeps
+project-owned destination files authoritative, but still permits operation kinds that are non-destructive by design:
+managed Markdown block append/upsert, JSON deep merge, and TOML add-only merge. Existing `copy-file` destinations are
+converted to visible skips so the project can adopt non-conflicting company assets without silently replacing local
+rules, skills, or prompts.
+
 `skip` transforms existing-destination operations into `skip` operations with a reason. This makes install-state reflect the actual write decision.
 
 `append`, `merge-json`, and `merge-toml` are allow-list policies for matching operation kinds. They fail closed when an existing destination would require a different strategy.

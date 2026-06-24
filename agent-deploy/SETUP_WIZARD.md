@@ -47,6 +47,55 @@ type company-agent-kit-<version>.zip.sha256
 검증이 실패하면 zip을 실행하거나 압축 해제하지 말고, 배포 채널에서 다시 다운로드한 뒤
 담당자에게 `release-manifest.json`과 실패 메시지를 함께 공유합니다.
 
+## 0.2 bundle root와 project root 구분
+
+zip을 풀면 보통 아래처럼 압축파일명과 같은 폴더가 생깁니다.
+
+```text
+<내 프로젝트>/
+  company-agent-kit/
+    SETUP_WIZARD.md
+    src/
+    assets/
+    docs/
+```
+
+이때 두 경로를 구분해야 합니다.
+
+```text
+bundle root:  company-agent-kit/        # agent-deploy 실행 파일과 자산이 들어 있는 폴더
+project root: <내 프로젝트>/            # AGENTS.md, .agents/, .codex/ 등을 설치할 실제 프로젝트
+```
+
+즉, `--project` 값은 `company-agent-kit`이 아니라 **그 부모인 실제 프로젝트 root**여야 합니다.
+
+예시:
+
+```bash
+cd <내 프로젝트>/company-agent-kit
+
+node src/cli.js apply \
+  --target codex \
+  --profile developer \
+  --project .. \
+  --dry-run
+```
+
+또는 프로젝트 root에서 실행한다면:
+
+```bash
+cd <내 프로젝트>
+
+node company-agent-kit/src/cli.js apply \
+  --target codex \
+  --profile developer \
+  --project . \
+  --dry-run
+```
+
+agent는 사용자가 zip을 프로젝트 안에 풀었는지 확인하고, 설치 대상이 `company-agent-kit/` 자체가
+아닌지 dry-run 전에 한 번 더 확인합니다.
+
 ## 1. Bundle goal
 
 이 bundle의 목표는 단순히 특정 agent 설정 파일을 생성하는 것이 아닙니다.
@@ -96,8 +145,15 @@ Agent는 아래 원칙을 지킵니다.
 
 3. 설치할 프로젝트 경로는 어디인가?
    - 기본값: 현재 작업 중인 repository root
+   - zip을 프로젝트 안에 풀었다면 `company-agent-kit/`은 bundle root이고, `--project`는 그 부모 프로젝트 root로 지정
+   - 예: `<repo>/company-agent-kit`에서 실행하면 `--project ..`, `<repo>`에서 실행하면 `--project .`
 
-4. 어떤 profile을 설치할 것인가?
+4. 이미 agent 설정을 사용 중인 프로젝트인가?
+   - 예: AGENTS.md / CLAUDE.md / GEMINI.md / .codex/ / .claude/ / .gemini/ / .cursor/ / .mcp.json 존재
+   - 잘 모르면 agent가 dry-run 전에 위 파일 존재 여부를 확인하도록 안내
+   - 기존 설정이 있으면 "기존 우선 병합" 모드(`--conflict-policy preserve-existing` + `--backup`)를 기본 추천
+
+5. 어떤 profile을 설치할 것인가?
    - minimal: 회사 공통 원칙/보안/출처/지식 공유
    - developer: 개발 규칙, SDD, architecture, commit convention
    - product: product 문서/기획 프롬프트 중심
@@ -105,19 +161,85 @@ Agent는 아래 원칙을 지킵니다.
    - governance: KPI/회고/GitHub 후보 branch 운영 중심
    - sdd/full: 내부 검토 또는 명시 요청 시 사용
 
-5. 어떤 target에 설치할 것인가?
+6. 어떤 target에 설치할 것인가?
    - codex
    - claude
    - gemini
    - cursor는 내부 검토 또는 별도 요청 시만 사용
 
-6. 설치 범위는 무엇인가?
+7. 설치 범위는 무엇인가?
    - project: 기본값, repository 내부에 설정 설치
    - home: 선택 옵션, 사용자 전역 설정 설치
 
-7. dry-run 결과를 확인한 뒤 apply를 진행할 것인가?
+8. dry-run 결과를 확인한 뒤 apply를 진행할 것인가?
 ```
 
+
+## 3.1 기존 agent 사용 프로젝트 병합 Q&A
+
+기존에 agent를 쓰던 프로젝트에 회사 bundle을 적용할 때는 **기존 프로젝트 설정을 우선**합니다.
+agent는 아래 질문을 짧게 확인한 뒤, 기본적으로 `preserve-existing` 정책으로 dry-run을 만듭니다.
+
+```text
+1. 이 프로젝트에 이미 agent 지시 파일이나 설정 폴더가 있나요?
+   - AGENTS.md / CLAUDE.md / GEMINI.md
+   - .codex/ / .claude/ / .gemini/ / .cursor/
+   - .mcp.json / .codex/config.toml / 기타 MCP 설정
+
+2. 기존 설정의 소유자는 누구인가요?
+   - project-local: 이 프로젝트 팀이 의도적으로 관리
+   - user-copied: 개인이 복사해 둔 설정
+   - unknown: 잘 모름
+
+3. 병합 원칙은 무엇으로 할까요?
+   - 추천: 기존 우선 병합
+     - root instruction(AGENTS/CLAUDE/GEMINI)은 기존 내용 뒤에 agent-deploy 관리 블록만 추가
+     - JSON/TOML MCP 설정은 기존 key를 덮지 않는 add-only/deep merge
+     - 이미 존재하는 rule/skill/prompt 파일은 덮어쓰지 않고 skip 기록
+   - 강한 검토: 충돌 시 중단
+     - `--conflict-policy conflict-error`로 어떤 파일이 충돌하는지 먼저 확인
+   - 명시 승인: 회사 표준으로 교체
+     - `--backup`을 켜고, dry-run에서 바뀌는 파일을 확인한 뒤에만 진행
+     - canonical rule 교체는 별도 governance 승인 없이는 금지
+
+4. 충돌 결과를 어떻게 기록할까요?
+   - dry-run 출력의 skipped/conflicts를 사용자에게 보여준다.
+   - apply 시 `--backup`을 붙여 기존 파일 사본을 남긴다.
+   - 공유 pack 충돌은 필요하면 `--conflict-resolution ./conflicts.reviewed.json`에 결정 기록을 남긴다.
+```
+
+기존 agent 프로젝트의 기본 dry-run 예시는 다음입니다.
+
+```bash
+node src/cli.js apply \
+  --target codex \
+  --profile developer \
+  --scope project \
+  --project /path/to/project \
+  --conflict-policy preserve-existing \
+  --dry-run
+```
+
+사용자가 dry-run 결과를 승인하면 apply에는 `--backup`을 추가합니다.
+
+```bash
+node src/cli.js apply \
+  --target codex \
+  --profile developer \
+  --scope project \
+  --project /path/to/project \
+  --conflict-policy preserve-existing \
+  --backup
+```
+
+`preserve-existing`은 기존 파일을 우선하되, 비파괴적인 병합만 허용합니다.
+
+```text
+- append-markdown: 기존 AGENTS.md/CLAUDE.md/GEMINI.md 뒤에 관리 블록 추가
+- merge-json: 기존 JSON key 보존 + 새 MCP key만 추가
+- merge-toml: 기존 TOML key 보존 + 새 MCP key만 추가
+- copy-file 충돌: 기존 rule/skill/prompt 파일을 덮지 않고 skip
+```
 
 ## 4. Role guide for beginners
 
@@ -161,6 +283,74 @@ Agent는 아래 원칙을 지킵니다.
 3. prompt/template/skill/doc 중 어떤 asset type인지 제안한다.
 4. 기존 문서/룰과 충돌하면 keep-existing/add-namespaced/rename-proposed/replace-existing 선택지를 설명한다.
 5. 기본 추천은 add-namespaced이며, canonical rule 교체는 별도 승인 없이는 금지한다.
+```
+
+### 4.1 externals가 비어 있을 때 Google Drive에서 가져오기
+
+사용자가 공유 prompt/skill을 쓰고 싶어 하지만 아래 폴더가 없거나 비어 있으면, agent는 Google Drive에서
+가져올지 먼저 묻습니다.
+
+```text
+<repo>/.agent-packs/externals/skills/
+<repo>/.agent-packs/externals/prompts/
+```
+
+Q&A 순서:
+
+```text
+1. 공유 prompt/skill을 Google Drive `AI-Knowhow`에서 가져올까요?
+   - 아니오: 빈 externals 상태로 설치를 계속한다.
+   - 예: 2번으로 진행한다.
+
+2. 현재 AI 도구에 Google Drive MCP/커넥터가 연결돼 있나요?
+   - 예: `AI-Knowhow/skills`, `AI-Knowhow/prompts`의 `.md` 목록 조회를 시도한다.
+   - 아니오/모름: 아래 "Google Drive MCP/커넥터 연결 안내"를 먼저 보여준다.
+
+3. 가져올 범위는 무엇인가요?
+   - prompts만
+   - skills만
+   - prompts + skills
+   - 특정 파일만
+
+4. 각 `.md`를 어떤 방식으로 받을까요?
+   - 보안 검사 후 받기(추천): agent가 본문을 먼저 읽고 민감정보/credential/고객 개인정보/출처 누락을 점검한 뒤 저장
+   - 원본 그대로 받기: Drive의 `.md` 내용을 그대로 externals에 저장하되, 검증 전 공유본으로 표시하고 적용 전 별도 확인
+```
+
+Google Drive MCP/커넥터 연결 안내:
+
+```text
+1. 자기 AI 도구의 커넥터/통합 설정에서 Google Drive를 연결한다.
+   - 예: Connectors / Integrations / MCP 설정에서 Google Drive 선택
+   - Google 로그인/OAuth 동의는 사용자가 직접 수행한다.
+2. 전사 공유 드라이브 `AI-Knowhow`에 해당 Google 계정이 멤버로 추가돼 있어야 한다.
+   - 권한이 없으면 연결되어 있어도 목록 조회가 실패한다.
+3. 연결 확인 요청 예시:
+   - "Google Drive에서 AI-Knowhow/prompts 폴더의 .md 목록을 보여줘"
+   - "Google Drive에서 AI-Knowhow/skills 폴더의 .md 목록을 보여줘"
+4. agent는 Drive 검색을 폴더명 전체 검색으로 하지 말고 `docs/SHARED_FOLDER_GUIDE.md`의 folder ID로 범위를 좁힌다.
+5. MCP/커넥터 연결이 안 되면 fallback으로 사용자가 Drive 웹에서 `.md`를 내려받아 externals 폴더에 직접 넣는다.
+```
+
+보안 검사 후 받기를 선택한 경우:
+
+```text
+1. agent는 Drive에서 `.md` 본문을 읽고 아래를 검사한다.
+   - token, private key, password, cookie, credential
+   - 고객 개인정보/계약/민감 재무/법무 검토 전 자료
+   - 내부 프로젝트명/고객명 원문이 그대로 노출되는지
+   - 출처/source/license 표기가 필요한 외부 자료인지
+2. 문제가 없으면 `.agent-packs/externals/prompts/` 또는 `.agent-packs/externals/skills/`에 저장한다.
+3. 문제가 있으면 원문 저장 전에 redaction/sanitized copy를 제안하고 사용자 확인을 받는다.
+4. sanitize한 파일은 가능하면 파일명에 `-sanitized` 또는 frontmatter `reviewStatus: security-reviewed`를 남긴다.
+```
+
+원본 그대로 받기를 선택한 경우에도, agent는 다음 안전장치를 유지합니다.
+
+```text
+- 원본은 곧바로 canonical rule/skill/prompt로 설치하지 않고 `.agent-packs/externals/`에만 둔다.
+- 적용 전에는 반드시 요약, 보안/출처 문제, 충돌 여부, 적용 파일 목록을 보여준다.
+- 원본에 민감정보가 명백히 보이면 저장/적용을 중단하고 사용자에게 확인한다.
 ```
 
 ## 5. 권장 기본값
@@ -241,6 +431,18 @@ node src/cli.js apply \
   --dry-run
 ```
 
+기존 agent 설정이 있는 프로젝트는 기본 dry-run에 기존 우선 병합 정책을 붙입니다.
+
+```bash
+node src/cli.js apply \
+  --target codex \
+  --profile developer \
+  --scope project \
+  --project /path/to/project \
+  --conflict-policy preserve-existing \
+  --dry-run
+```
+
 ### apply
 
 ```bash
@@ -249,6 +451,18 @@ node src/cli.js apply \
   --profile developer \
   --scope project \
   --project /path/to/project
+```
+
+기존 agent 설정이 있는 프로젝트에서 apply를 진행할 때는 백업을 함께 남깁니다.
+
+```bash
+node src/cli.js apply \
+  --target codex \
+  --profile developer \
+  --scope project \
+  --project /path/to/project \
+  --conflict-policy preserve-existing \
+  --backup
 ```
 
 ### home scope 선택 시

@@ -9,6 +9,30 @@
 
 ## 0. 최근 운영 반영
 
+### 0.14 externals 비어 있을 때 Drive 가져오기 Q&A 보강
+
+반영일: 2026-06-24
+
+- [x] `SETUP_WIZARD.md`에 `.agent-packs/externals/skills|prompts`가 비어 있을 때 Google Drive `AI-Knowhow`에서 공유 `.md`를 가져올지 묻는 Q&A flow 추가.
+- [x] agent가 직접 Drive에서 가져오려면 Google Drive MCP/커넥터 연결과 공유 드라이브 권한이 필요함을 안내하고, 연결이 없으면 Drive 웹 다운로드 fallback으로 안내하도록 정리.
+- [x] 공유 `.md`를 받을 때 `보안 검사 후 받기(추천)`와 `원본 그대로 받기` 선택지를 추가하고, 원본도 canonical에 바로 적용하지 않고 externals 검역 구역에만 두도록 명시.
+- [x] `SHARED_FOLDER_GUIDE.md`에도 동일한 가져오기/연동/보안검사 기준을 연결해 사용자·운영자 문서 간 흐름을 맞춤.
+
+### 0.13 SETUP_WIZARD project root 지정 안내 보강
+
+반영일: 2026-06-24
+
+- [x] zip 압축 해제 후 생기는 `company-agent-kit/`은 bundle root이고, 실제 설치 대상은 그 부모인 project root임을 `SETUP_WIZARD.md` 0.2에 명시.
+- [x] `<repo>/company-agent-kit`에서 실행할 때는 `--project ..`, `<repo>`에서 실행할 때는 `--project .`를 쓰는 예시를 추가해 bundle 자체에 설치되는 실수를 줄이도록 정리.
+
+### 0.12 기존 agent 프로젝트 우선 병합 Q&A 및 preserve-existing 정책 추가
+
+반영일: 2026-06-24
+
+- [x] `SETUP_WIZARD.md`에 기존 agent 설정 사용 여부를 묻는 Q&A를 추가하고, 기존 설정이 있으면 `--conflict-policy preserve-existing` dry-run을 기본 추천하도록 정리.
+- [x] `preserve-existing` conflict policy 추가: 기존 root instruction은 관리 블록 append, JSON/TOML MCP 설정은 비파괴 merge, 기존 copy-file 대상(rule/skill/prompt 등)은 overwrite하지 않고 skip으로 기록.
+- [x] README/runbook/spec/schema/test를 갱신해 기존 프로젝트 적용 시 `dry-run → --backup apply` 흐름과 install-state provenance 검증을 반영.
+
 ### 0.11 공유 폴더 feedback → feedbacks 통일 + 하위 폴더 직통 링크/ID 명시
 
 반영일: 2026-06-24
