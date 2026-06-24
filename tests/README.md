@@ -19,7 +19,7 @@ The default scenario is `codex` + `developer` + `project` scope.
 10. uninstall --dry-run
 ```
 
-Logs are written to `tests/results/` and ignored by git.
+Logs are written to `tests/results/` and ignored by git. Windows `.bat` logs use `dist-test-windows-*.log`.
 
 ## Linux / macOS / Git Bash
 
@@ -47,7 +47,7 @@ DIST_TEST_RUN_NPM_TEST=1 ./tests/dist_test.sh
 
 ## Windows Command Prompt
 
-Use Command Prompt for the Windows distribution test. The PowerShell test wrapper was removed because it caused execution-policy and console-encoding issues on some PCs.
+Use Command Prompt for the Windows distribution test. The PowerShell test wrapper was removed because it caused execution-policy and console-encoding issues on some PCs. The `.bat` file is now a thin wrapper around a Node-based Windows runner, which avoids fragile cmd quoting for the actual test logic.
 
 ```bat
 tests\dist_test.bat
