@@ -199,7 +199,7 @@ node src\cli.js uninstall `
 
 ## 5. 전사 공지문
 
-아래 문안을 사내 게시판, 메일, Drive 운영 메모 등 현재 회사가 쓰는 공지 채널에 그대로 게시한다. 배포 링크, 담당자, 문의 경로만 회사 상황에 맞게 채운다.
+아래 문안을 사내 게시판, 메일, Drive 운영 메모 등 현재 회사가 쓰는 공지 채널에 그대로 게시한다. 배포 링크/담당자/문의 경로에는 기본값을 채워 두었으니, 게시 채널 상황에 맞게 확인·조정한다.
 
 ```md
 # 전사 Agent Bundle 베타 안내
@@ -217,7 +217,8 @@ node src\cli.js uninstall `
 ## 진행 방법
 
 1. 배포된 `agent-deploy` bundle을 내려받습니다.
-   - 배포 위치: `<bundle 링크 또는 Drive/GitHub Releases 위치>`
+   - 배포 위치: Google Drive 공유 폴더 `AI-Knowhow` 의 `company-agent-kit-0.1.0.zip` (체크섬 `.sha256` 동봉)
+     - 폴더: https://drive.google.com/drive/folders/1krsWm7GBlwAk9M58HfW2kfWmkSuKBqQz
 2. bundle 안의 `SETUP_WIZARD.md`를 엽니다.
 3. 본인이 쓰는 AI 도구에 `SETUP_WIZARD.md` 내용을 전달하고, 설치 안내를 요청합니다.
 4. agent가 제안한 명령 중 `dry-run`을 먼저 실행해 어떤 파일이 생기는지 확인합니다.
@@ -245,8 +246,23 @@ node src\cli.js uninstall `
 
 ## 문의
 
-- 운영 담당: `<담당자 또는 팀>`
-- 문의 경로: `<메일/게시판/Drive 운영 메모 등>`
+- 운영 담당: AI 도입 운영 담당자
+- 문의 경로: Google Drive `AI-Knowhow` 운영 메모
+```
+
+### 5.1 배포(게시) 준비 절차
+
+공지 전 운영자가 진행한다. 번들 빌드/검증과 운영자 알파 리허설은 완료된 상태다(4장, `docs/pilot-alpha-rehearsal-log.md`).
+
+```text
+1. 빌드: agent-deploy에서 `npm run bundle`
+   → dist/company-agent-kit-0.1.0.zip (+ .sha256, release-manifest.json)
+2. 검증: sha256sum -c company-agent-kit-0.1.0.zip.sha256
+   (Windows는 PowerShell Get-FileHash로 비교). zip 내부 install.bat CRLF는 빌드 시 확인됨.
+3. 업로드: zip과 .sha256을 Google Drive 공유 폴더 AI-Knowhow에 올린다.
+4. 링크 확인: 5장 공지문 '배포 위치'가 실제 공유 위치를 가리키는지 확인한다.
+5. 게시: 5장 공지문을 사내 게시판/메일/Drive 운영 메모에 게시한다.
+6. 사용자 안내: 다운로드 후 README/SETUP_WIZARD의 checksum 검증 절차를 따르도록 안내한다.
 ```
 
 ## 6. 사용자용 피드백 수집 방식
