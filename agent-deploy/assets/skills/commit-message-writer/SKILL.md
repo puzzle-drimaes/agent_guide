@@ -16,6 +16,7 @@ Codex:  .agents/rules/developer/git-commit-convention.md
 Claude: .claude/rules/developer/git-commit-convention.md
 Gemini: .gemini/rules/developer/git-commit-convention.md
 Cursor: .cursor/rules/developer-git-commit-convention.mdc
+Kiro:   .kiro/steering/developer-git-commit-convention.md
 ```
 
 If the local harness uses another rule location, use the semantically equivalent installed rule file.

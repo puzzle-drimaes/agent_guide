@@ -1,7 +1,7 @@
 # agent-deploy — 사내 AI Markdown Asset 배포 엔진 (레퍼런스 구현)
 
 하나의 정규 소스(`assets/`)에 있는 회사 AI 업무 자산을 여러 AI 툴(Codex, Claude Code,
-Gemini, Cursor, …)의 네이티브 설정으로 **설치 시점에 변환·배포**하는 레퍼런스 구현입니다.
+Gemini, Cursor, Kiro, …)의 네이티브 설정으로 **설치 시점에 변환·배포**하는 레퍼런스 구현입니다.
 
 이 bundle의 1차 goal은 단순한 coding agent 설정 배포가 아니라, 역할/OS/기존 agent와
 무관하게 다음 Markdown 기반 자산을 각 프로젝트에 안전하게 적용하는 것입니다.
@@ -9,7 +9,7 @@ Gemini, Cursor, …)의 네이티브 설정으로 **설치 시점에 변환·배
 ```text
 공통 rule + 공유 문서 + skill + prompt/template + 개인/팀 공유 문서
   → target별 adapter
-  → AGENTS.md / CLAUDE.md / GEMINI.md / native config
+  → AGENTS.md / CLAUDE.md / GEMINI.md / .kiro/steering / native config
 ```
 
 최종 기준은 파일 구조의 동일성이 아니라 **semantic equivalence**입니다. 각 target의 파일명,
@@ -58,7 +58,7 @@ node src/cli.js repair --target codex --profile developer --project /path/to/rep
 node src/cli.js uninstall --target codex --profile developer --project /path/to/repo --dry-run
 ```
 
-이미 `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.codex/`, `.claude/`, `.gemini/` 등
+이미 `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.codex/`, `.claude/`, `.gemini/`, `.kiro/` 등
 agent 설정이 있는 프로젝트에 처음 적용할 때는 기존 설정을 우선하는 병합 정책을 권장합니다.
 
 ```bash
@@ -160,19 +160,19 @@ type company-agent-kit-<version>.zip.sha256
 ```
 
 ### 설치 범위(scope)
-- **project (기본)**: repo 내 `.claude/`, `.cursor/`, 선택 MCP config(`.mcp.json` 등) — 레포 단위 커밋·공유.
+- **project (기본)**: repo 내 `.claude/`, `.cursor/`, `.kiro/`, 선택 MCP config(`.mcp.json` 등) — 레포 단위 커밋·공유.
 - **home/global (`--global`)**: 사용자 전역 `~/.claude/`, `~/.claude.json` — 어떤 IDE/CLI·프로젝트에서나 공유.
 - 안전 경계(path-safety)는 scope의 base root(projectRoot 또는 home)로 적용.
 
 같은 소스에서 타깃별로 다르게 떨어지는 것이 핵심입니다:
 
-| 정규 소스 | Codex | Claude Code | Gemini | Cursor |
-|-----------|-------|-------------|--------|--------|
-| `assets/rules/**` | `.agents/rules/**` + `AGENTS.md` managed block | `.claude/rules/**` (구조 보존) | `.gemini/rules/**` + `GEMINI.md` managed block | `.cursor/rules/<flat>.mdc` (평탄화+.mdc) |
-| `assets/skills/<n>/SKILL.md` | `.agents/skills/<n>/SKILL.md` | `.claude/skills/<n>/SKILL.md` | `.gemini/skills/<n>/SKILL.md` (fallback) | `.cursor/skills/<n>/SKILL.md` |
-| `assets/agents/<a>.md` | `.codex/agents/<a>.md` | `.claude/agents/<a>.md` | `.gemini/agents/<a>.md` (fallback) | `.cursor/agents/<a>.md` |
-| `assets/commands/plan.md` | **skip+reason** (Codex adapter엔 슬래시 명령 설치 표면 없음) | `.claude/commands/plan.md` | `.gemini/commands/plan.md` | **skip+reason** (Cursor엔 슬래시 명령 없음 — install-state에 기록) |
-| `assets/mcp/servers.json` | allowlist/`DISABLED_MCPS` 필터 후 `.codex/config.toml` 에 add-only TOML merge | allowlist/`DISABLED_MCPS` 필터 후 `.mcp.json`(project)/`~/.claude.json`(home) 에 deepMerge | **skip+reason** (stable project-scope MCP contract 전까지) | allowlist/`DISABLED_MCPS` 필터 후 `.cursor/mcp.json` 에 deepMerge |
+| 정규 소스 | Codex | Claude Code | Gemini | Cursor | Kiro |
+|-----------|-------|-------------|--------|--------|------|
+| `assets/rules/**` | `.agents/rules/**` + `AGENTS.md` managed block | `.claude/rules/**` (구조 보존) | `.gemini/rules/**` + `GEMINI.md` managed block | `.cursor/rules/<flat>.mdc` (평탄화+.mdc) | `.kiro/steering/<flat>.md` + managed steering |
+| `assets/skills/<n>/SKILL.md` | `.agents/skills/<n>/SKILL.md` | `.claude/skills/<n>/SKILL.md` | `.gemini/skills/<n>/SKILL.md` (fallback) | `.cursor/skills/<n>/SKILL.md` | `.kiro/skills/<n>/SKILL.md` |
+| `assets/agents/<a>.md` | `.codex/agents/<a>.md` | `.claude/agents/<a>.md` | `.gemini/agents/<a>.md` (fallback) | `.cursor/agents/<a>.md` | `.kiro/agents/<a>.md` (fallback) |
+| `assets/commands/plan.md` | **skip+reason** (Codex adapter엔 슬래시 명령 설치 표면 없음) | `.claude/commands/plan.md` | `.gemini/commands/plan.md` | **skip+reason** (Cursor엔 슬래시 명령 없음 — install-state에 기록) | `.kiro/commands/plan.md` (fallback) |
+| `assets/mcp/servers.json` | allowlist/`DISABLED_MCPS` 필터 후 `.codex/config.toml` 에 add-only TOML merge | allowlist/`DISABLED_MCPS` 필터 후 `.mcp.json`(project)/`~/.claude.json`(home) 에 deepMerge | **skip+reason** (stable project-scope MCP contract 전까지) | allowlist/`DISABLED_MCPS` 필터 후 `.cursor/mcp.json` 에 deepMerge | allowlist/`DISABLED_MCPS` 필터 후 `.kiro/settings/mcp.json` 에 deepMerge |
 
 > 모듈은 카테고리 전체(`rules`)뿐 아니라 **서브경로(`rules/developer`)·단일 파일(`agents/x.md`)** 도 지정 가능 → 프로파일별 정밀 스코핑(예: architecture 자산은 `developer`에만).
 

@@ -24,6 +24,7 @@ Codex:  .agents/rules/common/knowledge-sharing.md  + source-attribution.md + sec
 Claude: .claude/rules/common/knowledge-sharing.md  + source-attribution.md + security.md
 Gemini: .gemini/rules/common/knowledge-sharing.md  + source-attribution.md + security.md
 Cursor: .cursor/rules/common-knowledge-sharing.mdc + common-source-attribution.mdc + common-security.mdc
+Kiro:   .kiro/steering/common-knowledge-sharing.md + common-source-attribution.md + common-security.md
 ```
 
 When available, also use the shared-folder and branch operation guides as the
@@ -76,6 +77,7 @@ Codex:  .agents/prompts/      (_universal-template.md + task templates)
 Claude: .claude/prompts/
 Gemini: .gemini/prompts/
 Cursor: .cursor/prompts/
+Kiro:   .kiro/prompts/
 ```
 
 Leave usage/success metrics blank for a new entry; they are filled by operations over time.

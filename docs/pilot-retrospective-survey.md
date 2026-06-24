@@ -21,7 +21,7 @@
 
 ```text
 - 직무: 개발 / PM·기획 / 사업·영업·CS / 운영·governance
-- 주로 쓴 AI 도구: Claude / Codex / Gemini
+- 주로 쓴 AI 도구: Claude / Codex / Gemini / Kiro
 - OS: Windows / macOS / Linux
 - 설치 여부: 정식 설치함 / 설치 없이 사용 / 시도했지만 실패
 ```

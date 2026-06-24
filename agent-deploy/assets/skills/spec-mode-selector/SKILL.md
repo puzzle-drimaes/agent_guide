@@ -16,6 +16,7 @@ Codex:  .agents/rules/developer/spec-driven-development.md
 Claude: .claude/rules/developer/spec-driven-development.md
 Gemini: .gemini/rules/developer/spec-driven-development.md
 Cursor: .cursor/rules/developer-spec-driven-development.mdc
+Kiro:   .kiro/steering/developer-spec-driven-development.md
 ```
 
 If the local harness uses another rule location, use the semantically equivalent installed rule file.

@@ -373,6 +373,73 @@ test('cursor flattens rules to .mdc and records a skip+reason for slash commands
   assert.ok(skipOps.some((o) => o.sourceRel === 'commands' && o.reason), 'commands recorded as skip+reason');
 });
 
+test('kiro minimal profile installs steering, skills, and shared install-state', () => {
+  const project = tmpProject();
+  applyPlan(buildPlan({ target: 'kiro', profile: 'minimal', projectRoot: project }));
+
+  assert.ok(fs.existsSync(path.join(project, '.kiro/steering/company-agent-deploy.md')));
+  assert.ok(fs.existsSync(path.join(project, '.kiro/steering/common-company-ai-principles.md')));
+  assert.ok(fs.existsSync(path.join(project, '.kiro/steering/common-knowledge-sharing.md')));
+  assert.ok(fs.existsSync(path.join(project, '.kiro/steering/common-security.md')));
+  assert.ok(fs.existsSync(path.join(project, '.kiro/steering/common-source-attribution.md')));
+  assert.ok(fs.existsSync(path.join(project, '.kiro/skills/agent-bundle-feedback/SKILL.md')));
+  assert.ok(!fs.existsSync(path.join(project, '.kiro/steering/developer-architecture.md')), 'architecture scoped out of minimal');
+  assert.ok(fs.existsSync(path.join(project, '.agent-deploy/install-state.json')));
+
+  const state = JSON.parse(fs.readFileSync(path.join(project, '.agent-deploy/install-state.json'), 'utf8'));
+  assert.equal(state.target.target, 'kiro');
+  assert.ok(state.operations.some((o) => o.kind === 'append-markdown' && o.dest.endsWith('.kiro/steering/company-agent-deploy.md')));
+});
+
+test('kiro developer profile installs steering, fallback agents/commands, skills, prompts, and mcp', () => {
+  const project = tmpProject();
+  const plan = buildPlan({ target: 'kiro', profile: 'developer', projectRoot: project });
+  const result = applyPlan(plan);
+
+  assert.ok(fs.existsSync(path.join(project, '.kiro/steering/common-security.md')));
+  assert.ok(fs.existsSync(path.join(project, '.kiro/steering/developer-architecture.md')));
+  assert.ok(fs.existsSync(path.join(project, '.kiro/steering/developer-harness-engineering.md')));
+  assert.ok(fs.existsSync(path.join(project, '.kiro/steering/developer-spec-driven-development.md')));
+  assertDeveloperWorkflowSkills(path.join(project, '.kiro'));
+  assert.ok(fs.existsSync(path.join(project, '.kiro/agents/code-reviewer.md')));
+  assert.ok(fs.existsSync(path.join(project, '.kiro/agents/architecture-reviewer.md')));
+  assert.ok(fs.existsSync(path.join(project, '.kiro/commands/plan.md')));
+  assert.ok(fs.existsSync(path.join(project, '.kiro/prompts/_universal-template.md')));
+  assert.ok(fs.existsSync(path.join(project, '.kiro/prompts/dev-implementation.md')));
+
+  const mcp = JSON.parse(fs.readFileSync(path.join(project, '.kiro/settings/mcp.json'), 'utf8'));
+  assert.ok(mcp.mcpServers['company-docs']);
+  assert.ok(!mcp.mcpServers.filesystem);
+  assert.deepEqual(validateInstallState(result.state), []);
+});
+
+test('kiro managed steering block and MCP merge are add-only/idempotent', () => {
+  const project = tmpProject();
+  const steeringDir = path.join(project, '.kiro/steering');
+  fs.mkdirSync(steeringDir, { recursive: true });
+  fs.writeFileSync(path.join(steeringDir, 'company-agent-deploy.md'), '# Existing Kiro steering\n\nKeep this.\n');
+  fs.mkdirSync(path.join(project, '.kiro/settings'), { recursive: true });
+  fs.writeFileSync(
+    path.join(project, '.kiro/settings/mcp.json'),
+    JSON.stringify({ mcpServers: { existing: { command: 'custom-mcp' } } }, null, 2),
+  );
+
+  const plan = buildPlan({ target: 'kiro', profile: 'developer', projectRoot: project });
+  applyPlan(plan, { installedAt: '2026-01-01T00:00:00Z' });
+  applyPlan(plan, { installedAt: '2026-01-01T00:00:01Z' });
+
+  const steering = fs.readFileSync(path.join(steeringDir, 'company-agent-deploy.md'), 'utf8');
+  assert.match(steering, /# Existing Kiro steering/);
+  assert.equal((steering.match(/agent-deploy:kiro:start/g) || []).length, 1);
+  assert.match(steering, /\.kiro\/steering\//);
+  assert.match(steering, /\.kiro\/skills\//);
+
+  const mcp = JSON.parse(fs.readFileSync(path.join(project, '.kiro/settings/mcp.json'), 'utf8'));
+  assert.equal(mcp.mcpServers.existing.command, 'custom-mcp');
+  assert.ok(mcp.mcpServers['company-docs']);
+  assert.ok(!mcp.mcpServers.filesystem);
+});
+
 test('merge-json preserves pre-existing user keys', () => {
   const project = tmpProject();
   fs.writeFileSync(
@@ -1653,7 +1720,7 @@ test('keep-existing decision skips colliding pack operations and records the rea
     profile: 'developer',
     moduleIds: ['team-conflict-pack-dev-prompt-module'],
     packPaths: [packRoot],
-    conflictResolutions: ['claude', 'cursor', 'codex', 'gemini'].map((target) => ({
+    conflictResolutions: ['claude', 'cursor', 'codex', 'gemini', 'kiro'].map((target) => ({
       proposed: `${target}:team-conflict-pack-dev-prompt-module`,
       conflictsWith: `${target}:prompt-library`,
       decision: 'keep-existing',

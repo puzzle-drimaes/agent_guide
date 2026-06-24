@@ -2,7 +2,7 @@
 
 사내 Agent Installer / Agent Deploy 표준을 설계하고 검증하는 저장소입니다.
 
-이 저장소의 목표는 회사 구성원이 Claude, Codex, Gemini 등 어떤 AI 도구를 사용하더라도 동일한 agent 사용 룰과 개발 기준을 적용할 수 있도록 배포 체계와 운영 문서를 준비하는 것입니다.
+이 저장소의 목표는 회사 구성원이 Claude, Codex, Gemini, Kiro 등 어떤 AI 도구를 사용하더라도 동일한 agent 사용 룰과 개발 기준을 적용할 수 있도록 배포 체계와 운영 문서를 준비하는 것입니다.
 
 ## Repository
 
@@ -25,12 +25,12 @@ references/     ECC, k-sdd 참고 소스(기본은 직접 수정 금지)
 `agent-deploy/`는 prototype 단계를 넘어, 베타 배포에 필요한 기본 설치/검증/운영 명령을 갖춘 레퍼런스 구현입니다.
 
 ```text
-지원 target: codex, claude, gemini, cursor
+지원 target: codex, claude, gemini, cursor, kiro
 지원 profile: minimal, core, developer, product, business, governance, sdd, full
 기본 scope: project
 운영 명령: list, plan, apply, update, repair, uninstall, doctor
 배포 산출물: release/company-agent-kit-<version>.zip + .sha256 + release-manifest.json
-검증: npm --prefix agent-deploy run validate, npm --prefix agent-deploy test (83 smoke tests)
+검증: npm --prefix agent-deploy run validate, npm --prefix agent-deploy test (87 smoke tests)
 ```
 
 운영자가 Windows/Linux 배포 경로를 확인할 때는 `tests/README.md`의 distribution test를 사용합니다.

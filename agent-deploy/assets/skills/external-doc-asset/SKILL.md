@@ -20,6 +20,7 @@ Codex:  .agents/rules/common/security.md + knowledge-sharing.md + source-attribu
 Claude: .claude/rules/common/security.md + knowledge-sharing.md + source-attribution.md
 Gemini: .gemini/rules/common/security.md + knowledge-sharing.md + source-attribution.md
 Cursor: .cursor/rules/common-security.mdc + common-knowledge-sharing.mdc + common-source-attribution.mdc
+Kiro:   .kiro/steering/common-security.md + common-knowledge-sharing.md + common-source-attribution.md
 ```
 
 Also use the installed prompt/template schema guidance when available:

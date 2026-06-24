@@ -9,6 +9,15 @@
 
 ## 0. 최근 운영 반영
 
+### 0.18 Kiro target adapter 및 setup wizard 반영
+
+반영일: 2026-06-24
+
+- [x] Kiro 공식 문서 기준으로 workspace steering(`.kiro/steering/`), Agent Skills(`.kiro/skills/`), MCP 설정(`.kiro/settings/mcp.json`) 표면을 확인하고 `agent-deploy/src/targets/kiro.js` adapter 추가.
+- [x] 모든 manifest module target에 `kiro`를 포함하고, Kiro minimal/developer/idempotent smoke test를 추가.
+- [x] SETUP_WIZARD와 사용자 안내 문서에서 선택 가능한 target에 Kiro를 포함.
+- [x] canonical harness/architecture/company 원칙 rule과 배포 asset rule을 Kiro 포함 기준으로 동기화.
+- [x] Kiro adapter spec(`docs/specs/kiro-adapter/`)에 요구사항/설계/tasks/review와 참고 출처 기록.
 
 ### 0.17 Drive `.md` 수신 기본 경로를 직접 다운로드 + 로컬 보안검사로 정리
 

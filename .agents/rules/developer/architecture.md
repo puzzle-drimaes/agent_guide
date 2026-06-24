@@ -58,7 +58,7 @@ interfaces/cli
 - CLI는 argument parsing과 결과 표시 중심으로 둔다.
 - install plan 생성은 planner/usecase 성격으로 둔다.
 - 파일 쓰기, merge, target별 변환은 adapter/helper로 격리한다.
-- target adapter는 Claude/Codex/Gemini 차이를 흡수한다.
+- target adapter는 Claude/Codex/Gemini/Kiro 차이를 흡수한다.
 - dry-run, install-state, path-safety, symlink guard를 우회하지 않는다.
 - 큰 구조 변경은 사용자 승인 또는 계획 문서 갱신 후 진행한다.
 

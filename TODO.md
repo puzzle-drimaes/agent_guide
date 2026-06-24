@@ -13,7 +13,7 @@
 회사의 누구나,
 개발자/비개발자 여부와 관계없이,
 Windows/Linux/macOS 환경에서,
-Claude/Codex/Gemini 등 어떤 AI 도구를 쓰더라도,
+Claude/Codex/Gemini/Kiro 등 어떤 AI 도구를 쓰더라도,
 같은 회사 표준 agent 설정, 업무 방식, Markdown 기반 AI 업무 자산을 사용할 수 있게 한다.
 ```
 
@@ -189,6 +189,7 @@ docs/plans/codex/company-wide-agent-rollout/00-open-decisions.md
 - [x] Gemini adapter
 - [x] Gemini project scope smoke test
 - [x] Claude/Codex/Gemini/Cursor profile smoke test
+- [x] Kiro adapter 및 Kiro minimal/developer smoke test
 - [x] Pilot 기본 profile(minimal/developer/product/business) Codex/Claude/Gemini 직접 smoke test
 - [x] company core rules/skills asset 승격
 - [x] 직무별 developer/product/business/governance profile 초안
@@ -204,7 +205,7 @@ npm --prefix agent-deploy run validate
   → manifest/rule-drift/entry-parity/asset-schema/catalog-parity/unicode-safety/secret-scan/MCP-governance validation 통과
 
 npm --prefix agent-deploy test
-  → 83개 smoke test 전체 통과
+  → 87개 smoke test 전체 통과
 ```
 
 ### 2.1-A 최우선 전략 문서화
@@ -373,7 +374,7 @@ docs/plans/codex/company-wide-agent-rollout/02b-harness-engineering-principles.m
 해야 할 일:
 
 - [x] `docs/harness-capability-matrix.md` 작성
-- [x] Claude/Codex/Gemini/Cursor capability 정리
+- [x] Claude/Codex/Gemini/Cursor/Kiro capability 정리
 - [x] adapter별 native/fallback/skip 정책 작성
 - [x] harness parity smoke test 보강 (Codex/Claude/Gemini core rules/skills + skip reason)
 - [x] 루트 진입점(AGENTS/CLAUDE/GEMINI) parity 자동 가드 추가 (`check-entry-parity.js`, validate에 통합)

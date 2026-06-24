@@ -7,7 +7,7 @@ argument-hint: "[feature or change description]"
 # Company Plan (Plan First)
 
 Use this skill before implementing any non-trivial change. It is the cross-harness
-form of the `/plan` command: harnesses without slash commands (Codex, Cursor) get
+form of the `/plan` command: harnesses without slash commands (Codex, Cursor, Kiro) get
 the same Plan First workflow here.
 
 ## Required context
@@ -20,6 +20,7 @@ Codex:  .agents/rules/developer/spec-driven-development.md
 Claude: .claude/rules/developer/spec-driven-development.md
 Gemini: .gemini/rules/developer/spec-driven-development.md
 Cursor: .cursor/rules/developer-spec-driven-development.mdc
+Kiro:   .kiro/steering/developer-spec-driven-development.md
 ```
 
 If the local harness uses another rule location, use the semantically equivalent

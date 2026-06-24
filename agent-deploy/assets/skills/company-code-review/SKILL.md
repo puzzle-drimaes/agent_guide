@@ -20,6 +20,7 @@ Codex:  .agents/rules/developer/
 Claude: .claude/rules/developer/
 Gemini: .gemini/rules/developer/
 Cursor: .cursor/rules/developer-*.mdc
+Kiro:   .kiro/steering/developer-*.md
 ```
 
 ## Workflow

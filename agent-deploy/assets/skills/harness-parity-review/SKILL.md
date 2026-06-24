@@ -16,6 +16,7 @@ Codex:  .agents/rules/developer/harness-engineering.md
 Claude: .claude/rules/developer/harness-engineering.md
 Gemini: .gemini/rules/developer/harness-engineering.md
 Cursor: .cursor/rules/developer-harness-engineering.mdc
+Kiro:   .kiro/steering/developer-harness-engineering.md
 ```
 
 If available in the repository, also read the root instruction file for each affected harness (`AGENTS.md`, `CLAUDE.md`, `GEMINI.md`) and the rollout harness engineering plan.

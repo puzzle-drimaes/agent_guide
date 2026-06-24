@@ -19,6 +19,7 @@ Codex:  .agents/rules/common/    (security, source-attribution, knowledge-sharin
 Claude: .claude/rules/common/
 Gemini: .gemini/rules/common/
 Cursor: .cursor/rules/common-*.mdc
+Kiro:   .kiro/steering/common-*.md
 ```
 
 ## Workflow (product: idea → problem → requirements → non-goals → acceptance → review)

@@ -20,6 +20,7 @@ Codex:  .agents/rules/common/    (security, source-attribution, knowledge-sharin
 Claude: .claude/rules/common/
 Gemini: .gemini/rules/common/
 Cursor: .cursor/rules/common-*.mdc
+Kiro:   .kiro/steering/common-*.md
 ```
 
 ## Workflow
@@ -47,7 +48,7 @@ Cursor: .cursor/rules/common-*.mdc
 5. 설치 또는 사용 중 막힌 단계가 있었나요?
 6. 실제 업무에 어떤 prompt / skill / rule을 써봤나요?
 7. 헷갈린 용어(target/profile/scope 등)나 비개발자에게 어려운 표현이 있었나요?
-8. Codex/Claude/Gemini 등 도구별로 결과 차이를 느꼈나요?
+8. Codex/Claude/Gemini/Kiro 등 도구별로 결과 차이를 느꼈나요?
 9. 공유 가능한 `.md` 산출물이나 재사용 후보가 있나요?
 10. 전사 확대 전에 가장 먼저 고쳐야 할 것은 무엇인가요?
 ```
