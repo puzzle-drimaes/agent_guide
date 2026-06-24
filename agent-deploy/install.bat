@@ -1,4 +1,6 @@
 @echo off
+rem Force UTF-8 so Korean messages render correctly on the default console code page.
+chcp 65001 >nul
 rem agent-deploy bundle installer (Windows).
 rem
 rem Unzip the bundle, then from inside your project run:

@@ -17,12 +17,14 @@ The default scenario is `codex` + `developer` + `project` scope.
 8. update --dry-run
 9. repair --dry-run
 10. uninstall --dry-run
-11. install.bat smoke on a path with spaces (Windows `.bat` runner only)
+11. installer entry-point smoke on a path with spaces
 ```
 
-Step 11 runs only on Windows project scope: it invokes the shipped `install.bat`
+Step 11 runs in project scope only. It invokes the shipped installer entry point
 from a temp directory whose name contains spaces and confirms the bundle lands in
-that exact path, covering `install.bat`'s own cmd quoting (the cli.js steps do not).
+that exact path — coverage the direct cli.js steps do not provide. The `.sh` runner
+exercises `install.sh`; the Windows `.bat` runner exercises `install.bat` (its cmd
+quoting and CRLF/`%~dp0` handling).
 
 Logs are written to `tests/results/` and ignored by git. Windows `.bat` logs use `dist-test-windows-*.log`.
 

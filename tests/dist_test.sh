@@ -101,36 +101,41 @@ run_step node --version
 run_step "$NPM_BIN" --version
 run_step node -e 'const v=Number(process.versions.node.split(".")[0]); if (v < 18) { console.error(`Node >= 18 required, got ${process.version}`); process.exit(1); } console.log(`Node version OK: ${process.version}`);'
 
-case "$TARGET" in
-  codex)
-    ENTRY_PATH="$PROJECT/AGENTS.md"
-    STATE_PATH="$PROJECT/.agent-deploy/install-state.json"
-    FEEDBACK_SKILL_PATH="$PROJECT/.agents/skills/agent-bundle-feedback/SKILL.md"
-    CONFIG_PATH="$PROJECT/.codex/config.toml"
-    ;;
-  gemini)
-    ENTRY_PATH="$PROJECT/GEMINI.md"
-    STATE_PATH="$PROJECT/.agent-deploy/install-state.json"
-    FEEDBACK_SKILL_PATH="$PROJECT/.gemini/skills/agent-bundle-feedback/SKILL.md"
-    CONFIG_PATH=""
-    ;;
-  claude)
-    ENTRY_PATH=""
-    STATE_PATH="$PROJECT/.claude/agent-install-state.json"
-    FEEDBACK_SKILL_PATH="$PROJECT/.claude/skills/agent-bundle-feedback/SKILL.md"
-    CONFIG_PATH="$PROJECT/.mcp.json"
-    ;;
-  cursor)
-    ENTRY_PATH=""
-    STATE_PATH="$PROJECT/.cursor/agent-install-state.json"
-    FEEDBACK_SKILL_PATH="$PROJECT/.cursor/skills/agent-bundle-feedback/SKILL.md"
-    CONFIG_PATH="$PROJECT/.cursor/mcp.json"
-    ;;
-  *)
-    echo "unsupported TARGET for dist_test.sh assertions: $TARGET" >&2
-    exit 1
-    ;;
-esac
+set_target_paths() {
+  local base="$1"
+  case "$TARGET" in
+    codex)
+      ENTRY_PATH="$base/AGENTS.md"
+      STATE_PATH="$base/.agent-deploy/install-state.json"
+      FEEDBACK_SKILL_PATH="$base/.agents/skills/agent-bundle-feedback/SKILL.md"
+      CONFIG_PATH="$base/.codex/config.toml"
+      ;;
+    gemini)
+      ENTRY_PATH="$base/GEMINI.md"
+      STATE_PATH="$base/.agent-deploy/install-state.json"
+      FEEDBACK_SKILL_PATH="$base/.gemini/skills/agent-bundle-feedback/SKILL.md"
+      CONFIG_PATH=""
+      ;;
+    claude)
+      ENTRY_PATH=""
+      STATE_PATH="$base/.claude/agent-install-state.json"
+      FEEDBACK_SKILL_PATH="$base/.claude/skills/agent-bundle-feedback/SKILL.md"
+      CONFIG_PATH="$base/.mcp.json"
+      ;;
+    cursor)
+      ENTRY_PATH=""
+      STATE_PATH="$base/.cursor/agent-install-state.json"
+      FEEDBACK_SKILL_PATH="$base/.cursor/skills/agent-bundle-feedback/SKILL.md"
+      CONFIG_PATH="$base/.cursor/mcp.json"
+      ;;
+    *)
+      echo "unsupported TARGET for dist_test.sh assertions: $TARGET" >&2
+      exit 1
+      ;;
+  esac
+}
+
+set_target_paths "$PROJECT"
 
 cd "$DEPLOY_DIR"
 
@@ -159,6 +164,38 @@ run_step node src/cli.js update --target "$TARGET" --profile "$PROFILE" --scope 
 run_step node src/cli.js repair --target "$TARGET" --profile "$PROFILE" --scope "$SCOPE" --project "$PROJECT" --dry-run
 run_step node src/cli.js uninstall --target "$TARGET" --profile "$PROFILE" --scope "$SCOPE" --project "$PROJECT" --dry-run
 assert_path_exists "$STATE_PATH"
+
+# install.sh smoke: the cli.js steps above never touch the shipped POSIX entry
+# point, so exercise it directly. install.sh uses $(pwd) as the project root, so
+# run it from a path WITH SPACES — a common quoting failure point — and confirm
+# the bundle lands in that exact path.
+INSTALL_SH="$DEPLOY_DIR/install.sh"
+if [ "$SCOPE" != "project" ]; then
+  echo
+  echo "install.sh smoke skipped: scope is not project (avoids writing outside the test project)"
+elif [ ! -f "$INSTALL_SH" ]; then
+  echo
+  echo "install.sh smoke skipped: not found at $INSTALL_SH"
+else
+  SPACE_PROJECT="${TMPDIR:-/tmp}/agent bundle install-sh $TIMESTAMP"
+  mkdir -p "$SPACE_PROJECT"
+  echo
+  echo "==> install.sh apply (spaces path)"
+  ( cd "$SPACE_PROJECT" && sh "$INSTALL_SH" --target "$TARGET" --profile "$PROFILE" )
+  set_target_paths "$SPACE_PROJECT"
+  [ -z "$ENTRY_PATH" ] || assert_path_exists "$ENTRY_PATH"
+  assert_path_exists "$STATE_PATH"
+  assert_path_exists "$FEEDBACK_SKILL_PATH"
+  [ -z "$CONFIG_PATH" ] || assert_path_exists "$CONFIG_PATH"
+  run_step node src/cli.js uninstall --target "$TARGET" --profile "$PROFILE" --scope "$SCOPE" --project "$SPACE_PROJECT" --dry-run
+  assert_path_exists "$STATE_PATH"
+  if [ "$KEEP_PROJECT" = "0" ]; then
+    rm -rf "$SPACE_PROJECT"
+    echo "install.sh smoke project cleanup: removed"
+  else
+    echo "install.sh smoke project: kept at $SPACE_PROJECT"
+  fi
+fi
 
 echo
 echo "Generated files sample:"
