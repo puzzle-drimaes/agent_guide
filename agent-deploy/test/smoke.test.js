@@ -26,7 +26,6 @@ import { calculatePackDigest } from '../src/packs/digest.js';
 
 const CLI = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../src/cli.js');
 const BUILD_BUNDLE = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../scripts/build-bundle.js');
-const INSTALL_SH = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../install.sh');
 const FIXTURES = path.resolve(path.dirname(fileURLToPath(import.meta.url)), 'fixtures');
 
 function tmpProject() {
@@ -1009,8 +1008,6 @@ test('build-bundle is deterministic and includes runtime-required members', () =
     'company-agent-kit/schemas/install-state.schema.json',
     'company-agent-kit/scripts/check-asset-schema.js',
     'company-agent-kit/scripts/check-catalog-parity.js',
-    'company-agent-kit/install.sh',
-    'company-agent-kit/install.bat',
     'company-agent-kit/SETUP_WIZARD.md',
   ]) {
     assert.ok(zipA.includes(Buffer.from(member)), `bundle must include ${member}`);
@@ -1042,12 +1039,12 @@ test('doctor CLI emits valid JSON and exits non-zero when a check fails', () => 
   );
 });
 
-test('install.sh passes a --project path with spaces through intact', () => {
+test('CLI passes a --project path with spaces through intact', () => {
   const spaced = path.join(tmpProject(), 'my project dir');
   fs.mkdirSync(spaced, { recursive: true });
 
-  const out = execFileSync('sh', [
-    INSTALL_SH, '--target', 'codex', '--profile', 'minimal', '--project', spaced, '--dry-run',
+  const out = execFileSync('node', [
+    CLI, 'apply', '--target', 'codex', '--profile', 'minimal', '--project', spaced, '--dry-run',
   ], { encoding: 'utf8' });
 
   // The resolved plan root must contain the full spaced path, not a truncated token.

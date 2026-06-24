@@ -14,7 +14,7 @@
 //   release-manifest.json                release-manifest.json.sha256
 //
 // Internal layout: everything under a stable top-level `company-agent-kit/`
-// folder, mirroring the runtime layout that install.sh / install.bat / the
+// folder, mirroring the runtime layout that `node src/cli.js` / the
 // package.json bin already expect. schemas/ (runtime install-state validation),
 // scripts/ (planner -> pack-composer -> pack-validator reaches check-asset-schema
 // + check-catalog-parity at import time), and package.json ("type":"module" is
@@ -32,7 +32,7 @@ const TOP = 'company-agent-kit';
 const RELEASE_MANIFEST = 'release-manifest.json';
 
 const BUNDLE_DIRS = ['src', 'scripts', 'manifests', 'schemas', 'docs', 'assets'];
-const BUNDLE_FILES = ['package.json', 'README.md', 'SETUP_WIZARD.md', 'INSTALL_GUIDE.html', 'install.sh', 'install.bat'];
+const BUNDLE_FILES = ['package.json', 'README.md', 'SETUP_WIZARD.md', 'INSTALL_GUIDE.html'];
 
 // Fixed DOS timestamp (1980-01-01 00:00:00) so archives are byte-reproducible.
 const DOS_TIME = 0;

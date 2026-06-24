@@ -1,5 +1,5 @@
 // Doctor: pre-install environment / bundle health check.
-// install.sh and install.bat point users here when something fails. doctor does
+// The setup guides point users here when an install fails. doctor does
 // not read install-state — it diagnoses whether this machine and this unzipped
 // bundle can run an install at all: Node version, required bundle members, and
 // whether the chosen install target directory is writable.

@@ -28,19 +28,15 @@ ECC( `manifests/` + `install-targets/` 어댑터 + `install-state` provenance +
 
 ### zip bundle + agent setup wizard (권장 배포 형태)
 
-```bash
-./install.sh
-```
-
-`install.sh`는 복잡한 QnA를 수행하지 않고 bundle 상태와 다음 단계를 안내합니다.
-첫 agent 대화에서 `SETUP_WIZARD.md`를 읽히고, agent가 project path/profile/target/scope를
-확인한 뒤 `dry-run` → `apply` 명령을 생성하게 합니다.
+별도 install 런처는 없습니다. 압축을 풀면 바로 `SETUP_WIZARD.md`를 첫 agent 대화에 제공하고,
+agent가 project path/profile/target/scope를 확인한 뒤 `dry-run` → `apply` 명령을 생성하게 합니다.
+런처 없이 어떤 OS에서나 `node src/cli.js`만으로 동작합니다(순수 Node, 의존성 0).
 
 권장 기본 흐름:
 
 ```text
 1. zip bundle 압축 해제
-2. ./install.sh 로 bootstrap 안내 확인
+2. (선택) node src/cli.js doctor 로 환경/번들 진단
 3. 첫 agent 대화에 SETUP_WIZARD.md 제공
 4. agent가 생성한 dry-run 명령 실행
 5. dry-run 결과 확인 후 apply 명령 실행
@@ -80,31 +76,18 @@ node src/cli.js apply \
 `preserve-existing`은 기존 root instruction에는 관리 블록을 append하고, JSON/TOML 설정은
 비파괴 merge하며, 이미 존재하는 복사 대상(rule/skill/prompt 등)은 덮어쓰지 않고 skip으로 기록합니다.
 
-### 고급 사용자용 wrapper
-
-`install.sh`에 인자를 넘기면 기존 direct apply wrapper처럼 사용할 수 있습니다.
-
-```bash
-./install.sh --target codex --profile developer --dry-run    # 현재 디렉터리를 project로 preview
-./install.sh --target codex --profile developer              # 현재 디렉터리에 apply
-./install.sh --target claude --profile developer --global    # home scope apply
-```
-
 ### Windows
 
-`install.sh`는 Git Bash/WSL용입니다. Windows 기본 환경에서는 cmd(`install.bat`)를 쓰세요.
-(전제: Node.js LTS >=18)
+bundle은 OS 공통입니다(순수 Node, 의존성 0). 별도 cmd 런처 없이 위 "직접 CLI" 명령을
+그대로 쓰되, 경로 표기만 cmd 규칙을 따릅니다. (전제: Node.js LTS >=18)
 
 ```bat
-install.bat --target codex --profile developer --dry-run
-```
-
-cmd wrapper가 환경 정책 때문에 막히면 launcher 없이 Node CLI를 직접 실행합니다.
-
-```bat
+node src\cli.js doctor --project "%CD%"
 node src\cli.js apply --target codex --profile developer --project "%CD%" --dry-run
+node src\cli.js apply --target codex --profile developer --project "%CD%" --backup
 ```
 
+경로에 공백이 있으면 항상 큰따옴표로 감쌉니다: `--project "C:\My Projects\repo"`.
 자세한 안내는 `SETUP_WIZARD.md` 9.1을 참고하세요.
 
 ### 개발/검증
@@ -132,8 +115,8 @@ release/company-agent-kit.zip                  release/company-agent-kit.zip.sha
 release/release-manifest.json                  release/release-manifest.json.sha256
 ```
 
-zip 내부 최상위 폴더는 `company-agent-kit/`로 고정이며, 압축 해제 후 그 안에서 `./install.sh`를
-실행합니다. `release-manifest.json`은 아래 정보를 담습니다.
+zip 내부 최상위 폴더는 `company-agent-kit/`로 고정이며, 압축 해제 후 그 안에서 `SETUP_WIZARD.md`를
+agent에 제공하거나 `node src/cli.js`를 직접 실행합니다. `release-manifest.json`은 아래 정보를 담습니다.
 
 ```text
 - schemaVersion: agentdeploy.release-manifest.v1
