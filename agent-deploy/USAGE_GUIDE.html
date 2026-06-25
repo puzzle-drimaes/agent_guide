@@ -1,0 +1,848 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>회사 AI 사용 매뉴얼 — 대화·프롬프트·지식 공유</title>
+<style>
+  :root{
+    --ink:#1e293b;--muted:#64748b;--line:#e2e8f0;--soft:#f8fafc;
+    --indigo:#4f46e5;--teal:#0d9488;--violet:#7c3aed;--sky:#0ea5e9;
+    --ok:#16a34a;--bad:#dc2626;--warn:#d97706;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans KR","Malgun Gothic",sans-serif;
+    color:var(--ink);background:#eef2f7;line-height:1.75;font-size:16.5px;-webkit-font-smoothing:antialiased}
+  a{color:var(--indigo);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:980px;margin:0 auto;padding:0 22px}
+
+  /* ---- hero ---- */
+  header.hero{background:linear-gradient(125deg,#0f172a,#312e81 48%,#0f766e);color:#fff;padding:48px 0 120px}
+  .hero .tag{display:inline-block;background:rgba(255,255,255,.14);color:#e0e7ff;font-size:13.5px;
+    font-weight:600;padding:5px 14px;border-radius:999px;margin-bottom:16px}
+  .hero h1{margin:0 0 12px;font-size:34px;letter-spacing:-.6px;line-height:1.25}
+  .hero p.lead{margin:0;color:#dbeafe;font-size:18px;max-width:660px}
+  .hero .who{margin-top:22px;display:flex;gap:10px;flex-wrap:wrap}
+  .hero .who span{background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.18);
+    border-radius:10px;padding:8px 13px;font-size:14px;color:#eef2ff}
+  .hero-art{margin:26px auto 0;display:block;max-width:620px;width:100%;height:auto}
+
+  /* ---- layout ---- */
+  main{margin-top:-86px;padding-bottom:60px}
+  section{background:#fff;border:1px solid var(--line);border-radius:18px;padding:30px 34px;margin:22px 0;
+    box-shadow:0 4px 18px rgba(15,23,42,.06)}
+  section.flush{padding-top:26px}
+  h2{font-size:23px;margin:0 0 6px;display:flex;align-items:center;gap:12px;letter-spacing:-.3px}
+  h2 .n{background:var(--indigo);color:#fff;font-size:15px;font-weight:700;width:32px;height:32px;border-radius:10px;
+    display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto}
+  h2 .n.teal{background:var(--teal)}
+  h2 .n.violet{background:var(--violet)}
+  h2 + .sub{color:var(--muted);margin:0 0 20px;font-size:15.5px}
+  h3{font-size:17.5px;margin:26px 0 10px;color:#0f172a;display:flex;align-items:center;gap:9px}
+  h3 .dot{width:9px;height:9px;border-radius:50%;background:var(--indigo);flex:0 0 auto}
+  h3 .dot.t{background:var(--teal)}h3 .dot.v{background:var(--violet)}
+  p{margin:10px 0}
+  .big{font-size:18px}
+
+  /* quick nav */
+  .nav{display:flex;flex-wrap:wrap;gap:9px;margin:4px 0 2px}
+  .nav a{background:#eef2ff;border:1px solid #e0e7ff;border-radius:999px;padding:7px 15px;font-size:14px;
+    color:#4338ca;font-weight:600}
+  .nav a:hover{background:#e0e7ff;text-decoration:none}
+
+  /* callouts */
+  .callout{border-left:5px solid var(--indigo);background:#f5f3ff;border-radius:0 12px 12px 0;
+    padding:14px 18px;margin:16px 0;font-size:15.5px}
+  .callout.teal{border-color:var(--teal);background:#f0fdfa}
+  .callout.warn{border-color:var(--warn);background:#fffbeb}
+  .callout.ok{border-color:var(--ok);background:#f0fdf4}
+  .callout.bad{border-color:var(--bad);background:#fef2f2}
+  .callout b{font-weight:700}
+  .callout .ttl{display:flex;align-items:center;gap:9px;font-weight:700;margin-bottom:4px}
+  .callout .ttl svg{flex:0 0 auto}
+
+  /* figures */
+  .figure{margin:20px 0;text-align:center}
+  .figure svg{max-width:100%;height:auto}
+  .figcap{color:var(--muted);font-size:13.5px;margin-top:8px}
+
+  /* step list */
+  .steps{counter-reset:step;margin:18px 0 4px;padding:0;list-style:none}
+  .steps>li{position:relative;padding:0 0 22px 64px;border-left:2px dashed #cbd5e1;margin-left:22px}
+  .steps>li:last-child{border-left:2px solid transparent;padding-bottom:4px}
+  .steps>li::before{counter-increment:step;content:counter(step);position:absolute;left:-22px;top:-4px;
+    width:44px;height:44px;border-radius:13px;background:var(--indigo);color:#fff;font-weight:800;font-size:18px;
+    display:flex;align-items:center;justify-content:center;box-shadow:0 3px 8px rgba(79,70,229,.3)}
+  .steps.teal>li::before{background:var(--teal);box-shadow:0 3px 8px rgba(13,148,136,.3)}
+  .steps.violet>li::before{background:var(--violet);box-shadow:0 3px 8px rgba(124,58,237,.3)}
+  .steps>li h4{margin:2px 0 5px;font-size:17px}
+  .steps>li p{margin:5px 0;font-size:15.5px;color:#334155}
+  .say{display:inline-block;background:#eef2ff;border:1px solid #dbe2ff;color:#312e81;border-radius:10px;
+    padding:7px 13px;margin:6px 6px 6px 0;font-size:15px}
+  .say::before{content:"💬 ";}
+  .say.t{background:#f0fdfa;border-color:#99f6e4;color:#0f766e}
+  .say.v{background:#f5f3ff;border-color:#ddd6fe;color:#6d28d9}
+
+  /* table */
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:15px}
+  th,td{text-align:left;padding:11px 13px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:var(--soft);color:#334155;font-weight:700;font-size:13.5px}
+  tbody tr:hover{background:#fafbff}
+  td .role{font-weight:700}
+  .chip{display:inline-block;font-size:13px;font-weight:700;padding:2px 9px;border-radius:7px}
+  .chip.none{background:#e2e8f0;color:#475569}
+  .chip.lite{background:#ccfbf1;color:#0f766e}
+  .chip.full{background:#ede9fe;color:#6d28d9}
+  .chip.req{background:#dcfce7;color:#15803d}
+  .chip.opt{background:#f1f5f9;color:#64748b}
+
+  /* code-ish */
+  code{background:#f1f5f9;border:1px solid var(--line);border-radius:6px;padding:1.5px 7px;font-size:14px;
+    font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;color:#0f172a}
+  .cmd{background:#0f172a;color:#e2e8f0;border-radius:12px;padding:14px 18px;margin:12px 0;
+    font-family:ui-monospace,Menlo,Consolas,monospace;font-size:14px;overflow-x:auto;white-space:pre;line-height:1.7}
+  .cmd .c{color:#94a3b8}.cmd .g{color:#86efac}.cmd .y{color:#fcd34d}.cmd .b{color:#7dd3fc}
+
+  /* prompt example card */
+  .prompt{border:1px solid var(--line);border-radius:14px;overflow:hidden;margin:14px 0}
+  .prompt .ph{background:#312e81;color:#e0e7ff;padding:10px 16px;font-weight:700;font-size:14.5px;
+    display:flex;align-items:center;gap:9px}
+  .prompt .pb{background:#fbfbfe;padding:16px 18px;font-size:14.5px;white-space:pre-wrap;
+    font-family:ui-monospace,Menlo,Consolas,monospace;color:#1e293b;line-height:1.7}
+  .prompt .pb .k{color:#7c3aed;font-weight:700}
+
+  /* two-column compare */
+  .twocol{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:12px 0}
+  @media(max-width:720px){.twocol{grid-template-columns:1fr}}
+  .pcard{border:1.5px solid var(--line);border-radius:14px;padding:18px}
+  .pcard.imp{border-color:#bfdbfe;background:#eff6ff}
+  .pcard.exp{border-color:#99f6e4;background:#f0fdfa}
+  .pcard .h{display:flex;align-items:center;gap:10px;font-weight:800;font-size:16.5px;margin-bottom:8px}
+  .pcard.imp .h{color:#1d4ed8}.pcard.exp .h{color:#0f766e}
+  .pcard ul{margin:8px 0 0;padding-left:20px;font-size:14.5px;color:#334155}
+  .pcard ul li{margin:5px 0}
+
+  /* limitation cards */
+  .limit{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:12px 0}
+  @media(max-width:620px){.limit{grid-template-columns:1fr}}
+  .lcard{border:1px solid #fde68a;background:#fffbeb;border-radius:12px;padding:14px 16px}
+  .lcard .h{font-weight:700;color:#9a3412;font-size:15px;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+  .lcard p{font-size:14px;margin:4px 0 0;color:#57534e}
+
+  /* path badges */
+  .paths{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+  .paths code{background:#0f172a;color:#a5b4fc;border-color:#1e293b}
+
+  /* drive folder shortcut links */
+  .drivelinks{display:flex;flex-wrap:wrap;gap:9px;margin:12px 0 6px}
+  .drivelinks a{display:inline-flex;align-items:center;gap:7px;background:#f0fdfa;border:1.5px solid #99f6e4;
+    color:#0f766e;font-weight:700;font-size:14px;border-radius:10px;padding:9px 14px}
+  .drivelinks a:hover{background:#ccfbf1;text-decoration:none}
+  .drivelinks a .ext{font-size:12px;color:#0d9488;font-weight:600}
+
+  footer{color:var(--muted);font-size:13px;text-align:center;padding:8px 22px 50px;line-height:1.8}
+  footer .src{display:inline-block;margin-top:6px}
+
+  @media print{
+    body{background:#fff;font-size:12.5px}
+    header.hero{background:#0f172a !important;-webkit-print-color-adjust:exact;print-color-adjust:exact;padding-bottom:40px}
+    main{margin-top:18px}
+    section{box-shadow:none;break-inside:avoid;page-break-inside:avoid}
+    .nav{display:none}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ HERO ============ -->
+<header class="hero">
+  <div class="wrap">
+    <span class="tag">사용 매뉴얼 · 설치를 마친 다음에 보는 안내서</span>
+    <h1>회사 AI, 이렇게 쓰면 됩니다</h1>
+    <p class="lead">설치는 끝났습니다. 이제 <b>어떻게 대화하고</b>, <b>검증된 프롬프트를 어떻게 꺼내 쓰고</b>,
+      <b>좋은 노하우를 어떻게 주고받는지</b>를 그림과 함께 설명합니다. 명령어를 외울 필요는 없습니다.</p>
+    <div class="who">
+      <span>🔄 에이전트 라이프사이클</span>
+      <span>💬 대화 요령 · 프롬프트</span>
+      <span>📦 지식 공유 (가져오기·승격·내보내기)</span>
+    </div>
+
+    <!-- hero illustration: talk -> agent (rules+prompt) -> result -> share -->
+    <svg class="hero-art" viewBox="0 0 620 230" role="img" aria-label="사람이 요청하면 에이전트가 회사 룰과 프롬프트를 적용해 결과를 내고, 좋은 결과는 다시 공유되는 순환 개념도">
+      <defs>
+        <linearGradient id="hg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#a5b4fc"/><stop offset="1" stop-color="#5eead4"/>
+        </linearGradient>
+        <marker id="ha" markerWidth="10" markerHeight="10" refX="7" refY="3" orient="auto">
+          <path d="M0 0 L7 3 L0 6 z" fill="#c7d2fe"/></marker>
+      </defs>
+      <!-- person -->
+      <circle cx="60" cy="84" r="24" fill="#fbcfe8"/>
+      <path d="M30 152 q30 -36 60 0 z" fill="#c7d2fe"/>
+      <rect x="96" y="56" width="120" height="50" rx="13" fill="#fff"/>
+      <path d="M108 106 l0 16 l18 -16 z" fill="#fff"/>
+      <text x="110" y="80" font-size="13" fill="#1e293b" font-family="sans-serif">"이거 해줘"</text>
+      <text x="110" y="98" font-size="11" fill="#64748b" font-family="sans-serif">목적·배경·제약</text>
+      <path d="M232 84 h34" stroke="#c7d2fe" stroke-width="3" marker-end="url(#ha)"/>
+      <!-- agent box with layers -->
+      <rect x="276" y="40" width="96" height="92" rx="18" fill="url(#hg)"/>
+      <circle cx="300" cy="78" r="6.5" fill="#0f172a"/><circle cx="348" cy="78" r="6.5" fill="#0f172a"/>
+      <path d="M298 98 q26 14 52 0" stroke="#0f172a" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <rect x="318" y="24" width="12" height="14" rx="4" fill="#a5b4fc"/><circle cx="324" cy="22" r="5" fill="#fff"/>
+      <text x="324" y="152" font-size="11.5" fill="#e0e7ff" font-family="sans-serif" text-anchor="middle">룰 + 프롬프트 적용</text>
+      <path d="M376 84 h34" stroke="#5eead4" stroke-width="3" marker-end="url(#ha)"/>
+      <!-- result doc -->
+      <rect x="420" y="46" width="62" height="78" rx="10" fill="#fff"/>
+      <rect x="432" y="62" width="38" height="6" rx="3" fill="#c7d2fe"/>
+      <rect x="432" y="76" width="38" height="6" rx="3" fill="#c7d2fe"/>
+      <rect x="432" y="90" width="24" height="6" rx="3" fill="#c7d2fe"/>
+      <circle cx="451" cy="112" r="12" fill="#16a34a"/>
+      <path d="M445 112 l4 5 l9 -10" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <!-- share cloud -->
+      <path d="M520 96 a18 18 0 0 1 34 -6 a14 14 0 0 1 4 27 h-34 a14 14 0 0 1 -4 -21 z" fill="#fff" stroke="#0d9488" stroke-width="2"/>
+      <path d="M539 84 v20 M531 96 l8 8 l8 -8" stroke="#0d9488" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="540" y="138" font-size="11.5" fill="#a7f3d0" font-family="sans-serif" text-anchor="middle">공유</text>
+      <!-- loop arrow back -->
+      <path d="M520 110 q-220 70 -440 0" stroke="#5eead4" stroke-width="2.5" fill="none" stroke-dasharray="6 5" marker-end="url(#ha)"/>
+      <text x="300" y="200" font-size="12.5" fill="#a7f3d0" font-family="sans-serif" text-anchor="middle">좋은 결과는 다시 회사 지식으로 — 가져오기·승격·내보내기</text>
+    </svg>
+  </div>
+</header>
+
+<main>
+<div class="wrap">
+
+  <!-- ============ 0. 큰 그림 + nav ============ -->
+  <section class="flush">
+    <h2><span class="n teal">0</span>이 매뉴얼을 보는 법</h2>
+    <p class="sub">설치 안내서(<code>INSTALL_GUIDE.html</code>)로 설치를 마쳤다면, 이 문서는 “이제 어떻게 쓰지?”에 답합니다.</p>
+    <p class="big">기억할 것은 세 가지입니다 — <b>① 에이전트가 어떻게 일하는지 알고</b>,
+      <b>② 잘 부탁하는 요령을 익히고</b>, <b>③ 좋은 결과를 회사 지식으로 주고받는 것</b>입니다.</p>
+
+    <div class="figure">
+      <svg viewBox="0 0 760 120" role="img" aria-label="매뉴얼 3단계: 라이프사이클 이해, 대화 요령, 지식 공유">
+        <defs><marker id="na" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 z" fill="#cbd5e1"/></marker></defs>
+        <rect x="14" y="28" width="216" height="64" rx="14" fill="#eef2ff"/>
+        <text x="122" y="56" font-size="15" fill="#3730a3" text-anchor="middle" font-family="sans-serif" font-weight="bold">1 · 라이프사이클</text>
+        <text x="122" y="78" font-size="12.5" fill="#4338ca" text-anchor="middle" font-family="sans-serif">SDD · 프롬프트 적용 과정</text>
+        <path d="M234 60 h26" stroke="#cbd5e1" stroke-width="2.5" marker-end="url(#na)"/>
+        <rect x="266" y="28" width="216" height="64" rx="14" fill="#f5f3ff"/>
+        <text x="374" y="56" font-size="15" fill="#6d28d9" text-anchor="middle" font-family="sans-serif" font-weight="bold">2 · 대화 요령</text>
+        <text x="374" y="78" font-size="12.5" fill="#7c3aed" text-anchor="middle" font-family="sans-serif">프롬프트 라이브러리 · 예시</text>
+        <path d="M486 60 h26" stroke="#cbd5e1" stroke-width="2.5" marker-end="url(#na)"/>
+        <rect x="518" y="28" width="226" height="64" rx="14" fill="#f0fdfa"/>
+        <text x="631" y="56" font-size="15" fill="#0f766e" text-anchor="middle" font-family="sans-serif" font-weight="bold">3 · 지식 공유</text>
+        <text x="631" y="78" font-size="12.5" fill="#0d9488" text-anchor="middle" font-family="sans-serif">가져오기 · 승격 · 내보내기</text>
+      </svg>
+    </div>
+
+    <div class="callout teal">
+      <div class="ttl">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0d9488" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M22 4 12 14.01l-3-3"/></svg>
+        한 가지만 기억하세요
+      </div>
+      에이전트는 “회사 룰을 먼저 읽고, 적절한 깊이를 스스로 정해서, 결과를 보고”합니다.
+      여러분이 <b>목적·배경·제약</b>만 분명히 말하면 나머지는 에이전트가 알아서 맞춰 줍니다.
+    </div>
+
+    <div class="nav">
+      <a href="#life">① 라이프사이클</a>
+      <a href="#sdd">SDD 소개</a>
+      <a href="#apply">프롬프트 적용 과정</a>
+      <a href="#talk">② 대화 요령</a>
+      <a href="#lib">프롬프트 라이브러리</a>
+      <a href="#share">③ 지식 공유</a>
+      <a href="#import">가져오기</a>
+      <a href="#promote">승격</a>
+      <a href="#export">내보내기</a>
+      <a href="#safe">꼭 지킬 것</a>
+    </div>
+  </section>
+
+  <!-- ============ 1. 라이프사이클 ============ -->
+  <section id="life">
+    <h2><span class="n">1</span>에이전트의 라이프사이클</h2>
+    <p class="sub">요청 한 건이 결과로 나오기까지, 에이전트 안에서는 정해진 흐름이 돕니다. 이걸 알면 “왜 이렇게 답하지?”가 이해됩니다.</p>
+
+    <!-- lifecycle flow A..Z -->
+    <div class="figure">
+      <svg viewBox="0 0 760 220" role="img" aria-label="에이전트 라이프사이클: 요청 해석, 모드 판단, 룰과 프롬프트 적용, 작업, 검증, 보고, 필요하면 공유">
+        <defs><marker id="la" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 z" fill="#94a3b8"/></marker></defs>
+        <!-- row 1 -->
+        <rect x="10" y="22" width="138" height="60" rx="13" fill="#eef2ff"/>
+        <text x="79" y="46" font-size="13.5" fill="#3730a3" text-anchor="middle" font-family="sans-serif" font-weight="bold">① 요청 해석</text>
+        <text x="79" y="66" font-size="11.5" fill="#4338ca" text-anchor="middle" font-family="sans-serif">무엇을 원하나 (A)</text>
+        <path d="M150 52 h22" stroke="#94a3b8" stroke-width="2.3" marker-end="url(#la)"/>
+        <rect x="174" y="22" width="150" height="60" rx="13" fill="#eef2ff"/>
+        <text x="249" y="46" font-size="13.5" fill="#3730a3" text-anchor="middle" font-family="sans-serif" font-weight="bold">② 모드 판단</text>
+        <text x="249" y="66" font-size="11.5" fill="#4338ca" text-anchor="middle" font-family="sans-serif">none / lite / full</text>
+        <path d="M326 52 h22" stroke="#94a3b8" stroke-width="2.3" marker-end="url(#la)"/>
+        <rect x="350" y="22" width="172" height="60" rx="13" fill="#f5f3ff"/>
+        <text x="436" y="46" font-size="13.5" fill="#6d28d9" text-anchor="middle" font-family="sans-serif" font-weight="bold">③ 룰 + 프롬프트 적용</text>
+        <text x="436" y="66" font-size="11.5" fill="#7c3aed" text-anchor="middle" font-family="sans-serif">회사 표준을 컨텍스트로</text>
+        <path d="M524 52 h22" stroke="#94a3b8" stroke-width="2.3" marker-end="url(#la)"/>
+        <rect x="548" y="22" width="138" height="60" rx="13" fill="#f5f3ff"/>
+        <text x="617" y="46" font-size="13.5" fill="#6d28d9" text-anchor="middle" font-family="sans-serif" font-weight="bold">④ 작업 수행</text>
+        <text x="617" y="66" font-size="11.5" fill="#7c3aed" text-anchor="middle" font-family="sans-serif">설계·구현·작성 (D~F)</text>
+        <!-- down arrow -->
+        <path d="M617 84 v20 h-540 v18" stroke="#94a3b8" stroke-width="2.3" fill="none" marker-end="url(#la)"/>
+        <!-- row 2 -->
+        <rect x="10" y="124" width="150" height="60" rx="13" fill="#f0fdf4"/>
+        <text x="85" y="148" font-size="13.5" fill="#15803d" text-anchor="middle" font-family="sans-serif" font-weight="bold">⑤ 검증</text>
+        <text x="85" y="168" font-size="11.5" fill="#16a34a" text-anchor="middle" font-family="sans-serif">테스트·diff·룰위반 (G)</text>
+        <path d="M162 154 h22" stroke="#94a3b8" stroke-width="2.3" marker-end="url(#la)"/>
+        <rect x="186" y="124" width="150" height="60" rx="13" fill="#f0fdf4"/>
+        <text x="261" y="148" font-size="13.5" fill="#15803d" text-anchor="middle" font-family="sans-serif" font-weight="bold">⑥ 결과 보고</text>
+        <text x="261" y="168" font-size="11.5" fill="#16a34a" text-anchor="middle" font-family="sans-serif">변경·검증·남은일 (Z)</text>
+        <path d="M338 154 h22" stroke="#94a3b8" stroke-width="2.3" marker-end="url(#la)"/>
+        <rect x="362" y="124" width="180" height="60" rx="13" fill="#f0fdfa"/>
+        <text x="452" y="148" font-size="13.5" fill="#0f766e" text-anchor="middle" font-family="sans-serif" font-weight="bold">⑦ (선택) 지식 공유</text>
+        <text x="452" y="168" font-size="11.5" fill="#0d9488" text-anchor="middle" font-family="sans-serif">재사용 가치 있으면 → 3장</text>
+        <!-- escalate note -->
+        <rect x="560" y="124" width="190" height="60" rx="13" fill="#fffbeb" stroke="#fde68a" stroke-width="1.5"/>
+        <text x="655" y="146" font-size="12" fill="#9a3412" text-anchor="middle" font-family="sans-serif" font-weight="bold">범위가 커지면</text>
+        <text x="655" y="166" font-size="11.5" fill="#b45309" text-anchor="middle" font-family="sans-serif">none → lite → full 승격</text>
+      </svg>
+      <div class="figcap">한 건의 요청이 도는 흐름 — 단계 기호(A~Z)는 아래 SDD 소개에서 이어집니다.</div>
+    </div>
+
+    <!-- 1.1 SDD -->
+    <h3 id="sdd"><span class="dot v"></span>SDD 소개 — 같은 흐름, 다른 깊이</h3>
+    <p>SDD(Spec Driven Development)는 “문서부터 쓰는 무거운 방법론”이 아닙니다.
+      <b>매번 질문으로 멈추지 않도록</b>, 에이전트가 요청의 무게를 보고 <b>스스로 적절한 깊이</b>를 고르는 규칙입니다.
+      세 모드는 <b>다른 방법이 아니라 같은 A~Z 흐름을 얼마나 압축하느냐</b>의 차이입니다.</p>
+
+    <!-- SDD stages bar with 3 modes -->
+    <div class="figure">
+      <svg viewBox="0 0 760 250" role="img" aria-label="SDD 공통 단계 A부터 Z, none/lite/full 모드가 어떤 단계를 쓰는지">
+        <!-- stage header chips -->
+        <g font-family="sans-serif" text-anchor="middle">
+          <!-- columns A B C D E F G H Z -->
+          <g>
+            <rect x="40"  y="20" width="66" height="34" rx="8" fill="#312e81"/><text x="73"  y="42" font-size="13" fill="#fff" font-weight="bold">A 분석</text>
+            <rect x="116" y="20" width="66" height="34" rx="8" fill="#4338ca"/><text x="149" y="42" font-size="13" fill="#fff" font-weight="bold">B 탐색</text>
+            <rect x="192" y="20" width="66" height="34" rx="8" fill="#312e81"/><text x="225" y="42" font-size="13" fill="#fff" font-weight="bold">C 기준</text>
+            <rect x="268" y="20" width="66" height="34" rx="8" fill="#4338ca"/><text x="301" y="42" font-size="13" fill="#fff" font-weight="bold">D 설계</text>
+            <rect x="344" y="20" width="66" height="34" rx="8" fill="#6d28d9"/><text x="377" y="42" font-size="13" fill="#fff" font-weight="bold">E 분해</text>
+            <rect x="420" y="20" width="66" height="34" rx="8" fill="#6d28d9"/><text x="453" y="42" font-size="13" fill="#fff" font-weight="bold">F 구현</text>
+            <rect x="496" y="20" width="66" height="34" rx="8" fill="#0d9488"/><text x="529" y="42" font-size="13" fill="#fff" font-weight="bold">G 검증</text>
+            <rect x="572" y="20" width="66" height="34" rx="8" fill="#4338ca"/><text x="605" y="42" font-size="13" fill="#fff" font-weight="bold">H 리뷰</text>
+            <rect x="648" y="20" width="66" height="34" rx="8" fill="#312e81"/><text x="681" y="42" font-size="13" fill="#fff" font-weight="bold">Z 보고</text>
+          </g>
+          <!-- none row -->
+          <text x="20" y="86" font-size="13" fill="#475569" text-anchor="start" font-weight="bold">none</text>
+          <g fill="#e2e8f0">
+            <circle cx="73" cy="82" r="13" fill="#475569"/><circle cx="149" cy="82" r="13"/>
+            <circle cx="225" cy="82" r="13" fill="#475569"/><circle cx="301" cy="82" r="13"/>
+            <circle cx="377" cy="82" r="13"/><circle cx="453" cy="82" r="13"/>
+            <circle cx="529" cy="82" r="13"/><circle cx="605" cy="82" r="13"/>
+            <circle cx="681" cy="82" r="13" fill="#475569"/>
+          </g>
+          <path d="M73 82 H225 M225 82 H681" stroke="#94a3b8" stroke-width="2" stroke-dasharray="4 4"/>
+          <!-- lite row -->
+          <text x="20" y="138" font-size="13" fill="#0f766e" text-anchor="start" font-weight="bold">lite</text>
+          <g fill="#ccfbf1">
+            <circle cx="73" cy="134" r="13" fill="#0d9488"/><circle cx="149" cy="134" r="13"/>
+            <circle cx="225" cy="134" r="13" fill="#0d9488"/><circle cx="301" cy="134" r="13"/>
+            <circle cx="377" cy="134" r="13" fill="#0d9488"/><circle cx="453" cy="134" r="13" fill="#0d9488"/>
+            <circle cx="529" cy="134" r="13" fill="#0d9488"/><circle cx="605" cy="134" r="13"/>
+            <circle cx="681" cy="134" r="13" fill="#0d9488"/>
+          </g>
+          <path d="M73 134 H225 M225 134 H377 M377 134 H529 M529 134 H681" stroke="#5eead4" stroke-width="2.5"/>
+          <!-- full row -->
+          <text x="20" y="190" font-size="13" fill="#6d28d9" text-anchor="start" font-weight="bold">full</text>
+          <g>
+            <circle cx="73" cy="186" r="13" fill="#7c3aed"/><circle cx="149" cy="186" r="13" fill="#7c3aed"/>
+            <circle cx="225" cy="186" r="13" fill="#7c3aed"/><circle cx="301" cy="186" r="13" fill="#7c3aed"/>
+            <circle cx="377" cy="186" r="13" fill="#7c3aed"/><circle cx="453" cy="186" r="13" fill="#7c3aed"/>
+            <circle cx="529" cy="186" r="13" fill="#7c3aed"/><circle cx="605" cy="186" r="13" fill="#7c3aed"/>
+            <circle cx="681" cy="186" r="13" fill="#7c3aed"/>
+          </g>
+          <path d="M73 186 H681" stroke="#c4b5fd" stroke-width="2.5"/>
+          <text x="380" y="228" font-size="12.5" fill="#64748b">색이 찬 동그라미 = 그 모드가 거치는 단계 · A·C·Z는 항상 거칩니다</text>
+        </g>
+      </svg>
+    </div>
+
+    <table>
+      <thead><tr><th>모드</th><th>흐름</th><th>언제</th><th>산출물</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><span class="chip none">none</span></td>
+          <td><code>A → C → Z</code></td>
+          <td>단순 질문, 오타·표현 수정처럼 영향 없는 작은 일</td>
+          <td>별도 문서 없음. 결과 보고만</td>
+        </tr>
+        <tr>
+          <td><span class="chip lite">lite</span></td>
+          <td><code>A → C → E → F → G → Z</code></td>
+          <td>한두 파일 수준 문서/설정 보강, 명확한 작은 변경</td>
+          <td>간단한 계획 + 변경 후 확인</td>
+        </tr>
+        <tr>
+          <td><span class="chip full">full</span></td>
+          <td><code>A → B → C → D → E → F → G → H → Z</code></td>
+          <td>새 기능·구조 변경, 여러 사람이 이어받는 큰 작업</td>
+          <td><code>requirements / design / tasks / review</code> 스펙</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout">
+      <div class="ttl">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16v-4M12 8h.01"/><circle cx="12" cy="12" r="9"/></svg>
+        내가 직접 모드를 정하고 싶다면
+      </div>
+      그냥 말로 지정하면 됩니다. <span class="say">이건 가볍게 lite로 빠르게 해줘</span>
+      <span class="say">설계 문서까지 남기는 full로 진행해줘</span>
+      지정하지 않으면 에이전트가 알아서 고르고, 작업 중 범위가 커지면 <b>스스로 승격</b>합니다.
+      (단, 파괴적 작업·보안·비용·외부 배포는 모드와 무관하게 먼저 확인합니다.)
+    </div>
+
+    <!-- 1.2 prompt apply -->
+    <h3 id="apply"><span class="dot v"></span>프롬프트가 적용되는 과정 — 층층이 쌓입니다</h3>
+    <p>에이전트가 보는 “지시”는 내 한 줄 요청만이 아닙니다. <b>회사 표준이 여러 겹으로 미리 깔려 있고</b>,
+      그 위에 내 요청이 얹힙니다. 그래서 같은 한 줄이라도 회사 룰에 맞는 결과가 나옵니다.</p>
+
+    <div class="figure">
+      <svg viewBox="0 0 700 290" role="img" aria-label="프롬프트 컨텍스트 층: 진입점, canonical 룰, 스킬, 프롬프트 라이브러리, 내 요청이 쌓여 에이전트에 전달됨">
+        <defs><marker id="pa" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 z" fill="#7c3aed"/></marker></defs>
+        <!-- left annotation -->
+        <path d="M80 28 v176" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="3 4"/>
+        <text x="22" y="106" font-size="12" fill="#64748b" font-family="sans-serif">미리</text>
+        <text x="22" y="124" font-size="12" fill="#64748b" font-family="sans-serif">깔려</text>
+        <text x="22" y="142" font-size="12" fill="#64748b" font-family="sans-serif">있음</text>
+        <!-- layers (x 104..550) -->
+        <g font-family="sans-serif">
+          <rect x="104" y="20"  width="446" height="40" rx="10" fill="#eef2ff" stroke="#c7d2fe" stroke-width="1.5"/>
+          <text x="124" y="45" font-size="13.5" fill="#3730a3" font-weight="bold">진입점</text>
+          <text x="196" y="45" font-size="12" fill="#4338ca">AGENTS.md · CLAUDE.md · GEMINI.md (룰 포인터)</text>
+
+          <rect x="104" y="66" width="446" height="40" rx="10" fill="#f5f3ff" stroke="#ddd6fe" stroke-width="1.5"/>
+          <text x="124" y="91" font-size="13.5" fill="#6d28d9" font-weight="bold">회사 룰</text>
+          <text x="196" y="91" font-size="12" fill="#7c3aed">.agents/rules/ — 보안·출처·SDD·아키텍처·커밋</text>
+
+          <rect x="104" y="112" width="446" height="40" rx="10" fill="#f0fdfa" stroke="#99f6e4" stroke-width="1.5"/>
+          <text x="124" y="137" font-size="13.5" fill="#0f766e" font-weight="bold">스킬</text>
+          <text x="196" y="137" font-size="12" fill="#0d9488">코드리뷰 · 회의록 · 커밋메시지 등 작업 절차</text>
+
+          <rect x="104" y="158" width="446" height="40" rx="10" fill="#fffbeb" stroke="#fde68a" stroke-width="1.5"/>
+          <text x="124" y="183" font-size="13.5" fill="#9a3412" font-weight="bold">프롬프트</text>
+          <text x="196" y="183" font-size="12" fill="#b45309">검증된 프롬프트 골격 (.agents/prompts/)</text>
+
+          <rect x="104" y="204" width="446" height="48" rx="10" fill="#312e81"/>
+          <text x="124" y="226" font-size="13.5" fill="#fff" font-weight="bold">내 요청</text>
+          <text x="196" y="226" font-size="12" fill="#c7d2fe">"이거 해줘" + 목적 · 배경 · 제약</text>
+          <text x="196" y="243" font-size="11" fill="#a5b4fc">← 여러분이 직접 쓰는 부분</text>
+        </g>
+        <!-- bracket gathering all layers to the agent -->
+        <path d="M580 40 V228" stroke="#c4b5fd" stroke-width="2.5" fill="none"/>
+        <path d="M550 40 h30 M550 86 h30 M550 132 h30 M550 178 h30 M550 228 h30"
+              stroke="#c4b5fd" stroke-width="2" fill="none"/>
+        <path d="M580 134 h13" stroke="#7c3aed" stroke-width="2.5" marker-end="url(#pa)"/>
+        <!-- agent -->
+        <circle cx="630" cy="134" r="30" fill="#a5b4fc"/>
+        <circle cx="620" cy="128" r="4.5" fill="#0f172a"/><circle cx="640" cy="128" r="4.5" fill="#0f172a"/>
+        <path d="M619 142 q11 8 22 0" stroke="#0f172a" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+        <text x="630" y="184" font-size="12" fill="#4338ca" font-family="sans-serif" text-anchor="middle" font-weight="bold">에이전트</text>
+      </svg>
+      <div class="figcap">아래에서 위로 쌓인 층이 한꺼번에 에이전트의 “컨텍스트”가 됩니다. 진입점은 룰을 직접 담지 않고 <code>.agents/rules/</code>를 가리키는 포인터입니다.</div>
+    </div>
+
+    <div class="callout teal">
+      <b>이게 왜 좋은가요?</b> 매번 “보안 지켜”, “출처 남겨”, “커밋은 회사 양식으로”를 말하지 않아도 됩니다.
+      이미 룰 층에 깔려 있어서, 여러분은 <b>하고 싶은 일만</b> 말하면 됩니다.
+    </div>
+  </section>
+
+  <!-- ============ 2. 대화 요령 ============ -->
+  <section id="talk">
+    <h2><span class="n violet">2</span>에이전트와의 대화 요령</h2>
+    <p class="sub">좋은 결과의 80%는 “잘 부탁하기”에서 나옵니다. 어렵지 않습니다 — 네 가지만 챙기면 됩니다.</p>
+
+    <div class="figure">
+      <svg viewBox="0 0 720 96" role="img" aria-label="좋은 요청의 4요소: 목적, 대상, 배경, 제약과 출력형식">
+        <g font-family="sans-serif" text-anchor="middle">
+          <rect x="14"  y="22" width="160" height="52" rx="13" fill="#f5f3ff"/><text x="94"  y="44" font-size="14" fill="#6d28d9" font-weight="bold">🎯 목적</text><text x="94"  y="64" font-size="11.5" fill="#7c3aed">무엇을 원하나</text>
+          <rect x="190" y="22" width="160" height="52" rx="13" fill="#f5f3ff"/><text x="270" y="44" font-size="14" fill="#6d28d9" font-weight="bold">👤 대상</text><text x="270" y="64" font-size="11.5" fill="#7c3aed">누가 읽나</text>
+          <rect x="366" y="22" width="160" height="52" rx="13" fill="#f5f3ff"/><text x="446" y="44" font-size="14" fill="#6d28d9" font-weight="bold">📄 배경</text><text x="446" y="64" font-size="11.5" fill="#7c3aed">상황·입력 자료</text>
+          <rect x="542" y="22" width="166" height="52" rx="13" fill="#f5f3ff"/><text x="625" y="44" font-size="14" fill="#6d28d9" font-weight="bold">⚙️ 제약·출력</text><text x="625" y="64" font-size="11.5" fill="#7c3aed">조건·원하는 형식</text>
+        </g>
+      </svg>
+    </div>
+
+    <div class="twocol">
+      <div class="pcard" style="border-color:#fecaca;background:#fef2f2">
+        <div class="h" style="color:#b91c1c">🙅 막연한 요청</div>
+        <span class="say" style="background:#fff;border-color:#fecaca;color:#7f1d1d">보고서 좀 써줘</span>
+        <p style="font-size:14px;color:#7f1d1d;margin-top:8px">→ 무슨 보고서인지, 누구에게, 무슨 내용인지 몰라 되묻거나 엉뚱한 결과가 나옵니다.</p>
+      </div>
+      <div class="pcard" style="border-color:#bbf7d0;background:#f0fdf4">
+        <div class="h" style="color:#15803d">🙆 좋은 요청</div>
+        <span class="say t">이번 주 작업 로그를 팀장 보고용 주간보고로 정리해줘. 성과·리스크·다음주 계획 3단락, 표 없이.</span>
+        <p style="font-size:14px;color:#166534;margin-top:8px">→ 목적·대상·배경·제약·형식이 모두 들어 있어 한 번에 쓸 만한 결과가 나옵니다.</p>
+      </div>
+    </div>
+
+    <div class="callout">
+      <div class="ttl">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4"/></svg>
+        대화를 더 잘하는 습관
+      </div>
+      <b>① 한 번에 완벽을 노리지 말기</b> — 초안을 받고 “이 부분 더 짧게”처럼 이어서 다듬으세요.
+      <b>② 예시를 주기</b> — “이런 톤으로”라며 샘플을 붙이면 정확도가 올라갑니다.
+      <b>③ 민감정보는 가리기</b> — 고객명·번호는 <code>&lt;고객명&gt;</code>처럼 placeholder로.
+    </div>
+
+    <!-- 2.1 prompt library -->
+    <h3 id="lib"><span class="dot v"></span>프롬프트 라이브러리 사용법</h3>
+    <p>매번 “좋은 요청”을 새로 짜기는 번거롭습니다. 그래서 설치 시 <b>검증된 프롬프트 골격 묶음(프롬프트 라이브러리)</b>이
+      함께 깔립니다. 직무에 맞는 골격을 꺼내 빈칸만 채우면 됩니다.</p>
+
+    <p style="margin-bottom:4px">설치된 위치는 사용하는 AI 도구에 따라 다릅니다(의미는 같습니다).</p>
+    <div class="paths">
+      <code>Codex · .agents/prompts/</code>
+      <code>Claude · .claude/prompts/</code>
+      <code>Gemini · .gemini/prompts/</code>
+      <code>Cursor · .cursor/prompts/</code>
+      <code>Kiro · .kiro/prompts/</code>
+    </div>
+
+    <p>기본으로 들어오는 골격(예시):</p>
+    <table>
+      <thead><tr><th>파일</th><th>용도</th><th>직무</th></tr></thead>
+      <tbody>
+        <tr><td><code>_universal-template.md</code></td><td>모든 프롬프트의 공통 골격(역할·목적·대상·배경·제약·출력)</td><td>전 직무</td></tr>
+        <tr><td><code>dev-implementation.md</code></td><td>구현 요청 → 설계·코드·설명·개선점</td><td><span class="chip" style="background:#ede9fe;color:#6d28d9">developer</span></td></tr>
+        <tr><td><code>doc-writing.md</code> · <code>comparison-analysis.md</code> · <code>research.md</code></td><td>문서 작성 · 비교 분석 · 리서치</td><td>전 직무</td></tr>
+        <tr><td><code>product/</code> (prd · user-story · prioritization)</td><td>PRD 초안 · 사용자 스토리 · 우선순위</td><td><span class="chip" style="background:#e0e7ff;color:#3730a3">product</span></td></tr>
+        <tr><td><code>business/</code> (faq · proposal · announcement)</td><td>FAQ · 제안 메시지 · 공지문</td><td><span class="chip" style="background:#ccfbf1;color:#0f766e">business</span></td></tr>
+      </tbody>
+    </table>
+
+    <p style="margin-bottom:6px">꺼내 쓰는 방법은 두 가지 — 둘 다 말로 시키면 됩니다.</p>
+    <ol class="steps violet">
+      <li>
+        <h4>이름으로 불러오기</h4>
+        <p>어떤 골격이 있는지 모르면 먼저 목록을 물어보고, 마음에 드는 걸 채워 달라고 합니다.</p>
+        <span class="say v">내 프롬프트 라이브러리에 뭐가 있는지 보여줘.</span>
+        <span class="say v">dev-implementation 골격으로 이 요구사항을 채워서 구현해줘.</span>
+      </li>
+      <li>
+        <h4>공통 골격으로 새로 만들기</h4>
+        <p>딱 맞는 게 없으면 <code>_universal-template.md</code>의 6개 섹션(역할·목적·대상·배경·제약·출력)을 기준으로 만들어 달라고 합니다.</p>
+        <span class="say v">범용 템플릿 골격으로, 신규 거래처 안내 메일 프롬프트를 만들어줘.</span>
+      </li>
+    </ol>
+
+    <!-- 2.2 prompt example -->
+    <h3 id="ex"><span class="dot v"></span>프롬프트 예시</h3>
+    <p>실제 골격 하나를 보면 감이 옵니다. 아래는 <code>dev-implementation.md</code>의 구조입니다 — <span class="k" style="color:#7c3aed;font-weight:700">대괄호 부분만</span> 채우면 됩니다.</p>
+
+    <div class="prompt">
+      <div class="ph">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#e0e7ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>
+        개발 구현 프롬프트 (dev-implementation)
+      </div>
+      <div class="pb">당신은 Senior Software Engineer이다.
+다음 요구사항을 구현한다.
+
+<span class="k">## 요구사항</span>
+[구현할 기능 — 민감정보는 placeholder로]
+
+<span class="k">## 개발환경</span>
+- OS / Language / Framework / Compiler
+
+<span class="k">## 조건</span>
+- 유지보수성 · 성능 · 예외처리 · 주석 포함
+
+<span class="k">## 출력</span>
+1. 설계   2. 코드   3. 설명   4. 개선점</div>
+    </div>
+
+    <p>직무별로 자주 쓰는 한 줄 요청 예시:</p>
+    <table>
+      <thead><tr><th>직무</th><th>이렇게 말하면 됩니다</th></tr></thead>
+      <tbody>
+        <tr><td class="role">개발</td><td><span class="say v" style="margin:3px 0">dev-implementation 골격으로 “CSV 업로드 검증” 기능을 Node로 구현해줘. 예외처리·주석 포함.</span></td></tr>
+        <tr><td class="role">기획·PM</td><td><span class="say v" style="margin:3px 0">product/prd 골격으로 “알림 설정 화면” PRD 초안 잡아줘. 대상은 모바일 사용자.</span></td></tr>
+        <tr><td class="role">사업·CS</td><td><span class="say v" style="margin:3px 0">business/faq 골격으로 환불 정책 FAQ 5개 만들어줘. 고객명은 &lt;고객명&gt;으로.</span></td></tr>
+        <tr><td class="role">공통</td><td><span class="say v" style="margin:3px 0">comparison-analysis 골격으로 A안·B안을 표로 비교하고 결론 내줘.</span></td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout ok">
+      <div class="ttl">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        잘 통한 프롬프트는 버리지 마세요
+      </div>
+      “이거 좋다” 싶은 프롬프트가 있으면 <b>3장의 내보내기</b>로 회사 라이브러리에 올릴 수 있습니다.
+      <span class="say">이 프롬프트 자산화해줘</span> 라고 말하면 에이전트가 정리해 줍니다.
+    </div>
+  </section>
+
+  <!-- ============ 3. 지식 공유 ============ -->
+  <section id="share">
+    <h2><span class="n teal">3</span>지식 공유 방법</h2>
+    <p class="sub">남이 만든 좋은 프롬프트·스킬을 <b>가져오고</b>, 검증된 건 <b>승격</b>하고, 내 노하우는 <b>내보냅니다</b>. 이 순환이 회사 AI 자산을 키웁니다.</p>
+
+    <!-- big share flow -->
+    <div class="figure">
+      <svg viewBox="0 0 760 250" role="img" aria-label="지식 공유 전체 흐름: 공유 드라이브와 깃허브 후보 브랜치에서 가져와 검역 구역에 두고, 검증되면 공식 자산으로 승격, 내 노하우는 정제해 내보냄">
+        <defs><marker id="sa" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 z" fill="#94a3b8"/></marker></defs>
+        <!-- shared sources -->
+        <rect x="14" y="30" width="170" height="86" rx="14" fill="#f0fdfa" stroke="#99f6e4" stroke-width="1.5"/>
+        <text x="99" y="54" font-size="13.5" fill="#0f766e" text-anchor="middle" font-family="sans-serif" font-weight="bold">공유 채널</text>
+        <text x="99" y="76" font-size="11.5" fill="#0d9488" text-anchor="middle" font-family="sans-serif">Google Drive</text>
+        <text x="99" y="94" font-size="11.5" fill="#0d9488" text-anchor="middle" font-family="sans-serif">AI-Knowhow/</text>
+        <text x="99" y="110" font-size="10.5" fill="#5ea89f" text-anchor="middle" font-family="sans-serif">GitHub prompts/skills</text>
+        <!-- import arrow -->
+        <path d="M186 73 h40" stroke="#94a3b8" stroke-width="2.3" marker-end="url(#sa)"/>
+        <text x="206" y="64" font-size="11" fill="#1d4ed8" text-anchor="middle" font-family="sans-serif" font-weight="bold">가져오기</text>
+        <!-- quarantine -->
+        <rect x="228" y="30" width="180" height="86" rx="14" fill="#fffbeb" stroke="#fde68a" stroke-width="2" stroke-dasharray="6 3"/>
+        <text x="318" y="54" font-size="13.5" fill="#9a3412" text-anchor="middle" font-family="sans-serif" font-weight="bold">검역 구역</text>
+        <text x="318" y="76" font-size="11" fill="#b45309" text-anchor="middle" font-family="sans-serif">.agents/externals/</text>
+        <text x="318" y="93" font-size="10.5" fill="#b45309" text-anchor="middle" font-family="sans-serif">skills · prompts · docs</text>
+        <text x="318" y="109" font-size="10.5" fill="#ca8a04" text-anchor="middle" font-family="sans-serif">보안검사 후 “검증 전 공유본”</text>
+        <!-- promote arrow -->
+        <path d="M410 73 h40" stroke="#94a3b8" stroke-width="2.3" marker-end="url(#sa)"/>
+        <text x="430" y="64" font-size="11" fill="#6d28d9" text-anchor="middle" font-family="sans-serif" font-weight="bold">승격</text>
+        <!-- official asset -->
+        <rect x="452" y="30" width="180" height="86" rx="14" fill="#f5f3ff" stroke="#ddd6fe" stroke-width="1.5"/>
+        <text x="542" y="54" font-size="13.5" fill="#6d28d9" text-anchor="middle" font-family="sans-serif" font-weight="bold">공식 자산</text>
+        <text x="542" y="76" font-size="11" fill="#7c3aed" text-anchor="middle" font-family="sans-serif">catalog · profile</text>
+        <text x="542" y="93" font-size="11" fill="#7c3aed" text-anchor="middle" font-family="sans-serif">company-* / main</text>
+        <text x="542" y="109" font-size="10.5" fill="#9061e0" text-anchor="middle" font-family="sans-serif">검증 게이트 통과해야 함</text>
+        <!-- right gate -->
+        <circle cx="690" cy="73" r="24" fill="#ede9fe"/>
+        <path d="M681 73 l6 7 l13 -15" stroke="#7c3aed" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <text x="690" y="116" font-size="11" fill="#6d28d9" text-anchor="middle" font-family="sans-serif">게이트</text>
+        <!-- export loop -->
+        <rect x="120" y="172" width="200" height="56" rx="14" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1.5"/>
+        <text x="220" y="196" font-size="13" fill="#1d4ed8" text-anchor="middle" font-family="sans-serif" font-weight="bold">내 노하우 정제</text>
+        <text x="220" y="216" font-size="11" fill="#2563eb" text-anchor="middle" font-family="sans-serif">민감정보 제거 · 출처 · frontmatter</text>
+        <path d="M220 172 V150 q0 -10 -10 -10 H110 q-11 0 -11 12 v24" stroke="#94a3b8" stroke-width="2.3" fill="none" marker-end="url(#sa)"/>
+        <text x="250" y="146" font-size="11" fill="#1d4ed8" font-family="sans-serif" font-weight="bold">내보내기</text>
+        <path d="M320 200 h120 q12 0 12 -12 v-2" stroke="#94a3b8" stroke-width="2.3" fill="none" stroke-dasharray="5 4" marker-end="url(#sa)"/>
+        <text x="500" y="196" font-size="11" fill="#64748b" font-family="sans-serif">반복 사용되면 → 승격 후보</text>
+      </svg>
+      <div class="figcap">핵심 원칙: <b>외부에서 받은 건 절대 바로 회사 자산처럼 쓰지 않습니다.</b> 먼저 검역 구역에 두고, 검증된 것만 승격합니다.</div>
+    </div>
+
+    <!-- 3.1 import -->
+    <h3 id="import"><span class="dot t"></span>가져오기 — 다운로드 / MD 복사</h3>
+    <p>다른 사람이 공유한 프롬프트·스킬 <code>.md</code>를 내 프로젝트로 가져오는 단계입니다.
+      어떻게 받든 <b>먼저 검역 구역(<code>.agents/externals/</code>)</b>에 두고, 보안검사를 거친 뒤에만 실제로 씁니다.</p>
+
+    <ol class="steps teal">
+      <li>
+        <h4>어디서 받을지 고르기</h4>
+        <p>공유 폴더 <b>Google Drive <code>AI-Knowhow/</code></b>(skills · prompts)에서 받거나, GitHub <code>prompts</code>/<code>skills</code> 후보 브랜치에서 받습니다.</p>
+        <span class="say t">AI-Knowhow/prompts 폴더의 .md 목록을 보여줘.</span>
+      </li>
+      <li>
+        <h4>받는 방법 — ① 다운로드 ② MD 복사</h4>
+        <p><b>① 직접 다운로드(권장):</b> AI 도구에 Google Drive 커넥터가 연결돼 있으면 에이전트가 <code>.md</code>를 원형 그대로 내려받습니다.
+          연결이 없으면 <b>사람이 Drive 웹에서</b> 내려받아 <code>.agents/externals/</code>에 넣습니다.</p>
+        <p><b>② MD 복사:</b> 짧은 내용은 <code>.md</code> 본문을 복사해 붙여넣어도 됩니다. (큰 파일을 base64 등으로 옮겨 적는 방식은 피하세요.)</p>
+      </li>
+      <li>
+        <h4>검역 구역에 두기</h4>
+        <p>받은 파일은 곧장 쓰지 않고 아래 위치에 둡니다 — 여긴 “검증 전 공유본” 보관소입니다.</p>
+        <div class="paths">
+          <code>.agents/externals/skills/</code>
+          <code>.agents/externals/prompts/</code>
+          <code>.agents/externals/docs/</code>
+        </div>
+      </li>
+      <li>
+        <h4>보안검사 받기</h4>
+        <p>에이전트가 로컬 파일에서 <b>민감정보·credential·고객 데이터·출처 누락</b>을 점검합니다. 필요하면 가린(redacted) 사본을 만듭니다.</p>
+        <span class="say t">externals에 받은 이 .md를 보안검사하고, 무슨 자산인지·어디 들어갈지·기존 파일과 충돌하는지 알려줘.</span>
+      </li>
+      <li>
+        <h4>확인 후 배치</h4>
+        <p>요약·배치 위치·충돌 여부를 확인하고 컨펌하면, 충돌 시 기본은 <b>add-namespaced</b>(이름공간을 나눠 나란히 두기)로 안전하게 배치합니다.
+          (다른 선택지: keep-existing · rename-proposed · replace-existing)</p>
+      </li>
+    </ol>
+
+    <div class="callout warn">
+      <div class="ttl">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+        검역이 필요한 이유
+      </div>
+      외부 <code>.md</code>에는 남의 민감정보가 섞여 있거나, 우리 프로젝트와 다른 가정이 들어 있을 수 있습니다.
+      <code>.agents/externals/</code>는 <b>검토 전 자료가 실수로 커밋되지 않도록</b> 보호되는 격리 구역입니다.
+    </div>
+
+    <!-- 3.2 promote -->
+    <h3 id="promote"><span class="dot t"></span>승격 및 사용 방법</h3>
+    <p>검역 구역의 자료가 <b>여러 사람·여러 작업에서 반복적으로 잘 쓰이면</b>, 운영자 검토를 거쳐 <b>공식 자산</b>으로 승격합니다.
+      승격되면 카탈로그/프로필에 들어가 설치만 하면 누구나 “정식 자산”으로 받게 됩니다.</p>
+
+    <table>
+      <thead><tr><th>상태</th><th>위치</th><th>의미</th></tr></thead>
+      <tbody>
+        <tr><td><span class="chip opt">검증 전</span></td><td><code>.agents/externals/…</code></td><td>받아만 둔 공유본. 내 프로젝트에서 시험 사용</td></tr>
+        <tr><td><span class="chip lite">후보</span></td><td>GitHub <code>prompts</code>/<code>skills</code> 브랜치</td><td>공유 후보로 수집됨. 아직 공식 아님</td></tr>
+        <tr><td><span class="chip full">공식</span></td><td><code>main</code> · <code>company-*</code> · catalog/profile</td><td>검증 통과. 설치 기본 자산으로 배포</td></tr>
+      </tbody>
+    </table>
+
+    <p style="margin-bottom:4px">승격 게이트(기본값 — governance가 바꾸지 않는 한):</p>
+    <div class="figure">
+      <svg viewBox="0 0 720 70" role="img" aria-label="승격 게이트: 사용 5회 이상, 사용자 2명 이상, 성공률 80퍼센트 이상, 표현 안정, owner와 reviewer 지정">
+        <g font-family="sans-serif" text-anchor="middle">
+          <rect x="10"  y="14" width="132" height="42" rx="10" fill="#ede9fe"/><text x="76"  y="40" font-size="13" fill="#6d28d9" font-weight="bold">사용 ≥ 5회</text>
+          <rect x="152" y="14" width="132" height="42" rx="10" fill="#ede9fe"/><text x="218" y="40" font-size="13" fill="#6d28d9" font-weight="bold">사용자 ≥ 2명</text>
+          <rect x="294" y="14" width="132" height="42" rx="10" fill="#ede9fe"/><text x="360" y="40" font-size="13" fill="#6d28d9" font-weight="bold">성공률 ≥ 80%</text>
+          <rect x="436" y="14" width="132" height="42" rx="10" fill="#ede9fe"/><text x="502" y="40" font-size="13" fill="#6d28d9" font-weight="bold">표현 안정</text>
+          <rect x="578" y="14" width="132" height="42" rx="10" fill="#ede9fe"/><text x="644" y="40" font-size="13" fill="#6d28d9" font-weight="bold">owner·reviewer</text>
+        </g>
+      </svg>
+    </div>
+    <p style="font-size:14.5px;color:#475569">승격은 에이전트가 단독으로 “공식”이라 선언하지 않습니다. 게이트 충족 + <b>운영자 수동 검토</b>를 거칩니다.
+      <span class="say t" style="margin-top:6px">이 프롬프트, 승격해도 될지 게이트 기준으로 점검하고 승격 제안 정리해줘.</span></p>
+
+    <h4 style="margin:22px 0 8px;font-size:16px;color:#9a3412">⚠ 승격 없이 그냥 쓰면 — 한계점</h4>
+    <p style="margin-top:0">검역 구역의 자료를 시험 삼아 쓰는 건 괜찮습니다. 다만 <b>승격 전에는 “검증 전 공유본”</b>이라는 점을 잊으면 안 됩니다.</p>
+    <div class="limit">
+      <div class="lcard">
+        <div class="h">🔁 자동 배포 안 됨</div>
+        <p>설치/업데이트 대상이 아니라, 새 프로젝트나 동료에게 그대로 따라오지 않습니다. 매번 수동으로 다시 가져와야 합니다.</p>
+      </div>
+      <div class="lcard">
+        <div class="h">🧪 품질 보증 없음</div>
+        <p>회사 검증(보안·출처·중복·품질)을 통과하지 않았습니다. 잘못된 가정이나 빠진 출처가 있을 수 있습니다.</p>
+      </div>
+      <div class="lcard">
+        <div class="h">👤 책임자 불명확</div>
+        <p>owner/reviewer가 없어, 문제가 생기거나 업데이트가 필요할 때 누구에게 물어야 할지 불분명합니다.</p>
+      </div>
+      <div class="lcard">
+        <div class="h">🔀 표류·중복 위험</div>
+        <p>여러 사람이 각자 조금씩 고친 사본이 흩어져, 어느 게 “맞는 버전”인지 알 수 없게 됩니다(drift).</p>
+      </div>
+    </div>
+    <div class="callout">
+      한 줄 요약: <b>혼자 잠깐 쓰는 건 OK, 팀 표준으로 삼으려면 반드시 승격.</b>
+      적용 시 에이전트는 항상 <b>“검증 전 공유본”</b>이라고 표시하고 컨펌을 받습니다.
+    </div>
+
+    <!-- 3.3 export -->
+    <h3 id="export"><span class="dot t"></span>내보내기 — 업로드 / MD 추출</h3>
+    <p>내가 잘 쓴 프롬프트·스킬·노하우를 회사 공유 채널로 올리는 단계입니다.
+      에이전트가 먼저 <b>정제(민감정보 제거·출처·frontmatter)</b>를 도와준 뒤 올립니다.</p>
+
+    <ol class="steps teal">
+      <li>
+        <h4>자산화 요청 (MD 추출)</h4>
+        <p>대화에 흩어진 내용을 재사용 가능한 <code>.md</code> 한 장으로 뽑아냅니다.</p>
+        <span class="say t">방금 그 프롬프트, 공유할 수 있게 .md로 정리해줘.</span>
+        <p style="font-size:14px;color:#64748b">에이전트가 “이건 프롬프트인지 스킬인지”를 분류하고, 회사 골격(역할·목적·대상·배경·제약·출력)에 맞춰 본문을 정돈합니다.</p>
+      </li>
+      <li>
+        <h4>정제 — 민감정보 제거 · 출처 · frontmatter</h4>
+        <p>고객정보·토큰·미공개 자료는 제거하거나 <code>&lt;placeholder&gt;</code>로 치환합니다. 외부 자료 기반이면 출처/라이선스를 적고,
+          한 줄 설명과 frontmatter(권장)를 붙입니다.</p>
+      </li>
+      <li>
+        <h4>업로드 — Google Drive</h4>
+        <p>프롬프트는 <code>AI-Knowhow/prompts/</code>, 스킬은 <code>AI-Knowhow/skills/</code>에 올립니다.
+          커넥터가 있으면 에이전트가 직접(원형 유지를 위해 자동변환 끄기), 없으면 본문을 받아 사람이 웹에서 업로드합니다.</p>
+        <p style="margin-bottom:2px;font-size:14.5px"><b>직접 업로드 폴더 바로가기</b> — 아래 링크를 열고 <code>.md</code>를 드래그해서 올리면 됩니다.</p>
+        <div class="drivelinks">
+          <a href="https://drive.google.com/drive/folders/1Cv104mmGpw9fqNQfuAttr_LfQl8Hxqee" target="_blank" rel="noopener">📁 AI-Knowhow / prompts <span class="ext">↗ 열기</span></a>
+          <a href="https://drive.google.com/drive/folders/1PZx9YNdpPZ2I2LX0zYC1k-XerQ0nEMys" target="_blank" rel="noopener">📁 AI-Knowhow / skills <span class="ext">↗ 열기</span></a>
+          <a href="https://drive.google.com/drive/folders/1krsWm7GBlwAk9M58HfW2kfWmkSuKBqQz" target="_blank" rel="noopener">📁 AI-Knowhow (상위) <span class="ext">↗ 열기</span></a>
+        </div>
+        <p style="font-size:13.5px;color:#64748b;margin-top:4px">폴더 <b>이름으로 검색하면</b> 동명 결과가 많이 나옵니다. 위 <b>바로가기 링크</b>로 여세요(에이전트는 folder ID로 범위를 좁힙니다).
+          공유 드라이브에 <b>멤버로 추가</b>돼 있어야 보입니다 — 안 보이면 관리자에게 요청하세요.</p>
+      </li>
+      <li>
+        <h4>이력 남기기 — GitHub 후보 브랜치</h4>
+        <p>변경 이력·중복 관리를 위해 후보 브랜치에도 남깁니다. (<code>main</code> 직접 push 아님)</p>
+        <div class="paths">
+          <code>prompts → uploads/prompts/&lt;name&gt;.md</code>
+          <code>skills → uploads/skills/&lt;skill-name&gt;/SKILL.md</code>
+        </div>
+      </li>
+    </ol>
+
+    <div class="twocol">
+      <div class="pcard imp">
+        <div class="h">📥 가져오기 요약</div>
+        <ul>
+          <li>Drive / GitHub 후보에서 <b>다운로드 또는 MD 복사</b></li>
+          <li>먼저 <code>.agents/externals/</code> 검역</li>
+          <li>보안검사 → 요약·충돌 확인 → 배치</li>
+          <li>승격 전엔 “검증 전 공유본”</li>
+        </ul>
+      </div>
+      <div class="pcard exp">
+        <div class="h">📤 내보내기 요약</div>
+        <ul>
+          <li>대화 → 재사용 <b>.md로 추출</b></li>
+          <li>정제: 민감정보·출처·frontmatter</li>
+          <li>Drive <code>AI-Knowhow/</code> 업로드</li>
+          <li>GitHub <code>prompts</code>/<code>skills</code> 후보에 이력</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 4. 꼭 지킬 것 ============ -->
+  <section id="safe">
+    <h2><span class="n">4</span>어떤 단계에서도 — 꼭 지킬 두 가지</h2>
+    <p class="sub">대화든 가져오기든 내보내기든, 예외 없이 이 둘만 지키면 안전합니다.</p>
+    <div class="twocol">
+      <div class="pcard" style="border-color:#fecaca;background:#fef2f2">
+        <div class="h" style="color:#b91c1c">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#b91c1c" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M5.6 5.6l12.8 12.8"/></svg>
+          민감정보는 넣지·올리지 않기
+        </div>
+        <p style="font-size:14.5px;color:#7f1d1d">고객 개인정보, 비밀번호·토큰, 미공개 계약·재무·법무 자료는 입력도 업로드도 금지.
+          꼭 써야 하면 <code>&lt;고객명&gt;</code>·<code>&lt;API_KEY&gt;</code>처럼 가립니다.</p>
+      </div>
+      <div class="pcard imp">
+        <div class="h">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 8h10M7 12h7"/><path d="M21 12a9 9 0 1 1-9-9"/><path d="M16 3l5 2-2 5"/></svg>
+          외부 자료는 출처 남기기
+        </div>
+        <p style="font-size:14.5px;color:#1e40af">인터넷 글·문서를 가져와 쓰면 어디서 왔는지 출처(가능하면 라이선스)를 함께 적습니다.
+          공유 <code>.md</code>의 frontmatter <code>source</code>/<code>license</code>에 기록하면 됩니다.</p>
+      </div>
+    </div>
+
+    <div class="callout teal">
+      <div class="ttl">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0d9488" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5 3.4 8.5 8 10 4.6-1.5 8-5 8-10V5z"/></svg>
+        막히거나 개선 아이디어가 있으면
+      </div>
+      에이전트에게 <span class="say t" style="margin:4px 6px 4px 0">이 내용 피드백 .md로 정리해서 AI-Knowhow/feedbacks 에 올리게 해줘</span>
+      라고 하면, 정리·민감정보 제거를 도와 공유 폴더에 올려 줍니다. 운영자가 보고 개선합니다.
+      <div class="drivelinks" style="margin-top:8px">
+        <a href="https://drive.google.com/drive/folders/17uEEoB9LdLBx9yNvOX0xKT3hh1uKFcL6" target="_blank" rel="noopener">📁 AI-Knowhow / feedbacks <span class="ext">↗ 열기</span></a>
+      </div>
+    </div>
+  </section>
+
+</div>
+</main>
+
+<footer>
+  <div class="wrap">
+    회사 AI 사용 매뉴얼 — 라이프사이클 · 대화 요령 · 지식 공유. 누구나 · 어떤 OS · 어떤 AI 도구든 같은 방식으로.
+    <br><span class="src">출처: 번들의 <code>SETUP_WIZARD.md</code>, <code>docs/SHARED_FOLDER_GUIDE.md</code>,
+      <code>.agents/rules/developer/spec-driven-development.md</code>, <code>.agents/rules/common/knowledge-sharing.md</code>,
+      프롬프트 라이브러리(<code>assets/prompts/</code>)와 <code>prompt-asset</code>·<code>external-doc-asset</code> 스킬을 쉬운 말로 옮긴 것입니다.</span>
+    <br>설치는 <code>INSTALL_GUIDE.html</code>, 상세 운영 규칙은 <code>docs/ASSET_PACKS.md</code>를 참고하세요.
+  </div>
+</footer>
+
+</body>
+</html>
