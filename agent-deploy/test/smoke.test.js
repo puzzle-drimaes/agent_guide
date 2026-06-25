@@ -20,7 +20,7 @@ import { checkCatalogParity } from '../scripts/check-catalog-parity.js';
 import { checkUnicodeSafety } from '../scripts/check-unicode-safety.js';
 import { checkSecretScan } from '../scripts/check-secret-scan.js';
 import { checkMcpGovernance } from '../scripts/check-mcp-governance.js';
-import { scanExternals } from '../src/packs/externals-scanner.js';
+import { scanAiKnowhow } from '../src/packs/ai-knowhow-scanner.js';
 import { validatePackRoot } from '../src/packs/pack-validator.js';
 import { calculatePackDigest } from '../src/packs/digest.js';
 
@@ -1477,18 +1477,18 @@ test('asset pack validator reports id and destination collision options', () => 
   assert.ok(result.conflicts.some((item) => item.choices.includes('replace-existing')));
 });
 
-test('externals scanner classifies Markdown and drafts candidate metadata', () => {
-  const result = scanExternals(path.join(FIXTURES, 'externals'), { packId: 'team-externals' });
+test('AI-Knowhow scanner classifies Markdown and drafts candidate metadata', () => {
+  const result = scanAiKnowhow(path.join(FIXTURES, 'AI-Knowhow'), { packId: 'team-ai-knowhow' });
   assert.deepEqual(result.errors, []);
   assert.equal(result.assets.length, 3);
   assert.deepEqual(new Set(result.assets.map((asset) => asset.assetType)), new Set(['skill', 'doc', 'prompt']));
   assert.equal(result.pack.packJson.packType, 'candidate');
   assert.equal(result.pack.packJson.reviewStatus, 'candidate');
-  assert.ok(result.pack.modulesDoc.modules.every((module) => module.id.startsWith('team-externals-')));
+  assert.ok(result.pack.modulesDoc.modules.every((module) => module.id.startsWith('team-ai-knowhow-')));
   assert.ok(result.pack.profilesDoc.profiles.candidate.length === 3);
 });
 
-test('check-pack CLI emits JSON for valid packs and externals scans', () => {
+test('check-pack CLI emits JSON for valid packs and AI-Knowhow scans', () => {
   const packOut = execFileSync('node', [
     path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../scripts/check-pack.js'),
     '--pack', path.join(FIXTURES, 'packs/valid-pack'),
@@ -1496,12 +1496,12 @@ test('check-pack CLI emits JSON for valid packs and externals scans', () => {
   ], { encoding: 'utf8' });
   assert.equal(JSON.parse(packOut).ok, true);
 
-  const externalsOut = execFileSync('node', [
+  const aiKnowhowOut = execFileSync('node', [
     path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../scripts/check-pack.js'),
-    '--externals', path.join(FIXTURES, 'externals'),
+    '--ai-knowhow', path.join(FIXTURES, 'AI-Knowhow'),
     '--json',
   ], { encoding: 'utf8' });
-  assert.equal(JSON.parse(externalsOut).assets.length, 3);
+  assert.equal(JSON.parse(aiKnowhowOut).assets.length, 3);
 });
 
 test('planner composes explicit pack modules into the install plan', () => {
@@ -1573,7 +1573,7 @@ test('conflict resolution file is recorded in install-state provenance', () => {
     JSON.stringify({
       conflictResolutions: [
         {
-          proposed: '.agents/externals/docs/onboarding-checklist.md',
+          proposed: 'AI-Knowhow/docs/onboarding-checklist.md',
           conflictsWith: '.agents/shared/team/onboarding-checklist.md',
           decision: 'add-namespaced',
           decidedBy: 'platform-team',
@@ -1599,7 +1599,7 @@ test('conflict resolution file is recorded in install-state provenance', () => {
   const state = JSON.parse(fs.readFileSync(path.join(project, '.claude/agent-install-state.json'), 'utf8'));
   assert.deepEqual(state.source.conflictResolutions, [
     {
-      proposed: '.agents/externals/docs/onboarding-checklist.md',
+      proposed: 'AI-Knowhow/docs/onboarding-checklist.md',
       conflictsWith: '.agents/shared/team/onboarding-checklist.md',
       decision: 'add-namespaced',
       decidedBy: 'platform-team',

@@ -32,7 +32,7 @@ AI 사용 노하우가 개인 대화창 안에 갇히지 않고 회사 지식으
 3. 사원들은 필요한 `.md`를 선택해 자기 프로젝트에 적용한다.
    - 기본은 `main` 기준으로 추천받는다.
    - `prompts` / `skills` branch 후보는 "검증 전 공유본"으로 표시하고 사용자 컨펌 후 적용한다.
-   - 적용은 프로젝트의 `.agents/externals/`에 넣고 agent가 검토/배치하게 한다
+   - 적용은 프로젝트의 `AI-Knowhow/`에 넣고 agent가 검토/배치하게 한다
      (자세한 흐름: agent-deploy/docs/ASSET_PACKS.md).
 4. 더 다듬어 표준으로 만들고 싶을 때만 수동 병합/승격 흐름으로 옮긴다
      (15-prompt-db-operations.md). 처음부터 강제하지 않는다.

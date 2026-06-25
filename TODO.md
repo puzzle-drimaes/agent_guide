@@ -196,7 +196,7 @@ docs/plans/codex/company-wide-agent-rollout/00-open-decisions.md
 - [x] rule drift / entry parity / asset schema / catalog parity / unicode safety / secret scan / MCP governance validation
 - [x] doctor / update / repair / uninstall 명령
 - [x] deterministic zip bundle + release manifest + sha256 sidecar
-- [x] asset pack validator / externals scanner / conflict resolution provenance
+- [x] asset pack validator / AI-Knowhow scanner / conflict resolution provenance
 
 검증:
 
@@ -250,7 +250,7 @@ docs/specs/external-shared-asset-packs/
    - `schemas/asset-pack.schema.json`
    - `scripts/check-pack.js`
    - pack root 구조/module/profile/path/conflict 검증
-   - `.agents/externals/` Markdown scanner
+   - `AI-Knowhow/` Markdown scanner
    - fixture + smoke test
 7. [x] asset pack Phase 2 planner/apply 1차 통합
    - CLI `--pack DIR[,DIR]`

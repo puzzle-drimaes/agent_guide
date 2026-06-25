@@ -1,6 +1,6 @@
-# External / Shared Asset Pack Design
+# AI-Knowhow / Shared Asset Pack Design
 
-This document summarizes how `agent-deploy` should apply external or shared Markdown asset packs.
+This document summarizes how `agent-deploy` should apply AI-Knowhow or shared Markdown asset packs.
 The full SDD design lives in:
 
 ```text
@@ -8,7 +8,7 @@ docs/specs/external-shared-asset-packs/
 ```
 
 1차 도입 공유 폴더(Google Drive AI-Knowhow)에 `.md`를 올리고 고르는 운영 기준은
-[SHARED_FOLDER_GUIDE.md](SHARED_FOLDER_GUIDE.md) 참고. 이 문서는 그 파일을 `externals`로 적용하는 단계의 상세 규칙이다.
+[SHARED_FOLDER_GUIDE.md](SHARED_FOLDER_GUIDE.md) 참고. 이 문서는 그 파일을 `AI-Knowhow`로 적용하는 단계의 상세 규칙이다.
 
 ## Principle
 
@@ -40,13 +40,13 @@ my-pack/
   schemas/             # optional, reference-only in v1
 ```
 
-## Externals folder for imported Markdown
+## AI-Knowhow folder for shared Markdown
 
-`externals` is the single project-local holding area for **all Markdown files imported from outside the current project** that a user wants the agent to consider applying.
+`AI-Knowhow` is the single project-local holding area for **all shared Markdown files imported from Google Drive, GitHub candidate branches, or another teammate** that a user wants the agent to consider applying.
 Contributors do not need to create a full pack first; they can drop shared `*.md` files here:
 
 ```text
-<repo>/.agents/externals/
+<repo>/AI-Knowhow/
   skills/
     my-review-skill.md        # or my-review-skill/SKILL.md
   docs/
@@ -58,10 +58,10 @@ Contributors do not need to create a full pack first; they can drop shared `*.md
 
 Rules:
 
-- `externals` is the candidate area for imported Markdown, not a canonical rule/document folder.
-- Every external Markdown proposal should enter through `externals` before it is applied to the project.
-- Files in `externals` never overwrite bundled `assets/`, `.agents/rules/`, `AGENTS.md`, `CLAUDE.md`, or `GEMINI.md` directly.
-- The agent treats `externals` as a `candidate` asset pack and validates/summarizes files before apply.
+- `AI-Knowhow` is the candidate area for shared Markdown, not a canonical rule/document folder.
+- Every shared Markdown proposal should enter through `AI-Knowhow` before it is applied to the project.
+- Files in `AI-Knowhow` never overwrite bundled `assets/`, `.agents/rules/`, `AGENTS.md`, `CLAUDE.md`, or `GEMINI.md` directly.
+- The agent treats `AI-Knowhow` as a `candidate` asset pack and validates/summarizes files before apply.
 - If a Markdown file has no frontmatter, the agent proposes draft frontmatter instead of mutating existing rules.
 - Accepted files are installed under a target-specific shared asset area, not mixed into canonical rule folders.
 
@@ -99,7 +99,7 @@ The decision should be written to pack provenance, for example:
 {
   "conflictResolutions": [
     {
-      "proposed": ".agents/externals/docs/onboarding-checklist.md",
+      "proposed": "AI-Knowhow/docs/onboarding-checklist.md",
       "conflictsWith": ".agents/shared/team/onboarding-checklist.md",
       "decision": "add-namespaced",
       "decidedBy": "user",
@@ -228,7 +228,7 @@ grep '"digest"' /tmp/pack-review/.agent-deploy/install-state.json
 ### Candidate to shared-approved promotion flow
 
 ```text
-externals or candidate pack
+AI-Knowhow or candidate pack
   → scan/validate candidate metadata
   → normalize frontmatter/catalog/module ids
   → run conflict detection and choose explicit resolutions
@@ -255,7 +255,7 @@ Required fields:
 
 ```json
 {
-  "proposed": ".agents/externals/docs/onboarding-checklist.md",
+  "proposed": "AI-Knowhow/docs/onboarding-checklist.md",
   "conflictsWith": ".agents/shared/team/onboarding-checklist.md",
   "decision": "add-namespaced",
   "decidedBy": "platform-team",
@@ -272,7 +272,7 @@ The same record shape can be passed to `--conflict-resolution` after review:
 {
   "conflictResolutions": [
     {
-      "proposed": ".agents/externals/docs/onboarding-checklist.md",
+      "proposed": "AI-Knowhow/docs/onboarding-checklist.md",
       "conflictsWith": ".agents/shared/team/onboarding-checklist.md",
       "decision": "add-namespaced",
       "decidedBy": "platform-team",
@@ -360,7 +360,7 @@ Install-state pack provenance includes:
 
 ```text
 agent-deploy pack validate --pack ./packs/frontend
-agent-deploy pack inspect --externals ./.agents/externals
+agent-deploy pack inspect --ai-knowhow ./AI-Knowhow
 agent-deploy plan  --target codex --profile developer --pack ./packs/frontend --modules frontend-team-pack-review-checklist
 agent-deploy apply --target codex --profile developer --pack ./packs/frontend --dry-run
 agent-deploy plan  --target codex --profile developer --pack ./packs/frontend --enable-pack-extensions
@@ -373,12 +373,12 @@ Implemented validation-only commands:
 
 ```text
 node scripts/check-pack.js --pack ./packs/frontend
-node scripts/check-pack.js --externals ./.agents/externals
+node scripts/check-pack.js --ai-knowhow ./AI-Knowhow
 ```
 
 These commands are read-only. They validate pack structure, module/profile references,
 asset metadata, catalog parity, path safety, and base-bundle conflicts, or generate draft
-candidate metadata from external Markdown without modifying source files.
+candidate metadata from shared Markdown without modifying source files.
 
 ## Phase 2 planner/apply entry point
 

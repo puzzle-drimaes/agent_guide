@@ -4,7 +4,7 @@ import { assertPackTreeSafe, normalizeRel, slugify, walkMarkdown } from './path-
 
 const TARGETS = ['claude', 'cursor', 'codex', 'gemini', 'kiro'];
 
-function classifyExternal(rel) {
+function classifyAiKnowhow(rel) {
   const [category] = rel.split('/');
   if (category === 'skills') return 'skill';
   if (category === 'docs') return 'doc';
@@ -18,7 +18,7 @@ function titleFromMarkdown(text, rel) {
   return slugify(path.basename(rel, '.md'), 'Untitled').replace(/-/g, ' ');
 }
 
-function externalAssetPath(type, rel) {
+function aiKnowhowAssetPath(type, rel) {
   const normalized = normalizeRel(rel);
   if (type === 'skill' && normalized.endsWith('/SKILL.md')) {
     return normalized;
@@ -26,32 +26,32 @@ function externalAssetPath(type, rel) {
   return normalized;
 }
 
-export function scanExternals(externalsRoot, options = {}) {
-  const root = path.resolve(externalsRoot);
-  const packId = options.packId || 'externals-candidate';
+export function scanAiKnowhow(aiKnowhowRoot, options = {}) {
+  const root = path.resolve(aiKnowhowRoot);
+  const packId = options.packId || 'ai-knowhow-candidate';
   const errors = [];
   const warnings = [];
   const assets = [];
 
-  assertPackTreeSafe(root, errors, 'externals');
+  assertPackTreeSafe(root, errors, 'AI-Knowhow');
   if (errors.length) return { errors, warnings, pack: null, assets: [] };
 
   for (const abs of walkMarkdown(root)) {
     const rel = normalizeRel(path.relative(root, abs));
-    const assetType = classifyExternal(rel);
+    const assetType = classifyAiKnowhow(rel);
     if (!assetType) {
-      warnings.push(`externals/${rel}: ignored because it is not under skills/, docs/, or prompts/`);
+      warnings.push(`AI-Knowhow/${rel}: ignored because it is not under skills/, docs/, or prompts/`);
       continue;
     }
 
     const text = fs.readFileSync(abs, 'utf8');
-    const assetPath = externalAssetPath(assetType, rel);
+    const assetPath = aiKnowhowAssetPath(assetType, rel);
     const assetId = `${packId}-${slugify(assetPath)}`;
     assets.push({
       id: assetId,
       assetType,
       title: titleFromMarkdown(text, rel),
-      description: `Candidate ${assetType} generated from externals/${rel}`,
+      description: `Candidate ${assetType} generated from AI-Knowhow/${rel}`,
       path: assetPath,
       sourcePath: abs,
       moduleId: `${assetId}-module`,
@@ -67,7 +67,7 @@ export function scanExternals(externalsRoot, options = {}) {
     packJson: {
       schemaVersion: 'agentdeploy.assetPack.v1',
       id: packId,
-      title: options.title || 'External Markdown Candidate Pack',
+      title: options.title || 'AI-Knowhow Markdown Candidate Pack',
       version: '0.0.0',
       owner: options.owner || 'unknown',
       stability: 'draft',
@@ -80,7 +80,7 @@ export function scanExternals(externalsRoot, options = {}) {
       assets: assets.map(({ sourcePath, moduleId, ...asset }) => ({
         ...asset,
         moduleIds: [moduleId],
-        tags: ['externals', 'candidate'],
+        tags: ['ai-knowhow', 'candidate'],
       })),
     },
     modulesDoc: {

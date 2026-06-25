@@ -1,6 +1,6 @@
 ---
 name: external-doc-asset
-description: Capture personal or team shared documents as sanitized Markdown asset candidates and decide whether it can be promoted to a shared catalog/profile asset. Triggers on "externals 문서 공유", "공유 문서 자산화", "promote external document", "make this external document reusable".
+description: Capture personal or team shared documents as sanitized Markdown asset candidates and decide whether it can be promoted to a shared catalog/profile asset. Triggers on "AI-Knowhow 문서 공유", "공유 문서 자산화", "promote shared document", "make this shared document reusable".
 allowed-tools: ["Read"]
 argument-hint: "[external document / workflow / reusable practice]"
 ---

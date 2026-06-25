@@ -1,4 +1,4 @@
-# External / Shared Asset Packs — Review
+# AI-Knowhow / Shared Asset Packs — Review
 
 ## Spec coverage review
 
@@ -6,7 +6,7 @@
 |---|---|
 | Pack structure | `design.md` section 3 |
 | Manifest/catalog/profile merge | `design.md` section 4 |
-| External Markdown proposals | `design.md` section 3.1 |
+| AI-Knowhow Markdown proposals | `design.md` section 3.1 |
 | User-driven conflict resolution | `design.md` section 4.4 |
 | Dry-run/apply flow | `design.md` section 5 |
 | Validation before apply | `design.md` section 6 |
@@ -38,7 +38,7 @@ Mitigation: v1 packs are declarative only; install-time hooks/scripts/postinstal
 
 ### R6. Drop-in files overwrite existing rules or docs
 
-Mitigation: `.agents/externals/` is a candidate area only. Proposed files install under target-specific
+Mitigation: `AI-Knowhow/` is a candidate area only. Proposed files install under target-specific
 `shared/<pack-id>/` by default. Canonical rule replacement is blocked unless a separate approved rule-change
 workflow is used.
 
@@ -55,15 +55,15 @@ pack provenance/install-state.
 ## Review conclusion
 
 The design is suitable as a safe v1 direction because it preserves the existing bundled flow,
-keeps external packs read-only and declarative, and blocks automatic default-profile mutation unless a pack is explicitly approved.
+keeps shared packs read-only and declarative, and blocks automatic default-profile mutation unless a pack is explicitly approved.
 
 ## Phase 1 implementation review
 
 - `schemas/asset-pack.schema.json` now captures the required `pack.json` shape, including `packType`, `id`, `version`, `owner`, and `reviewStatus`.
 - `src/packs/pack-validator.js` validates pack structure, module/profile references, path safety, reused asset metadata checks, catalog parity, and base-bundle conflicts.
-- `src/packs/externals-scanner.js` treats `.agents/externals/` style folders as read-only candidate metadata sources.
+- `src/packs/ai-knowhow-scanner.js` treats `AI-Knowhow/` style folders as read-only candidate metadata sources.
 - `src/packs/conflicts.js` detects module/profile/asset/destination collisions and exposes the required user decision choices.
-- Smoke fixtures cover a valid pack, missing `pack.json`, path escape, id collision, and externals Markdown scanning.
+- Smoke fixtures cover a valid pack, missing `pack.json`, path escape, id collision, and AI-Knowhow Markdown scanning.
 
 Remaining Phase 2 risk: planner integration must keep pack logic out of target adapters by passing a composed manifest object into planning.
 
@@ -97,7 +97,7 @@ from a JSON file and written to install-state provenance.
 ## Phase 3 governance documentation review
 
 - Shared-approved approval criteria now require source/license, owner, approved review status, validation pass, metadata parity, security checks, conflict decisions, and approval evidence.
-- Candidate to shared-approved promotion is documented from externals/candidate scan through validation, conflict resolution, dry-run, approval, digest recording, and publish.
+- Candidate to shared-approved promotion is documented from AI-Knowhow/candidate scan through validation, conflict resolution, dry-run, approval, digest recording, and publish.
 - Conflict-resolution record policy defines required fields and decision constraints for `keep-existing`, `add-namespaced`, `rename-proposed`, and `replace-existing`.
 - Runtime conflict decision capture now mirrors the documented fields into install-state when `--conflict-resolution` is provided.
 

@@ -100,7 +100,7 @@ Last Reviewed At
   → 공유하고 싶다면 한 줄로 남긴다 (매 사용마다 기록할 필요 없음)
   → agent가 쓸 만한 스킬/프롬프트 `.md`를 정제한다
   → Google Drive에 올리고 GitHub prompts/skills branch에 남긴다
-  → 다른 사원이 Drive 또는 후보 branch에서 선택해 자기 프로젝트에 적용한다 (.agents/externals/)
+  → 다른 사원이 Drive 또는 후보 branch에서 선택해 자기 프로젝트에 적용한다 (AI-Knowhow/)
   → 후보 branch 자료는 "검증 전 공유본"으로 표시하고 사용자 컨펌을 받는다
   → 반복해서 쓸 만한 프롬프트만 main 수동 병합 또는 승격 후보로 표시한다 (표의 "지식 공유 태그" = 대상 직무)
   → 충분히 검증되면 main 또는 company-* skill로 승격한다
