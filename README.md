@@ -15,6 +15,7 @@
 
 ```text
 agent-deploy/   사내 AI Markdown asset 배포 엔진 구현체
+AI-Knowhow/     Google Drive AI-Knowhow와 이름을 맞춘 공유 .md 후보 검역 폴더
 docs/           분석 리포트, rollout 계획, runbook, 사용자/운영 문서
 references/     ECC, k-sdd 참고 소스(기본은 직접 수정 금지)
 .agents/        현재 프로젝트에 먼저 적용한 agent 사용 룰
@@ -30,6 +31,7 @@ references/     ECC, k-sdd 참고 소스(기본은 직접 수정 금지)
 기본 scope: project
 운영 명령: list, plan, apply, update, repair, uninstall, doctor
 배포 산출물: release/company-agent-kit-<version>.zip + .sha256 + release-manifest.json
+사용자 가이드: agent-deploy/INSTALL_GUIDE.html|pdf, agent-deploy/USAGE_GUIDE.html|pdf
 검증: npm --prefix agent-deploy run validate, npm --prefix agent-deploy test (87 smoke tests)
 ```
 
@@ -147,7 +149,7 @@ evidence-first verification
 아래 격리 폴더에서 관리합니다.
 
 ```text
-<repo>/.agents/externals/
+<repo>/AI-Knowhow/
   skills/
   docs/
   prompts/
@@ -157,7 +159,7 @@ evidence-first verification
 
 ```text
 1. Import
-   → 외부에서 받은 *.md를 .agents/externals/ 아래에 둔다.
+   → 외부에서 받은 *.md를 AI-Knowhow/ 아래에 둔다.
 
 2. Inspect / classify
    → agent가 prompt/template/skill/doc 중 asset type을 제안한다.

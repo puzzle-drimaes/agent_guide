@@ -273,7 +273,7 @@ node src/cli.js apply \
 "후보 branch 최소 등록 경로"를 기준으로 합니다.
 
 ```text
-<repo>/.agents/externals/
+<repo>/AI-Knowhow/
   skills/
   docs/
   prompts/
@@ -282,28 +282,28 @@ node src/cli.js apply \
 그 다음 agent는 다음 순서로 안내합니다.
 
 ```text
-1. externals에 넣은 파일 목록을 확인한다.
+1. AI-Knowhow에 넣은 파일 목록을 확인한다.
 2. 민감정보/credential/customer data 포함 여부를 확인한다.
 3. prompt/template/skill/doc 중 어떤 asset type인지 제안한다.
 4. 기존 문서/룰과 충돌하면 keep-existing/add-namespaced/rename-proposed/replace-existing 선택지를 설명한다.
 5. 기본 추천은 add-namespaced이며, canonical rule 교체는 별도 승인 없이는 금지한다.
 ```
 
-### 4.1 externals가 비어 있을 때 Google Drive에서 가져오기
+### 4.1 AI-Knowhow가 비어 있을 때 Google Drive에서 가져오기
 
 사용자가 공유 prompt/skill을 쓰고 싶어 하지만 아래 폴더가 없거나 비어 있으면, agent는 Google Drive에서
 가져올지 먼저 묻습니다.
 
 ```text
-<repo>/.agents/externals/skills/
-<repo>/.agents/externals/prompts/
+<repo>/AI-Knowhow/skills/
+<repo>/AI-Knowhow/prompts/
 ```
 
 Q&A 순서:
 
 ```text
 1. 공유 prompt/skill을 Google Drive `AI-Knowhow`에서 가져올까요?
-   - 아니오: 빈 externals 상태로 설치를 계속한다.
+   - 아니오: 빈 AI-Knowhow 상태로 설치를 계속한다.
    - 예: 2번으로 진행한다.
 
 2. 현재 AI 도구에 Google Drive MCP/커넥터가 연결돼 있나요?
@@ -317,8 +317,8 @@ Q&A 순서:
    - 특정 파일만
 
 4. 각 `.md`를 어떤 방식으로 받을까요?
-   - 직접 다운로드 후 보안 검사(추천): Drive의 `.md` 파일을 원형 그대로 externals에 저장한 뒤 로컬 파일에서 민감정보/credential/고객 개인정보/출처 누락을 점검한다.
-   - 원본 그대로 받기: Drive의 `.md` 파일을 원형 그대로 externals에 저장하되, 검증 전 공유본으로 표시하고 적용 전 별도 확인
+   - 직접 다운로드 후 보안 검사(추천): Drive의 `.md` 파일을 원형 그대로 AI-Knowhow에 저장한 뒤 로컬 파일에서 민감정보/credential/고객 개인정보/출처 누락을 점검한다.
+   - 원본 그대로 받기: Drive의 `.md` 파일을 원형 그대로 AI-Knowhow에 저장하되, 검증 전 공유본으로 표시하고 적용 전 별도 확인
 ```
 
 > 속도 원칙: 큰 `.md`를 base64 문자열이나 대화창 텍스트로 옮겨 적어 디코딩하지 않는다.
@@ -336,15 +336,15 @@ Google Drive MCP/커넥터 연결 안내:
 3. 연결 확인 요청 예시:
    - "Google Drive에서 AI-Knowhow/prompts 폴더의 .md 목록을 보여줘"
    - "Google Drive에서 AI-Knowhow/skills 폴더의 .md 목록을 보여줘"
-   - "선택한 .md 파일을 원형 그대로 다운로드해서 `.agents/externals/`에 저장해줘"
+   - "선택한 .md 파일을 원형 그대로 다운로드해서 `AI-Knowhow/`에 저장해줘"
 4. agent는 Drive 검색을 폴더명 전체 검색으로 하지 말고 `docs/SHARED_FOLDER_GUIDE.md`의 folder ID로 범위를 좁힌다.
-5. MCP/커넥터 연결이 안 되면 fallback으로 사용자가 Drive 웹에서 `.md`를 내려받아 externals 폴더에 직접 넣는다.
+5. MCP/커넥터 연결이 안 되면 fallback으로 사용자가 Drive 웹에서 `.md`를 내려받아 AI-Knowhow 폴더에 직접 넣는다.
 ```
 
 직접 다운로드 후 보안 검사를 선택한 경우:
 
 ```text
-1. agent는 Drive에서 `.md` 파일을 원형 그대로 다운로드해 `.agents/externals/prompts/` 또는 `.agents/externals/skills/`에 저장한다.
+1. agent는 Drive에서 `.md` 파일을 원형 그대로 다운로드해 `AI-Knowhow/prompts/` 또는 `AI-Knowhow/skills/`에 저장한다.
 2. agent는 저장된 로컬 `.md` 파일을 읽고 아래를 검사한다.
    - token, private key, password, cookie, credential
    - 고객 개인정보/계약/민감 재무/법무 검토 전 자료
@@ -357,7 +357,7 @@ Google Drive MCP/커넥터 연결 안내:
 원본 그대로 받기를 선택한 경우에도, agent는 다음 안전장치를 유지합니다.
 
 ```text
-- 원본은 곧바로 canonical rule/skill/prompt로 설치하지 않고 `.agents/externals/`에만 둔다.
+- 원본은 곧바로 canonical rule/skill/prompt로 설치하지 않고 `AI-Knowhow/`에만 둔다.
 - 적용 전에는 반드시 요약, 보안/출처 문제, 충돌 여부, 적용 파일 목록을 보여준다.
 - 원본에 민감정보가 명백히 보이면 저장/적용을 중단하고 사용자에게 확인한다.
 ```
@@ -615,14 +615,14 @@ Q&A 순서:
 
 ```text
 1. 지금 사내 공유 자료(prompts/skills `.md`)를 받아둘까요?
-   - 예:        "## 4.1 externals가 비어 있을 때 Google Drive에서 가져오기" 흐름을 그대로 진행한다.
+   - 예:        "## 4.1 AI-Knowhow가 비어 있을 때 Google Drive에서 가져오기" 흐름을 그대로 진행한다.
    - 아니오:    받지 않고 마치되, 아래 "나중에 받기"를 한 줄로 안내한다.
-   - 이미 받음:  `.agents/externals/{prompts,skills}/`에 최신본이 있는지만 확인하고 넘어간다.
+   - 이미 받음:  `AI-Knowhow/{prompts,skills}/`에 최신본이 있는지만 확인하고 넘어간다.
 
 2. (예일 때) 받을 범위는?  prompts만 / skills만 / prompts+skills / 특정 파일만
    - 받는 방식·보안 검사는 4.1 절차를 따른다(직접 다운로드 후 로컬 보안 검사 추천).
    - Drive 커넥터가 없으면 fallback: 사용자가 docs/SHARED_FOLDER_GUIDE.md의 folder ID 링크에서
-     `.md`를 내려받아 externals 폴더에 직접 넣는다.
+     `.md`를 내려받아 AI-Knowhow 폴더에 직접 넣는다.
 
 3. 설치/사용 중 불편하거나 개선점이 있었나요? (지식 공유의 반대 방향)
    - 있으면 agent가 `feedbacks/YYYY-MM-DD-<role>-<target>-<short-topic>.md`로 정리해
@@ -633,7 +633,7 @@ Q&A 순서:
 
 ```text
 - 공유 자료 위치·받는 방법: docs/SHARED_FOLDER_GUIDE.md (브라우저만으로도 가능, 커넥터 연동은 선택)
-- 받은 `.md`는 `.agents/externals/{prompts,skills}/`에 두고, 적용 전 요약/보안/충돌을 확인한다.
+- 받은 `.md`는 `AI-Knowhow/{prompts,skills}/`에 두고, 적용 전 요약/보안/충돌을 확인한다.
 ```
 
 이 Q&A(받기 또는 "나중에 받기" 안내)를 마친 뒤에야 "여기서 마칠까요 / 다른 target도 설치할까요?"로 대화를 닫습니다.

@@ -1,4 +1,4 @@
-# External / Shared Asset Packs — Design
+# AI-Knowhow / Shared Asset Packs — Design
 
 ## 1. 핵심 결정
 
@@ -39,14 +39,14 @@ my-pack/
   schemas/            # 선택. pack 전용 schema 확장 후보, v1에서는 참조용
 ```
 
-### 3.1 Externals drop-in layout
+### 3.1 AI-Knowhow drop-in layout
 
-외부에서 가져와 현재 프로젝트에 적용하려는 모든 Markdown은 먼저 project-local `externals` 폴더에 둔다.
+외부에서 가져와 현재 프로젝트에 적용하려는 모든 Markdown은 먼저 project-local `AI-Knowhow` 폴더에 둔다.
 구성원이 공유할 skill 또는 문서를 Markdown 파일로만 제안하는 경우 full pack을 직접 만들지 않아도 되며,
-agent가 `externals`를 candidate pack으로 해석한다.
+agent가 `AI-Knowhow`를 candidate pack으로 해석한다.
 
 ```text
-<repo>/.agents/externals/
+<repo>/AI-Knowhow/
   skills/
     my-review-skill.md
     my-workflow/SKILL.md
@@ -60,10 +60,10 @@ agent가 `externals`를 candidate pack으로 해석한다.
 
 Rules:
 
-- externals는 외부에서 가져온 Markdown의 단일 후보 영역이며 canonical rule/document 폴더가 아니다.
-- 모든 외부 Markdown 제안은 적용 전 externals를 거치며, bundled `assets/`, `.agents/rules/`, `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`를 직접 수정하지 않는다.
+- AI-Knowhow는 외부에서 가져온 Markdown의 단일 후보 영역이며 canonical rule/document 폴더가 아니다.
+- 모든 외부 Markdown 제안은 적용 전 AI-Knowhow를 거치며, bundled `assets/`, `.agents/rules/`, `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`를 직접 수정하지 않는다.
 - frontmatter가 없으면 agent가 draft frontmatter를 제안한다.
-- externals에서 승인된 파일은 target별 shared 영역에 설치한다.
+- AI-Knowhow에서 승인된 파일은 target별 shared 영역에 설치한다.
 
 Recommended target placement:
 
@@ -178,7 +178,7 @@ Allowed decisions:
 | `rename-proposed` | 제안 asset id/path/title 변경 후 추가 | id/path 충돌 |
 | `replace-existing` | 기존 문서 대체 | 일반 문서에서만 explicit opt-in |
 
-Canonical company rules cannot use `replace-existing` through the externals flow. They require the separate canonical rule-change workflow.
+Canonical company rules cannot use `replace-existing` through the AI-Knowhow flow. They require the separate canonical rule-change workflow.
 
 Resolution provenance:
 
@@ -186,7 +186,7 @@ Resolution provenance:
 {
   "conflictResolutions": [
     {
-      "proposed": ".agents/externals/docs/onboarding-checklist.md",
+      "proposed": "AI-Knowhow/docs/onboarding-checklist.md",
       "conflictsWith": ".agents/shared/team/onboarding-checklist.md",
       "decision": "add-namespaced",
       "decidedBy": "user",
@@ -196,7 +196,7 @@ Resolution provenance:
 }
 ```
 
-Runtime capture supports a `--conflict-resolution <json-file>` option that records externally reviewed decisions in
+Runtime capture supports a `--conflict-resolution <json-file>` option that records reviewed shared-asset decisions in
 install-state under `source.conflictResolutions[]`. `add-namespaced` records can resolve target-destination/asset-path collisions by transforming copy-file destinations
 to `shared/<pack-id>/...`. Other decisions remain provenance-only in v1: any path/id renames or replacements must be
 reflected in the pack files before planning. The JSON file may be either an array of decision records or an object with
@@ -210,7 +210,7 @@ a `conflictResolutions` array. Each record uses the same fields and may include 
 ```text
 agent-deploy pack inspect --pack ./packs/frontend
 agent-deploy pack validate --pack ./packs/frontend
-agent-deploy pack inspect --externals ./.agents/externals
+agent-deploy pack inspect --ai-knowhow ./AI-Knowhow
 agent-deploy plan  --target codex --profile developer --pack ./packs/frontend --modules frontend-team-pack-review-checklist
 agent-deploy apply --target codex --profile developer --pack ./packs/frontend --dry-run
 agent-deploy apply --target codex --profile developer --pack ./packs/frontend --conflict-resolution ./conflicts.reviewed.json
@@ -300,7 +300,7 @@ Approval criteria:
 Candidate promotion flow:
 
 ```text
-externals / candidate
+AI-Knowhow / candidate
   → validate and normalize metadata
   → resolve conflicts explicitly
   → dry-run affected targets/profiles

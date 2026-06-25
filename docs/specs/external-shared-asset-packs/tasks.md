@@ -1,4 +1,4 @@
-# External / Shared Asset Packs — Tasks
+# AI-Knowhow / Shared Asset Packs — Tasks
 
 ## Phase 0 — Design baseline
 
@@ -12,8 +12,8 @@
 
 - [x] Add `schemas/asset-pack.schema.json`.
 - [x] Add `scripts/check-pack.js` for a single pack root.
-- [x] Add `.agents/externals/` Markdown scanner for drop-in skill/doc proposals.
-- [x] Generate candidate pack metadata from externals Markdown files without modifying source files.
+- [x] Add `AI-Knowhow/` Markdown scanner for drop-in skill/doc proposals.
+- [x] Generate candidate pack metadata from AI-Knowhow Markdown files without modifying source files.
 - [x] Detect conflicts with existing docs/rules/assets and present user decision options.
 - [x] Reuse asset frontmatter and catalog parity validators for pack asset roots.
 - [x] Add symlink/path escape checks for pack root.
@@ -22,7 +22,7 @@
 Implementation notes:
 
 - `scripts/check-pack.js --pack <pack-root>` validates a declarative pack root and fails on conflicts by default.
-- `scripts/check-pack.js --externals <externals-root>` scans `skills/`, `docs/`, and `prompts/` Markdown into read-only candidate pack metadata.
+- `scripts/check-pack.js --ai-knowhow <AI-Knowhow-root>` scans `skills/`, `docs/`, and `prompts/` Markdown into read-only candidate pack metadata.
 - Conflict reports expose the explicit decision set: `keep-existing`, `add-namespaced`, `rename-proposed`, `replace-existing`.
 - Phase 1 remains validation-only; planner/apply integration is still Phase 2.
 
