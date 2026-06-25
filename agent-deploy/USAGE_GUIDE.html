@@ -604,7 +604,7 @@
         <!-- quarantine -->
         <rect x="228" y="30" width="180" height="86" rx="14" fill="#fffbeb" stroke="#fde68a" stroke-width="2" stroke-dasharray="6 3"/>
         <text x="318" y="54" font-size="13.5" fill="#9a3412" text-anchor="middle" font-family="sans-serif" font-weight="bold">검역 구역</text>
-        <text x="318" y="76" font-size="11" fill="#b45309" text-anchor="middle" font-family="sans-serif">.agents/externals/</text>
+        <text x="318" y="76" font-size="11" fill="#b45309" text-anchor="middle" font-family="sans-serif">AI-Knowhow/</text>
         <text x="318" y="93" font-size="10.5" fill="#b45309" text-anchor="middle" font-family="sans-serif">skills · prompts · docs</text>
         <text x="318" y="109" font-size="10.5" fill="#ca8a04" text-anchor="middle" font-family="sans-serif">보안검사 후 “검증 전 공유본”</text>
         <!-- promote arrow -->
@@ -635,7 +635,7 @@
     <!-- 3.1 import -->
     <h3 id="import"><span class="dot t"></span>가져오기 — 다운로드 / MD 복사</h3>
     <p>다른 사람이 공유한 프롬프트·스킬 <code>.md</code>를 내 프로젝트로 가져오는 단계입니다.
-      어떻게 받든 <b>먼저 검역 구역(<code>.agents/externals/</code>)</b>에 두고, 보안검사를 거친 뒤에만 실제로 씁니다.</p>
+      어떻게 받든 <b>먼저 검역 구역(<code>AI-Knowhow/</code>)</b>에 두고, 보안검사를 거친 뒤에만 실제로 씁니다.</p>
 
     <ol class="steps teal">
       <li>
@@ -646,22 +646,22 @@
       <li>
         <h4>받는 방법 — ① 다운로드 ② MD 복사</h4>
         <p><b>① 직접 다운로드(권장):</b> AI 도구에 Google Drive 커넥터가 연결돼 있으면 에이전트가 <code>.md</code>를 원형 그대로 내려받습니다.
-          연결이 없으면 <b>사람이 Drive 웹에서</b> 내려받아 <code>.agents/externals/</code>에 넣습니다.</p>
+          연결이 없으면 <b>사람이 Drive 웹에서</b> 내려받아 <code>AI-Knowhow/</code>에 넣습니다.</p>
         <p><b>② MD 복사:</b> 짧은 내용은 <code>.md</code> 본문을 복사해 붙여넣어도 됩니다. (큰 파일을 base64 등으로 옮겨 적는 방식은 피하세요.)</p>
       </li>
       <li>
         <h4>검역 구역에 두기</h4>
         <p>받은 파일은 곧장 쓰지 않고 아래 위치에 둡니다 — 여긴 “검증 전 공유본” 보관소입니다.</p>
         <div class="paths">
-          <code>.agents/externals/skills/</code>
-          <code>.agents/externals/prompts/</code>
-          <code>.agents/externals/docs/</code>
+          <code>AI-Knowhow/skills/</code>
+          <code>AI-Knowhow/prompts/</code>
+          <code>AI-Knowhow/docs/</code>
         </div>
       </li>
       <li>
         <h4>보안검사 받기</h4>
         <p>에이전트가 로컬 파일에서 <b>민감정보·credential·고객 데이터·출처 누락</b>을 점검합니다. 필요하면 가린(redacted) 사본을 만듭니다.</p>
-        <span class="say t">externals에 받은 이 .md를 보안검사하고, 무슨 자산인지·어디 들어갈지·기존 파일과 충돌하는지 알려줘.</span>
+        <span class="say t">AI-Knowhow에 받은 이 .md를 보안검사하고, 무슨 자산인지·어디 들어갈지·기존 파일과 충돌하는지 알려줘.</span>
       </li>
       <li>
         <h4>확인 후 배치</h4>
@@ -676,7 +676,7 @@
         검역이 필요한 이유
       </div>
       외부 <code>.md</code>에는 남의 민감정보가 섞여 있거나, 우리 프로젝트와 다른 가정이 들어 있을 수 있습니다.
-      <code>.agents/externals/</code>는 <b>검토 전 자료가 실수로 커밋되지 않도록</b> 보호되는 격리 구역입니다.
+      <code>AI-Knowhow/</code>는 <b>검토 전 자료가 실수로 커밋되지 않도록</b> 보호되는 격리 구역입니다.
     </div>
 
     <!-- 3.2 promote -->
@@ -687,7 +687,7 @@
     <table>
       <thead><tr><th>상태</th><th>위치</th><th>의미</th></tr></thead>
       <tbody>
-        <tr><td><span class="chip opt">검증 전</span></td><td><code>.agents/externals/…</code></td><td>받아만 둔 공유본. 내 프로젝트에서 시험 사용</td></tr>
+        <tr><td><span class="chip opt">검증 전</span></td><td><code>AI-Knowhow/…</code></td><td>받아만 둔 공유본. 내 프로젝트에서 시험 사용</td></tr>
         <tr><td><span class="chip lite">후보</span></td><td>GitHub <code>prompts</code>/<code>skills</code> 브랜치</td><td>공유 후보로 수집됨. 아직 공식 아님</td></tr>
         <tr><td><span class="chip full">공식</span></td><td><code>main</code> · <code>company-*</code> · catalog/profile</td><td>검증 통과. 설치 기본 자산으로 배포</td></tr>
       </tbody>
@@ -778,7 +778,7 @@
         <div class="h">📥 가져오기 요약</div>
         <ul>
           <li>Drive / GitHub 후보에서 <b>다운로드 또는 MD 복사</b></li>
-          <li>먼저 <code>.agents/externals/</code> 검역</li>
+          <li>먼저 <code>AI-Knowhow/</code> 검역</li>
           <li>보안검사 → 요약·충돌 확인 → 배치</li>
           <li>승격 전엔 “검증 전 공유본”</li>
         </ul>

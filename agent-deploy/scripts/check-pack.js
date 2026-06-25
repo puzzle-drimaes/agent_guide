@@ -2,15 +2,15 @@
 // Asset pack validation entry point.
 //
 // This is intentionally read-only: it validates a pack root or scans
-// .agents/externals/ into draft candidate metadata without writing files.
+// AI-Knowhow/ into draft candidate metadata without writing files.
 import { pathToFileURL } from 'node:url';
-import { scanExternals } from '../src/packs/externals-scanner.js';
+import { scanAiKnowhow } from '../src/packs/ai-knowhow-scanner.js';
 import { validatePackRoot } from '../src/packs/pack-validator.js';
 
 function usage() {
   return `Usage:
   node scripts/check-pack.js --pack <pack-root> [--json] [--allow-conflicts]
-  node scripts/check-pack.js --externals <externals-root> [--json]`;
+  node scripts/check-pack.js --ai-knowhow <AI-Knowhow-root> [--json]`;
 }
 
 function parseArgs(argv) {
@@ -20,7 +20,7 @@ function parseArgs(argv) {
     if (arg === '--json') args.json = true;
     else if (arg === '--allow-conflicts') args.allowConflicts = true;
     else if (arg === '--pack') args.pack = argv[++index];
-    else if (arg === '--externals') args.externals = argv[++index];
+    else if (arg === '--ai-knowhow') args.aiKnowhow = argv[++index];
     else throw new Error(`unknown argument: ${arg}`);
   }
   return args;
@@ -43,14 +43,14 @@ function printHumanPack(result) {
   console.log(`asset pack validation OK: ${result.packJson.id}@${result.packJson.version}`);
 }
 
-function printHumanExternals(result) {
+function printHumanAiKnowhow(result) {
   for (const warning of result.warnings) console.warn(`warning: ${warning}`);
   if (result.errors.length) {
-    console.error(`externals scan FAILED (${result.errors.length}):`);
+    console.error(`AI-Knowhow scan FAILED (${result.errors.length}):`);
     for (const error of result.errors) console.error(`  - ${error}`);
     return;
   }
-  console.log(`externals scan OK: ${result.assets.length} Markdown candidate(s)`);
+  console.log(`AI-Knowhow scan OK: ${result.assets.length} Markdown candidate(s)`);
   for (const asset of result.assets) {
     console.log(`  - ${asset.assetType}: ${asset.path} -> ${asset.id}`);
   }
@@ -58,13 +58,13 @@ function printHumanExternals(result) {
 
 export function run(argv = process.argv.slice(2)) {
   const args = parseArgs(argv);
-  if (args.pack && args.externals) throw new Error('choose either --pack or --externals, not both');
-  if (!args.pack && !args.externals) throw new Error(usage());
+  if (args.pack && args.aiKnowhow) throw new Error('choose either --pack or --ai-knowhow, not both');
+  if (!args.pack && !args.aiKnowhow) throw new Error(usage());
 
-  if (args.externals) {
-    const result = scanExternals(args.externals);
+  if (args.aiKnowhow) {
+    const result = scanAiKnowhow(args.aiKnowhow);
     if (args.json) console.log(JSON.stringify(result, null, 2));
-    else printHumanExternals(result);
+    else printHumanAiKnowhow(result);
     return result.errors.length ? 1 : 0;
   }
 

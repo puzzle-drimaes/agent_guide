@@ -24,6 +24,7 @@ ECC( `manifests/` + `install-targets/` 어댑터 + `install-state` provenance +
 
 > 👉 **비개발자·처음 사용자라면** 터미널 대신 `INSTALL_GUIDE.html`을 웹 브라우저로 먼저 여세요.
 > 그림과 함께 "설치 없이 바로 쓰기"와 "정식 설치" 두 가지 길을 쉬운 말로 안내합니다.
+> 설치 후 공유 프롬프트/스킬을 받아 쓰는 방법은 `USAGE_GUIDE.html`의 `AI-Knowhow/` 흐름을 참고하세요.
 > (텍스트 버전은 `docs/non-developer-guide.md`)
 
 ### zip bundle + agent setup wizard (권장 배포 형태)
@@ -205,7 +206,7 @@ assets/catalog.draft.json
 
 ```text
 1. Import
-   외부에서 받은 *.md를 <repo>/.agents/externals/ 아래에 둔다.
+   외부에서 받은 *.md를 <repo>/AI-Knowhow/ 아래에 둔다.
 
 2. Inspect / classify
    agent가 prompt/template/skill/doc 중 asset type을 제안하고 frontmatter 초안을 만든다.
@@ -235,11 +236,11 @@ Lifecycle별 책임:
 
 | 단계 | 관리 위치 | 의미 | 기존 rule/doc 영향 |
 |---|---|---|---|
-| 제안 | `.agents/externals/` | 외부에서 가져온 모든 Markdown 후보 | 없음 |
+| 제안 | `AI-Knowhow/` | 외부에서 가져온 모든 Markdown 후보 | 없음 |
 | 적용 | `<target>/shared/<pack-id>/` | 프로젝트에서 agent가 참고하는 shared asset | 직접 덮어쓰기 없음 |
 | 승격 | `agent-deploy/assets/` + `manifests/` + `catalog` | 회사/팀이 승인한 canonical asset | 리뷰 후 반영 |
 
-`externals`는 다운로드 폴더가 아니라 **프로젝트에 적용하려는 외부 Markdown의 검역/검토 구역**입니다.
+`AI-Knowhow`는 다운로드 폴더가 아니라 **프로젝트에 적용하려는 외부 Markdown의 검역/검토 구역**입니다.
 사용자는 여기에 파일을 넣고, agent는 검증·충돌 해결·dry-run을 거쳐 적용 여부를 결정해야 합니다.
 
 ## 4-레이어 파이프라인
@@ -280,8 +281,8 @@ owner, audience, stability, review status를 정한 뒤 module/profile에 연결
 `prompts/` 또는 별도 외부 asset pack으로 시작하고, 운영 단계에서 `assets/docs/`와 catalog를
 도입합니다.
 
-**외부/shared asset pack 적용** → 기본 bundle은 base layer로 두고, 승인된 shared pack 또는
-project-local pack을 read-only overlay로 합성합니다. 충돌은 자동 병합하지 않고 실패시키며,
+**AI-Knowhow/shared asset pack 적용** → 기본 bundle은 base layer로 두고, `AI-Knowhow/`에서
+검토한 shared pack 또는 project-local pack을 read-only overlay로 합성합니다. 충돌은 자동 병합하지 않고 실패시키며,
 자세한 설계는 `docs/ASSET_PACKS.md`와 `../docs/specs/external-shared-asset-packs/`를 따릅니다.
 
 ## 적용된 재사용 기법 (사내 도입 체크리스트)
